@@ -1,0 +1,2 @@
+# DeclarativeClientServerArchitecture
+Diplomski rad: Implementacija arhitekture klijent-poslužitelj korištenjem deklarativnog programskog jezika
