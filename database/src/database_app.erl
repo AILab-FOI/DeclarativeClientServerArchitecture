@@ -1,19 +1,18 @@
 %%%-------------------------------------------------------------------
-%% @doc server public API
+%% @doc database public API
 %% @end
 %%%-------------------------------------------------------------------
 
--module(server_app).
+-module(database_app).
 
 -behaviour(application).
 
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-    {ok, _} = server_http:start(),
-    server_sup:start_link().
+    database_sup:start_link().
 
 stop(_State) ->
-    server_http:stop().
+    ok.
 
 %% internal functions
