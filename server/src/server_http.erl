@@ -6,7 +6,7 @@ start() ->
     Dispatch =
         cowboy_router:compile([{'_',
                                 [{"/home/", server_home_handler, []},
-                                 {"/login/", server_login_handler, []}]}]),
+                                 {"/register/", server_register_handler, []}]}]),
     cowboy:start_clear(server_http_listener,
                        [{port, 5000}],
                        #{middlewares => [cowboy_router, cowboy_handler],

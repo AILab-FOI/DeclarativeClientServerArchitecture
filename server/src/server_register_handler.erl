@@ -1,6 +1,4 @@
--module(server_login_handler).
-
--import(database, [dodaj_studenta/4]).
+-module(server_register_handler).
 
 -behaviour(cowboy_handler).
 
@@ -39,8 +37,8 @@ json_request(Req, State) ->
 run_request(Map, Req, State) ->
     Body = jiffy:encode(Map),
     Req2 = cowboy_req:set_resp_body(Body, Req),
-    database:dodaj_studenta(<<"">>, <<"">>, <<"">>, <<"">>),
-    io:format(<<"ok">>),
+    {Resp, Reason} = database:dodaj_studenta(<<"Filip">>, <<"">>, <<"">>, <<"">>),
+    io:format("~p", [Reason]),
     Reply = cowboy_req:reply(200, Req2),
     {stop, Reply, State}.
 

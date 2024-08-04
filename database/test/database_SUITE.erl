@@ -10,7 +10,7 @@ all() ->
 init_per_suite(Config) ->
   Priv = ?config(priv_dir, Config),
   application:set_env(mnesia, dir, Priv),
-  mafiapp:install([node()]),
+  database:install([node()]),
   application:start(mnesia),
   application:start(database),
   Config.

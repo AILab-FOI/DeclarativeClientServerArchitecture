@@ -11,6 +11,7 @@
 
 start(_StartType, _StartArgs) ->
     {ok, _} = server_http:start(),
+    % ok = database:install([node()]),
     server_sup:start_link().
 
 stop(_State) ->
