@@ -10,7 +10,7 @@ start() ->
                                  {"/student/[:id]", server_student_handler, []}]}]),
     cowboy:start_clear(server_http_listener,
                        [{port, 5000}],
-                       #{middlewares => [cowboy_router, cowboy_handler],
+                       #{middlewares => [server_cors_middleware, cowboy_router, cowboy_handler],
                          env => #{dispatch => Dispatch}}).
 
 stop() ->

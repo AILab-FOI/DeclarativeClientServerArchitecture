@@ -68,7 +68,7 @@ dodaj_studenta(Ime, Prezime, Oib, Lozinka) ->
         {aborted, Reason} ->
             {unable_to_insert, Reason};
         {atomic, _} ->
-            {done, uuid:uuid_to_string(Uuid)};
+            {done, list_to_binary(uuid:uuid_to_string(Uuid))};
         _ ->
             unable_to_insert
     end.
@@ -79,7 +79,7 @@ dohvati_studente() ->
                           prezime = P,
                           lozinka = L},
               Acc) ->
-             UuidString = uuid:uuid_to_string(U),
+             UuidString = list_to_binary(uuid:uuid_to_string(U)),
              [#{uuid => UuidString,
                 ime => I,
                 prezime => P,
