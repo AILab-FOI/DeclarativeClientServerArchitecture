@@ -5,14 +5,23 @@
 -export([install/1, start/2, stop/1, dodaj_studenta/4, dohvati_studenta/1,
          dohvati_studente/0, dohvati_fakultet/1, dodaj_fakultet/3, dohvati_fakultete/0]).
 
--record(db_fakultet, {uuid, naziv, adresa, lokacija}).
--record(db_katedra, {uuid, naziv}).
+-record(db_fakultet,
+        {uuid, naziv, adresa, uuid_katedre = [], uuid_djelatnici = [], uuid_student = []}).
+-record(db_katedra, {uuid, naziv, uuid_djelatnik = [], uuid_kolegij = []}).
 -record(db_student, {uuid, ime, prezime, oib, lozinka}).
--record(db_djelatnik, {uuid, naziv, oib, uuid_katedra}).
--record(db_kolegij, {uuid, naziv, lekcija, uuid_nositelj}).
--record(db_lekcija, {uuid, naziv, sadrzaj}).
--record(db_kviz, {uuid, naziv, uuid_lekcija}).
--record(table_id, {table_name, last_id}).
+-record(db_djelatnik_tip, {uuid, uuid_djelatnik, status}).
+-record(db_djelatnik, {uuid, ime, prezime, oib, uuid_katedra}).
+-record(db_kolegij,
+        {uuid,
+         naziv,
+         uuid_lekcije = [],
+         uuid_nositelj,
+         uuid_djelatnici = [],
+         uuid_studenti = [],
+         uuid_lekcije = []}).
+-record(db_lekcija, {uuid, naziv, uuid_sadrzaj = [], uuid_kviz = []}).
+-record(db_sadrzaj, {uuid, naslov, opis}).
+-record(db_kviz, {uuid, naziv}).
 
 start(normal, []) ->
     mnesia:wait_for_tables([db_fakultet, db_student], 5000),
@@ -46,28 +55,32 @@ install(Nodes) ->
     io:format("Table kviz ~p~n", [mnesia:error_description(R4)]),
     {_, R5} =
         mnesia:create_table(db_student,
-                            [{attributes, record_info(fields, db_student)}, {disc_copies, Nodes}]),
+                            [{attributes, record_info(fields, db_student)},
+                             {index, [#db_student.oib]},
+                             {disc_copies, Nodes}]),
     io:format("Table student ~p~n", [mnesia:error_description(R5)]),
-    {_, R6} =
-        mnesia:create_table(table_id,
-                            [{attributes, record_info(fields, table_id)}, {disc_copies, Nodes}]),
-    io:format("Table student ~p~n", [mnesia:error_description(R6)]),
     rpc:multicall(Nodes, application, stop, [mnesia]).
 
 dodaj_studenta(Ime, Prezime, Oib, Lozinka) ->
     Uuid = uuid:get_v4(),
     Fun = fun() ->
-             mnesia:write(#db_student{uuid = Uuid,
-                                      ime = Ime,
-                                      prezime = Prezime,
-                                      oib = Oib,
-                                      lozinka = Lozinka})
+             case mnesia:index_read(db_student, Oib, #db_student.oib) of
+                 [_] -> {error, korisnik_postoji};
+                 [] ->
+                     mnesia:write(#db_student{uuid = Uuid,
+                                              ime = Ime,
+                                              prezime = Prezime,
+                                              oib = Oib,
+                                              lozinka = Lozinka})
+             end
           end,
     Trans_result = mnesia:transaction(Fun),
     case Trans_result of
         {aborted, Reason} ->
             {unable_to_insert, Reason};
-        {atomic, _} ->
+        {atomic, {error, korisnik_postoji}} ->
+            {unable_to_insert, "Korisnik postoji!"};
+        {atomic, ok} ->
             {done, list_to_binary(uuid:uuid_to_string(Uuid))};
         _ ->
             unable_to_insert
@@ -77,12 +90,14 @@ dohvati_studente() ->
     Fun = fun(#db_student{uuid = U,
                           ime = I,
                           prezime = P,
+                          oib = O,
                           lozinka = L},
               Acc) ->
              UuidString = list_to_binary(uuid:uuid_to_string(U)),
              [#{uuid => UuidString,
                 ime => I,
                 prezime => P,
+                oib => O,
                 lozinka => L}
               | Acc]
           end,

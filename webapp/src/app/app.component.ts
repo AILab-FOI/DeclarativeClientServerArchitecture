@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import init, { dohvati_studente } from '../assets/pkg/client';
+import init, { dohvati_studente, InitOutput } from '../assets/pkg/client';
 import { Student } from '../assets/pkg/client';
 
 @Component({
@@ -12,21 +12,23 @@ import { Student } from '../assets/pkg/client';
 })
 export class AppComponent {
   title = 'client';
-  studenti: Promise<Student[]>;
-
+  init: Promise<InitOutput>;
+  studenti = signal<Student[]>([]);
   constructor() {
+    this.init = init();
     this.loadWasm();
   }
 
   async loadWasm() {
-    init().then((wasm) => {
-      dohvati_studente().then((studenti) => {
-        console.log(studenti);
+    this.init.then(() => {
+      dohvati_studente().then((studenti: { data: Student[] }) => {
+        this.studenti.update((s) => studenti.data);
       });
     });
-  }
-
-  async dohvati(): Promise<Student[]> {
-    return this.studenti;
+    // init().then((wasm) => {
+    //   dohvati_studente().then((studenti) => {
+    //     console.log(studenti);
+    //   });
+    // });
   }
 }
