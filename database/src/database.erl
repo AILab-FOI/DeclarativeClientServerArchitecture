@@ -2,26 +2,49 @@
 
 -behaviour(application).
 
--export([install/1, start/2, stop/1, dodaj_studenta/4, dohvati_studenta/1,
-         dohvati_studente/0, dohvati_fakultet/1, dodaj_fakultet/3, dohvati_fakultete/0]).
+-export([install/1, start/2, stop/1, dodaj_studenta/6, dohvati_studenta/1,
+         dohvati_studente/0, dohvati_fakultet/1, dodaj_fakultet/2, dohvati_fakultete/0]).
+
+-define(ID, erlang:unique_integer([positive])).
+
+-type id() :: pos_integer().
+-type adresa() ::
+    #{grad := binary(),
+      ulica := binary(),
+      postanski_broj := number(),
+      drzava := binary(),
+      kucni_broj := binary()}.
+
+-type status_djelatnika() :: nositelj | asistent.
+
+-type datum_vrijeme() :: {{integer(), integer(), integer()},{integer(), integer(), integer()}}.
 
 -record(db_fakultet,
-        {uuid, naziv, adresa, uuid_katedre = [], uuid_djelatnici = [], uuid_student = []}).
--record(db_katedra, {uuid, naziv, uuid_djelatnik = [], uuid_kolegij = []}).
--record(db_student, {uuid, ime, prezime, oib, lozinka}).
--record(db_djelatnik_tip, {uuid, uuid_djelatnik, status}).
--record(db_djelatnik, {uuid, ime, prezime, oib, uuid_katedra}).
+        {id :: id(),
+         naziv :: binary(),
+         adresa :: adresa(),
+         id_katedre = [] :: [id()],
+         id_djelatnici = [] :: [id()],
+         id_student = [] :: [id()]}).
+-record(db_katedra,
+        {id :: id(), naziv :: binary(), id_djelatnik = [] :: [id()], id_kolegij = [] :: [id()]}).
+-record(db_student,
+        {id :: id(),
+         ime :: binary(),
+         oib :: integer(),
+         prezime :: binary(),
+         lozinka :: binary(),
+         email :: binary(),
+         opis = "" :: binary()}).
+-record(db_djelatnik_tip, {id::id(), id_djelatnik:: id(), status::status_djelatnika()}).
+-record(db_djelatnik,
+        {id::id(), ime::binary(), prezime::binary(), oib::integer(), email::binary(), opis::binary(), kabinet::binary(), vrijeme_konzultacija = []::datum_vrijeme()}).
 -record(db_kolegij,
-        {uuid,
-         naziv,
-         uuid_lekcije = [],
-         uuid_nositelj,
-         uuid_djelatnici = [],
-         uuid_studenti = [],
-         uuid_lekcije = []}).
--record(db_lekcija, {uuid, naziv, uuid_sadrzaj = [], uuid_kviz = []}).
--record(db_sadrzaj, {uuid, naslov, opis}).
--record(db_kviz, {uuid, naziv}).
+        {id::id(), naziv::binary(), id_djelatnici = []::[id()], id_studenti = []::[id()], id_lekcije = []:: [id()]}).
+-record(db_lekcija, {id::id(), naziv::binary(), id_sadrzaj = []::[id()], id_kviz = []::[id()]}).
+-record(db_sadrzaj, {id::id(), naslov::binary(), opis::binary()}).
+-record(db_kviz, {id::id(), naziv::binary(), id_pitanja = []::[id()]}).
+-record(db_pitanje, {id::id(), naslov::binary(), odgovori = []::[binary()]}).
 
 start(normal, []) ->
     mnesia:wait_for_tables([db_fakultet, db_student], 5000),
@@ -61,17 +84,20 @@ install(Nodes) ->
     io:format("Table student ~p~n", [mnesia:error_description(R5)]),
     rpc:multicall(Nodes, application, stop, [mnesia]).
 
-dodaj_studenta(Ime, Prezime, Oib, Lozinka) ->
-    Uuid = uuid:get_v4(),
+-spec dodaj_studenta(binary(), binary(), integer(), binary(), binary(), binary()) -> {unable_to_insert, term()} | {done, pos_integer()}.
+dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis) ->
+    Id = ?ID,
     Fun = fun() ->
              case mnesia:index_read(db_student, Oib, #db_student.oib) of
                  [_] -> {error, korisnik_postoji};
                  [] ->
-                     mnesia:write(#db_student{uuid = Uuid,
+                     mnesia:write(#db_student{id = Id,
                                               ime = Ime,
                                               prezime = Prezime,
                                               oib = Oib,
-                                              lozinka = Lozinka})
+                                              lozinka = Lozinka,
+                                              opis = Opis,
+                                              email = Email})
              end
           end,
     Trans_result = mnesia:transaction(Fun),
@@ -81,79 +107,78 @@ dodaj_studenta(Ime, Prezime, Oib, Lozinka) ->
         {atomic, {error, korisnik_postoji}} ->
             {unable_to_insert, "Korisnik postoji!"};
         {atomic, ok} ->
-            {done, list_to_binary(uuid:uuid_to_string(Uuid))};
+            {done, Id};
         _ ->
-            unable_to_insert
+            {unable_to_insert, "Transakcija neuspiješna"}
     end.
 
 dohvati_studente() ->
-    Fun = fun(#db_student{uuid = U,
-                          ime = I,
-                          prezime = P,
-                          oib = O,
-                          lozinka = L},
+    Fun = fun(#db_student{id = Id,
+                          ime = Ime,
+                          prezime = Prezime,
+                          oib = Oib,
+                          lozinka = Lozinka,
+                          opis = Opis,
+                          email = Email},
               Acc) ->
-             UuidString = list_to_binary(uuid:uuid_to_string(U)),
-             [#{uuid => UuidString,
-                ime => I,
-                prezime => P,
-                oib => O,
-                lozinka => L}
+             [#{id => Id,
+                ime => Ime,
+                prezime => Prezime,
+                oib => Oib,
+                lozinka => Lozinka,
+                email => Email,
+                opis => Opis
+                }
               | Acc]
           end,
     {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_student) end),
     Record.
 
-dohvati_studenta(Uuid) ->
+dohvati_studenta(Id) ->
     Fun = fun() ->
-             UuidTransformed = uuid:string_to_uuid(Uuid),
-             case mnesia:read({db_student, UuidTransformed}) of
-                 [#db_student{ime = I,
-                              prezime = P,
-                              oib = O,
-                              lozinka = L}] ->
-                     #{uuid => Uuid,
-                       ime => I,
-                       prezime => P,
-                       oib => O,
-                       lozinka => L};
+             case mnesia:read({db_student, Id}) of
+                 [#db_student{ime = Ime,
+                              prezime = Prezime,
+                              oib = Oib,
+                              lozinka = Lozinka,
+                              email = Email,
+                              opis = Opis}] ->
+                     #{id => Id,
+                       ime => Ime,
+                       prezime => Prezime,
+                       oib => Oib,
+                       lozinka => Lozinka,
+                       email => Email,
+                       opis => Opis};
                  [] -> undefined
              end
           end,
     mnesia:transaction(Fun).
 
 dohvati_fakultete() ->
-    Fun = fun(#db_fakultet{uuid = U,
-                           naziv = N,
-                           adresa = A,
-                           lokacija = L},
+    Fun = fun(#db_fakultet{id = Id,
+                           naziv = Naziv,
+                           adresa = Adresa},
               Acc) ->
-             UuidString = uuid:uuid_to_string(U),
-             [{UuidString, N, A, L} | Acc]
+             [{Id, Naziv, Adresa} | Acc]
           end,
     {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_fakultet) end),
     Record.
 
-dohvati_fakultet(Uuid) ->
+dohvati_fakultet(Id) ->
     Fun = fun() ->
-             UuidTransformed = uuid:string_to_uuid(Uuid),
-             case mnesia:read({db_fakultet, UuidTransformed}) of
-                 [#db_fakultet{naziv = N,
-                               adresa = A,
-                               lokacija = L}] ->
-                     {Uuid, N, A, L};
+             case mnesia:read({db_fakultet, Id}) of
+                 [#db_fakultet{naziv = N, adresa = A}] -> {Id, N, A};
                  [] -> undefined
              end
           end,
     mnesia:transaction(Fun).
 
-dodaj_fakultet(Naziv, Adresa, Lokacija) ->
+dodaj_fakultet(Naziv, Adresa) ->
     Fun = fun() ->
-             Uuid = uuid:get_v4(),
-             mnesia:write(#db_fakultet{uuid = Uuid,
+             mnesia:write(#db_fakultet{id = ?ID,
                                        naziv = Naziv,
-                                       adresa = Adresa,
-                                       lokacija = Lokacija})
+                                       adresa = Adresa})
           end,
     Trans_result = mnesia:transaction(Fun),
     case Trans_result of

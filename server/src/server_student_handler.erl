@@ -61,12 +61,14 @@ run_put_request(Map, Req, State) ->
              maps:get(<<"ime">>, Map),
              maps:get(<<"prezime">>, Map),
              maps:get(<<"oib">>, Map),
-             maps:get(<<"lozinka">>, Map))
+             maps:get(<<"lozinka">>, Map),
+             maps:get(<<"email">>, Map),
+             maps:get(<<"opis">>, Map))
     of
         {unable_to_insert, Reason} ->
             {_, Reply, _} = err(400, Reason, Req, State);
         {done, Result} ->
-            Body = jiffy:encode(#{data => Result}),
+            Body = json:encode(#{data => Result}),
             Req2 = cowboy_req:set_resp_body(Body, Req),
             Reply = cowboy_req:reply(200, Req2)
     end,
@@ -74,14 +76,14 @@ run_put_request(Map, Req, State) ->
 
 run_get_all_request(Req, State) ->
     Result = database:dohvati_studente(),
-    Body = jiffy:encode(#{data => Result}),
+    Body = json:encode(#{data => Result}),
     Req2 = cowboy_req:set_resp_body(Body, Req),
     Reply = cowboy_req:reply(200, Req2),
     {stop, Reply, State}.
 
 run_get_request(Req, Id, State) ->
-    {atomic, Result} = database:dohvati_studenta(Id),
-    Body = jiffy:encode(#{data => Result}),
+    {atomic, Result} = database:dohvati_studenta(binary_to_integer(Id)),
+    Body = json:encode(#{data => Result}),
     Req2 = cowboy_req:set_resp_body(Body, Req),
     Reply = cowboy_req:reply(200, Req2),
 
@@ -89,19 +91,18 @@ run_get_request(Req, Id, State) ->
 
 gather_json(Req) ->
     {ok, Body, Req2} = cowboy_req:read_body(Req),
-    Map = jiffy:decode(Body, [return_maps]),
+    Map = json:decode(Body),
     {ok, Map, Req2}.
 
 gather_html(Req) ->
     {ok, _, Req2} = cowboy_req:read_body(Req),
     Bindings = cowboy_req:bindings(Req2),
-    io:format("~p~n", [Bindings]),
     {ok, Bindings, Req2}.
 
 err(Code, Reason, Req, State) ->
     Formatted = iolist_to_binary(io_lib:format("~p", [Reason])),
     Err = #{type => error, message => Formatted},
-    Body = jiffy:encode(#{errors => [Err]}),
+    Body = json:encode(#{errors => [Err]}),
     Req2 = cowboy_req:set_resp_body(Body, Req),
     Reply = cowboy_req:reply(Code, Req2),
     {stop, Reply, State}.
