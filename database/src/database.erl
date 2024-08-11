@@ -3,7 +3,8 @@
 -behaviour(application).
 
 -export([install/1, start/2, stop/1, dodaj_studenta/6, dohvati_studenta/1,
-         dohvati_studente/0, dohvati_fakultet/1, dodaj_fakultet/2, dohvati_fakultete/0]).
+         dohvati_studente/0, prijava_studenta/2, dohvati_fakultet/1, dodaj_fakultet/2,
+         dohvati_fakultete/0]).
 
 -define(ID, erlang:unique_integer([positive])).
 
@@ -14,10 +15,10 @@
       postanski_broj := number(),
       drzava := binary(),
       kucni_broj := binary()}.
-
 -type status_djelatnika() :: nositelj | asistent.
-
--type datum_vrijeme() :: {{integer(), integer(), integer()},{integer(), integer(), integer()}}.
+-type datum_vrijeme() ::
+    {{integer(), integer(), integer()}, {integer(), integer(), integer()}}.
+-type lozinka() :: {binary(), binary()}.
 
 -record(db_fakultet,
         {id :: id(),
@@ -33,18 +34,31 @@
          ime :: binary(),
          oib :: integer(),
          prezime :: binary(),
-         lozinka :: binary(),
+         lozinka :: lozinka(),
          email :: binary(),
          opis = "" :: binary()}).
--record(db_djelatnik_tip, {id::id(), id_djelatnik:: id(), status::status_djelatnika()}).
+-record(db_djelatnik_tip,
+        {id :: id(), id_djelatnik :: id(), status :: status_djelatnika()}).
 -record(db_djelatnik,
-        {id::id(), ime::binary(), prezime::binary(), oib::integer(), email::binary(), opis::binary(), kabinet::binary(), vrijeme_konzultacija = []::datum_vrijeme()}).
+        {id :: id(),
+         ime :: binary(),
+         prezime :: binary(),
+         oib :: integer(),
+         email :: binary(),
+         opis :: binary(),
+         kabinet :: binary(),
+         vrijeme_konzultacija = [] :: datum_vrijeme()}).
 -record(db_kolegij,
-        {id::id(), naziv::binary(), id_djelatnici = []::[id()], id_studenti = []::[id()], id_lekcije = []:: [id()]}).
--record(db_lekcija, {id::id(), naziv::binary(), id_sadrzaj = []::[id()], id_kviz = []::[id()]}).
--record(db_sadrzaj, {id::id(), naslov::binary(), opis::binary()}).
--record(db_kviz, {id::id(), naziv::binary(), id_pitanja = []::[id()]}).
--record(db_pitanje, {id::id(), naslov::binary(), odgovori = []::[binary()]}).
+        {id :: id(),
+         naziv :: binary(),
+         id_djelatnici = [] :: [id()],
+         id_studenti = [] :: [id()],
+         id_lekcije = [] :: [id()]}).
+-record(db_lekcija,
+        {id :: id(), naziv :: binary(), id_sadrzaj = [] :: [id()], id_kviz = [] :: [id()]}).
+-record(db_sadrzaj, {id :: id(), naslov :: binary(), opis :: binary()}).
+-record(db_kviz, {id :: id(), naziv :: binary(), id_pitanja = [] :: [id()]}).
+-record(db_pitanje, {id :: id(), naslov :: binary(), odgovori = [] :: [binary()]}).
 
 start(normal, []) ->
     mnesia:wait_for_tables([db_fakultet, db_student], 5000),
@@ -79,23 +93,28 @@ install(Nodes) ->
     {_, R5} =
         mnesia:create_table(db_student,
                             [{attributes, record_info(fields, db_student)},
-                             {index, [#db_student.oib]},
+                             {index, [#db_student.oib, #db_student.email]},
                              {disc_copies, Nodes}]),
     io:format("Table student ~p~n", [mnesia:error_description(R5)]),
     rpc:multicall(Nodes, application, stop, [mnesia]).
 
--spec dodaj_studenta(binary(), binary(), integer(), binary(), binary(), binary()) -> {unable_to_insert, term()} | {done, pos_integer()}.
+-spec dodaj_studenta(binary(), binary(), integer(), binary(), binary(), binary()) ->
+                        {unable_to_insert, term()} | {done, pos_integer()}.
 dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis) ->
     Id = ?ID,
+    Salt = crypto:strong_rand_bytes(16),
+    Hash = crypto:hash(sha256, <<Salt/binary, Lozinka/binary>>),
     Fun = fun() ->
-             case mnesia:index_read(db_student, Oib, #db_student.oib) of
-                 [_] -> {error, korisnik_postoji};
-                 [] ->
+             case mnesia:index_read(db_student, Oib, #db_student.oib) == []
+                  andalso mnesia:index_read(db_student, Email, #db_student.email) == []
+             of
+                 false -> {error, korisnik_postoji};
+                 true ->
                      mnesia:write(#db_student{id = Id,
                                               ime = Ime,
                                               prezime = Prezime,
                                               oib = Oib,
-                                              lozinka = Lozinka,
+                                              lozinka = {Hash, Salt},
                                               opis = Opis,
                                               email = Email})
              end
@@ -117,7 +136,6 @@ dohvati_studente() ->
                           ime = Ime,
                           prezime = Prezime,
                           oib = Oib,
-                          lozinka = Lozinka,
                           opis = Opis,
                           email = Email},
               Acc) ->
@@ -125,10 +143,8 @@ dohvati_studente() ->
                 ime => Ime,
                 prezime => Prezime,
                 oib => Oib,
-                lozinka => Lozinka,
                 email => Email,
-                opis => Opis
-                }
+                opis => Opis}
               | Acc]
           end,
     {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_student) end),
@@ -140,17 +156,29 @@ dohvati_studenta(Id) ->
                  [#db_student{ime = Ime,
                               prezime = Prezime,
                               oib = Oib,
-                              lozinka = Lozinka,
                               email = Email,
                               opis = Opis}] ->
                      #{id => Id,
                        ime => Ime,
                        prezime => Prezime,
                        oib => Oib,
-                       lozinka => Lozinka,
                        email => Email,
                        opis => Opis};
                  [] -> undefined
+             end
+          end,
+    mnesia:transaction(Fun).
+
+prijava_studenta(Email, Lozinka) ->
+    Fun = fun() ->
+             case mnesia:index_read(db_student, Email, #db_student.email) of
+                 [#db_student{id = Id, lozinka = {Hash, Salt}}] ->
+                     Key = crypto:hash(sha256, <<Salt/binary, Lozinka/binary>>),
+                     case Key == Hash of
+                         true -> {ok, #{id => Id}};
+                         false -> {error, lozinka_nije_ispravna}
+                     end;
+                 [] -> {error, korisnik_ne_postoji}
              end
           end,
     mnesia:transaction(Fun).
