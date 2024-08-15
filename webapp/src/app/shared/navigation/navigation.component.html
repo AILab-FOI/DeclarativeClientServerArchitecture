@@ -1,0 +1,24 @@
+<div class="Nav">
+  <div class="NavHeader">
+    <h2 class="NavHeaderHeading">WebApp</h2>
+  </div>
+  <div class="NavList">
+    <a class="NavListItem" routerLinkActive="active" routerLink="home">
+      Home
+    </a>
+    @if (auth.isAuthenticated()) {
+      <a class="NavListItem" routerLinkActive="active" routerLink="dashboard">
+        Dashboard
+      </a>
+    }
+  </div>
+  <div class="NavInfo">
+    @if (!auth.isAuthenticated()) {
+      <a class="NavInfoLogin" routerLinkActive="active" routerLink="login">
+        Login
+      </a>
+    } @else {
+      <app-user-menu #element [(userMenu)]="show"></app-user-menu>
+    }
+  </div>
+</div>

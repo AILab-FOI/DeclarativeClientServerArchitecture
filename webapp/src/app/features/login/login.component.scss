@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  place-items: center;
+  height: calc(100vh - 50px);
+  width: 100vw;
+  justify-content: center;
+}
+
+.Form {
+  display: flex;
+  flex-direction: column;
+  height: 50%;
+  place-items: center;
+  gap: 20px;
+}

@@ -1,0 +1,17 @@
+<form class="Form">
+  <h1>Login</h1>
+  <app-input
+    [(value)]="email"
+    [type]="'email'"
+    [placeholder]="'Insert e-mail'"
+  ></app-input>
+  <app-input
+    [(value)]="password"
+    [type]="'password'"
+    [placeholder]="'Insert password'"
+  ></app-input>
+  <button type="button" (click)="submit()">Submit</button>
+  @if (this.error().is) {
+    <label>{{ this.error().value }}</label>
+  }
+</form>

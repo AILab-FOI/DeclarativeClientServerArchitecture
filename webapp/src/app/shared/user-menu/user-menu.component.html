@@ -1,0 +1,18 @@
+<button (click)="userMenu.set(!this.userMenu())" class="User">
+  <img class="UserImg" src="asd" />
+</button>
+@if (userMenu()) {
+  <div class="List">
+    <a class="ListItem" routerLinkActive="active" routerLink="profile">
+      Profile
+    </a>
+    <a class="ListItem" routerLinkActive="active" routerLink="messages">
+      Messages
+    </a>
+    <a class="ListItem" routerLinkActive="active" routerLink="preferences">
+      Preferences
+    </a>
+    <hr class="ListDivider" />
+    <a class="ListItem" (click)="auth.logout()"> Log out </a>
+  </div>
+}

@@ -2,8 +2,9 @@
 
 -behaviour(cowboy_handler).
 
--export([init/2, allowed_methods/2, content_types_accepted/2, charsets_provided/2,is_authorized/2,
-         from_json/2, content_type_provided/2, to_json/2, from_html/2, to_html/2]).
+-export([init/2, allowed_methods/2, content_types_accepted/2, charsets_provided/2,
+         is_authorized/2, from_json/2, content_type_provided/2, to_json/2, from_html/2,
+         to_html/2]).
 
 init(Req, State) ->
     {cowboy_rest, Req, State}.
@@ -12,7 +13,7 @@ allowed_methods(Req, State) ->
     {[<<"PUT">>, <<"GET">>], Req, State}.
 
 is_authorized(Req, State) ->
-    case cowboy_req:header(<<"authorization">>,Req) of
+    case cowboy_req:header(<<"authorization">>, Req) of
         undefined ->
             {{false, <<"Bearer token_type=\"JWT\"">>}, Req, State};
         _ ->

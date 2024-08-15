@@ -1,9 +1,2 @@
-<h1>Web Aplikacija</h1>
-@for (student of studenti(); track student.uuid) {
-  <div>
-    <p>{{ student.ime }}</p>
-    <p>{{ student.prezime }}</p>
-    <p>{{ student.oib }}</p>
-    <p>{{ student.lozinka }}</p>
-  </div>
-}
+<app-navigation></app-navigation>
+<router-outlet></router-outlet>

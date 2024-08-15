@@ -3,7 +3,7 @@
 -behaviour(application).
 
 -export([install/1, start/2, stop/1, dodaj_studenta/6, dohvati_studenta/1,
-         dohvati_studente/0, prijava_studenta/2, dohvati_fakultet/1, dodaj_fakultet/2,
+         dohvati_studente/0, prijava/2, dohvati_fakultet/1, dodaj_fakultet/2,
          dohvati_fakultete/0]).
 
 -define(ID, erlang:unique_integer([positive])).
@@ -37,27 +37,30 @@
          lozinka :: lozinka(),
          email :: binary(),
          opis = "" :: binary()}).
--record(db_djelatnik_tip,
+-record(db_djelatnik_konfiguracija,
         {id :: id(), id_djelatnik :: id(), status :: status_djelatnika()}).
 -record(db_djelatnik,
         {id :: id(),
          ime :: binary(),
          prezime :: binary(),
+         lozinka :: lozinka(),
          oib :: integer(),
          email :: binary(),
          opis :: binary(),
          kabinet :: binary(),
          vrijeme_konzultacija = [] :: datum_vrijeme()}).
 -record(db_kolegij,
-        {id :: id(),
-         naziv :: binary(),
-         id_djelatnici = [] :: [id()],
-         id_studenti = [] :: [id()],
-         id_lekcije = [] :: [id()]}).
+        {id :: id(), naziv :: binary(), id_sudionik :: [id()], id_lekcije = [] :: [id()]}).
+-record(db_ocjena, {student_id :: id()}).
 -record(db_lekcija,
         {id :: id(), naziv :: binary(), id_sadrzaj = [] :: [id()], id_kviz = [] :: [id()]}).
 -record(db_sadrzaj, {id :: id(), naslov :: binary(), opis :: binary()}).
--record(db_kviz, {id :: id(), naziv :: binary(), id_pitanja = [] :: [id()]}).
+-record(db_kviz,
+        {id :: id(),
+         naziv :: binary(),
+         dostupan_od :: datum_vrijeme(),
+         dostupan_do :: datum_vrijeme(),
+         id_pitanja = [] :: [id()]}).
 -record(db_pitanje, {id :: id(), naslov :: binary(), odgovori = [] :: [binary()]}).
 
 start(normal, []) ->
@@ -96,6 +99,13 @@ install(Nodes) ->
                              {index, [#db_student.oib, #db_student.email]},
                              {disc_copies, Nodes}]),
     io:format("Table student ~p~n", [mnesia:error_description(R5)]),
+    {_, R6} =
+        mnesia:create_table(db_djelatnik,
+                            [{attributes, record_info(fields, db_djelatnik)},
+                             {index, [#db_djelatnik.oib, #db_djelatnik.email]},
+                             {disc_copies, Nodes}]),
+    io:format("Table djelatnik ~p~n", [mnesia:error_description(R6)]),
+
     rpc:multicall(Nodes, application, stop, [mnesia]).
 
 -spec dodaj_studenta(binary(), binary(), integer(), binary(), binary(), binary()) ->
@@ -169,7 +179,7 @@ dohvati_studenta(Id) ->
           end,
     mnesia:transaction(Fun).
 
-prijava_studenta(Email, Lozinka) ->
+prijava(Email, Lozinka) ->
     Fun = fun() ->
              case mnesia:index_read(db_student, Email, #db_student.email) of
                  [#db_student{id = Id, lozinka = {Hash, Salt}}] ->
@@ -178,7 +188,16 @@ prijava_studenta(Email, Lozinka) ->
                          true -> {ok, #{id => Id}};
                          false -> {error, lozinka_nije_ispravna}
                      end;
-                 [] -> {error, korisnik_ne_postoji}
+                 [] ->
+                     case mnesia:index_read(db_djelatnik, Email, #db_djelatnik.email) of
+                         [#db_djelatnik{id = Id, lozinka = {Hash, Salt}}] ->
+                             Key = crypto:hash(sha256, <<Salt/binary, Lozinka/binary>>),
+                             case Key == Hash of
+                                 true -> {ok, #{id => Id}};
+                                 false -> {error, lozinka_nije_ispravna}
+                             end;
+                         [] -> {error, korisnik_ne_postoji}
+                     end
              end
           end,
     mnesia:transaction(Fun).

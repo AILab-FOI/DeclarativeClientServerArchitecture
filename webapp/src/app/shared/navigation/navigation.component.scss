@@ -1,0 +1,79 @@
+@import '../../../styles/variables.scss';
+
+.Nav {
+  padding: 0 20px;
+  height: 50px;
+  width: 100%;
+  background: $black;
+  display: flex;
+  flex-direction: row;
+  place-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  &Header {
+
+    &Heading {
+      color: $white;
+    }
+  }
+
+  &List {
+    flex: 1 1 100%;
+    display: flex;
+    gap: 10px;
+
+    &Item {
+      font-weight: 500;
+      transition: .4s;
+    }
+
+  }
+
+  &Info {
+    position: relative;
+
+    &Login {
+      font-weight: 500;
+      transition: .4s;
+
+    }
+
+    &User {
+      height: 50px;
+      background: transparent;
+      outline: none;
+      border: none;
+      width: 50px;
+      cursor: pointer;
+    }
+
+    &List {
+      border-radius: 8px;
+      border: .5px solid grey;
+      margin: 2px;
+      width: 150px;
+      top: 100%;
+      background: $white;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+
+      &Item {
+        padding: 10px;
+        color: $black;
+        width: 100%;
+
+        &:hover {
+          background: $orange;
+        }
+      }
+
+    }
+  }
+}
+
+.active {
+  color: $orange;
+}

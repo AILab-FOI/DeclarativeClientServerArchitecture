@@ -8,7 +8,9 @@ start() ->
                                 [{"/home/", server_home_handler, []},
                                  {"/student/", server_student_handler, []},
                                  {"/student/[:id]", server_student_handler, []},
-                                 {"/login/", server_prijava_handler, []}]}]),
+                                 {"/login/", server_login_handler, []},
+                                 {"/verify/[:id]", server_verify_handler, []}]}]),
+
     cowboy:start_clear(server_http_listener,
                        [{port, 5000}],
                        #{middlewares => [server_cors_middleware, cowboy_router, cowboy_handler],
