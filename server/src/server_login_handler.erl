@@ -35,7 +35,7 @@ json_request(Req, State) ->
     end.
 
 run_put_request(Map, Req, State) ->
-    case database:prijava(
+    case user:prijava(
              maps:get(<<"email">>, Map), maps:get(<<"password">>, Map))
     of
         {atomic, Result} ->
@@ -47,12 +47,7 @@ run_put_request(Map, Req, State) ->
                                             refresh_token => RefreshToken},
                                           State);
                 {error, Reason} ->
-                    case Reason of
-                        lozinka_nije_ispravna ->
-                            request:err(404, "Lozinka nije ispravna", Req, State);
-                        korisnik_ne_postoji ->
-                            request:err(404, "Korisnik ne postoji", Req, State)
-                    end
+                    request:err(404, Reason, Req, State)
             end;
         {aborted, _} ->
             request:err(500, "Database error", Req, State)

@@ -1,4 +1,4 @@
--module(server_student_handler).
+-module(server_worker_handler).
 
 -behaviour(cowboy_handler).
 
@@ -48,7 +48,7 @@ json_request(Req, State) ->
     end.
 
 run_put_request(Map, Req, State) ->
-    case user:dodaj_studenta(
+    case user:dodaj_djelatnika(
              maps:get(<<"ime">>, Map),
              maps:get(<<"prezime">>, Map),
              maps:get(<<"oib">>, Map),
