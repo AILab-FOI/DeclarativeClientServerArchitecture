@@ -2,9 +2,9 @@
 
 -behaviour(application).
 
--export([install/1, start/2, stop/1, dodaj_studenta/6, dohvati_studenta/1,
-         dohvati_studente/0, prijava/2, dohvati_fakultet/1, dodaj_fakultet/2,
-         dohvati_fakultete/0]).
+-export([install/1, start/2, stop/1, dodaj_studenta/6, dohvati_korisnika/1,
+         dohvati_studente/0, prijava/2, dohvati_fakultet/1, dodaj_fakultet/2, dohvati_fakultete/0,
+         obrisi_studenta/1]).
 
 -define(ID, erlang:unique_integer([positive])).
 
@@ -36,6 +36,7 @@
          prezime :: binary(),
          lozinka :: lozinka(),
          email :: binary(),
+         % id_kolegij :: [id()],
          opis = "" :: binary()}).
 -record(db_djelatnik_konfiguracija,
         {id :: id(), id_djelatnik :: id(), status :: status_djelatnika()}).
@@ -141,6 +142,11 @@ dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis) ->
             {unable_to_insert, "Transakcija neuspiješna"}
     end.
 
+obrisi_studenta(Id) ->
+    io:format("~p", [Id]),
+    Fun = fun() -> mnesia:delete({db_student, Id}) end,
+    mnesia:transaction(Fun).
+
 dohvati_studente() ->
     Fun = fun(#db_student{id = Id,
                           ime = Ime,
@@ -160,7 +166,7 @@ dohvati_studente() ->
     {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_student) end),
     Record.
 
-dohvati_studenta(Id) ->
+dohvati_korisnika(Id) ->
     Fun = fun() ->
              case mnesia:read({db_student, Id}) of
                  [#db_student{ime = Ime,
@@ -168,13 +174,36 @@ dohvati_studenta(Id) ->
                               oib = Oib,
                               email = Email,
                               opis = Opis}] ->
+                     Kolegiji =
+                         lists:map(fun(Kolegij) ->
+                                      case mnesia:read({db_kolegij, Kolegij}) of
+                                          [#db_kolegij{id = IdK, naziv = NazivK}] -> {IdK, NazivK};
+                                          [] -> undefined
+                                      end
+                                   end,
+                                   []),
                      #{id => Id,
                        ime => Ime,
                        prezime => Prezime,
                        oib => Oib,
                        email => Email,
-                       opis => Opis};
-                 [] -> undefined
+                       opis => Opis,
+                       kolegiji => Kolegiji};
+                 [] ->
+                     case mnesia:read({db_djelatnik, Id}) of
+                         [#db_djelatnik{ime = Ime,
+                                        prezime = Prezime,
+                                        oib = Oib,
+                                        email = Email,
+                                        opis = Opis}] ->
+                             #{id => Id,
+                               ime => Ime,
+                               prezime => Prezime,
+                               oib => Oib,
+                               email => Email,
+                               opis => Opis};
+                         [] -> {error, korisnik_ne_postoji}
+                     end
              end
           end,
     mnesia:transaction(Fun).
@@ -196,7 +225,7 @@ prijava(Email, Lozinka) ->
                                  true -> {ok, #{id => Id}};
                                  false -> {error, lozinka_nije_ispravna}
                              end;
-                         [] -> {error, korisnik_ne_postoji}
+                         {aborted, Reason} -> {error, korisnik_ne_postoji}
                      end
              end
           end,

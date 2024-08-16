@@ -29,7 +29,7 @@ to_json(Req, State) ->
 json_request(Req, State) ->
     case utils:gather_json(Req) of
         {error, Reason, _} ->
-            utils:err(400, Reason, Req, State);
+            request:err(400, Reason, Req, State);
         {ok, Map, Req2} ->
             run_put_request(Map, Req2, State)
     end.
@@ -38,18 +38,22 @@ run_put_request(Map, Req, State) ->
     case database:prijava(
              maps:get(<<"email">>, Map), maps:get(<<"password">>, Map))
     of
-        {atomic, {error, Reason}} ->
-            {_, Reply, _} = utils:err(400, Reason, Req, State);
-        {atomic, {ok, #{id := Id}}} ->
-            io:format("~p", [Id]),
-            Claims =
-                #{sub => Id,
-                  iat =>
-                      calendar:datetime_to_gregorian_seconds(
-                          calendar:universal_time())},
-            Jwt = jwerl:sign([Claims], hs256, utils:jwt_key()),
-            Body = json:encode(#{data => Jwt}),
-            Req2 = cowboy_req:set_resp_body(Body, Req),
-            Reply = cowboy_req:reply(200, Req2)
-    end,
-    {stop, Reply, State}.
+        {atomic, Result} ->
+            case Result of
+                {ok, #{id := Id}} ->
+                    {AccessToken, RefreshToken} = jwt_manager:generate_tokens(Id),
+                    request:send_response(Req,
+                                          #{access_token => AccessToken,
+                                            refresh_token => RefreshToken},
+                                          State);
+                {error, Reason} ->
+                    case Reason of
+                        lozinka_nije_ispravna ->
+                            request:err(404, "Lozinka nije ispravna", Req, State);
+                        korisnik_ne_postoji ->
+                            request:err(404, "Korisnik ne postoji", Req, State)
+                    end
+            end;
+        {aborted, _} ->
+            request:err(500, "Database error", Req, State)
+    end.

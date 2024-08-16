@@ -1,17 +1,8 @@
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  inject,
-  input,
-  model,
-  signal,
-  viewChild,
-  viewChildren,
-} from '@angular/core';
-import { AuthService } from '../../core';
+import { Component, inject, input, model } from '@angular/core';
+import { AuthService, Korisnik } from '../../core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Student } from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-user-menu',
@@ -23,4 +14,5 @@ import { RouterModule } from '@angular/router';
 export class UserMenuComponent {
   public auth = inject(AuthService);
   public userMenu = model<boolean>(false);
+  public user = input.required<Korisnik>();
 }

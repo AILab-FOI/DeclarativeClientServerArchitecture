@@ -1,8 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import init, { dohvati_studente, InitOutput } from '../assets/pkg/client';
-import { Student } from '../assets/pkg/client';
 import { NavigationComponent } from './shared';
+import { UserService } from './core';
 
 @Component({
   selector: 'app-root',
@@ -13,18 +12,8 @@ import { NavigationComponent } from './shared';
 })
 export class AppComponent {
   title = 'client';
-  init: Promise<InitOutput>;
-  studenti = signal<Student[]>([]);
+  user = inject(UserService);
   constructor() {
-    this.init = init();
-    this.loadWasm();
-  }
-
-  async loadWasm() {
-    // this.init.then(() => {
-    //   dohvati_studente('').then((studenti: { data: Student[] }) => {
-    //     this.studenti.update((s) => studenti.data);
-    //   });
-    // });
+    this.user.dohvatiKorisnika();
   }
 }

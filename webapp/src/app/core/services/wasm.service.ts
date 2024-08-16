@@ -7,16 +7,18 @@ export type Response<T> = {
 };
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'platform',
 })
 export class WasmService {
-  private init: Promise<InitOutput>;
+  public wasm: any;
 
-  constructor() {
-    this.init = init();
-  }
+  constructor() {}
 
-  async callWasmFunction<T>(fun: Promise<void>): Promise<Response<T>> {
-    return this.init.then(() => fun) as Promise<Response<T>>;
+  async loadWasmModule() {
+    if (!this.wasm) {
+      this.wasm = await import('../../../assets/pkg/client');
+      await init();
+    }
+    return this.wasm;
   }
 }

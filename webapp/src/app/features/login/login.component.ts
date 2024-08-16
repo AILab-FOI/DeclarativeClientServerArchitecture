@@ -25,16 +25,13 @@ export class LoginComponent {
   });
   private auth = inject(AuthService);
   private router = inject(Router);
-  constructor() {
-    effect(() => {});
-  }
 
   submit(): void {
     this.auth.login(this.email(), this.password()).then((isLogedIn) => {
-      if (isLogedIn) {
+      if (isLogedIn.status) {
         this.router.navigate(['dashboard']);
       } else {
-        this.error.set({ is: true, value: 'Greška prilikom prijave' });
+        this.error.set({ is: true, value: isLogedIn.data });
       }
     });
   }

@@ -1,5 +1,6 @@
 <button (click)="userMenu.set(!this.userMenu())" class="User">
   <img class="UserImg" src="asd" />
+  <label>{{ user().ime }}</label>
 </button>
 @if (userMenu()) {
   <div class="List">

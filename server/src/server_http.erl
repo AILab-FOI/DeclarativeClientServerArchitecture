@@ -9,7 +9,7 @@ start() ->
                                  {"/student/", server_student_handler, []},
                                  {"/student/[:id]", server_student_handler, []},
                                  {"/login/", server_login_handler, []},
-                                 {"/verify/[:id]", server_verify_handler, []}]}]),
+                                 {"/jwt/refresh", server_jwt_refresh_handler, []}]}]),
 
     cowboy:start_clear(server_http_listener,
                        [{port, 5000}],

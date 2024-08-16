@@ -6,6 +6,7 @@ export * from './guards/auth.guard';
 
 export * from './services/auth.service';
 export * from './services/wasm.service';
+export * from './services/user.service';
 
 // NOTE: Directives
 

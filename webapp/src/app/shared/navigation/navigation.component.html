@@ -18,7 +18,11 @@
         Login
       </a>
     } @else {
-      <app-user-menu #element [(userMenu)]="show"></app-user-menu>
+      <app-user-menu
+        [user]="user.user()"
+        #element
+        [(userMenu)]="show"
+      ></app-user-menu>
     }
   </div>
 </div>

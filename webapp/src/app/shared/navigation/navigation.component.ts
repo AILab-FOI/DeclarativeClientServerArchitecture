@@ -1,15 +1,12 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  inject,
-  signal,
-  viewChild,
-  viewChildren,
-} from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AuthService, OutsideClickDirective } from '../../core';
+import {
+  AuthService,
+  OutsideClickDirective,
+  UserService,
+  WasmService,
+} from '../../core';
 import { UserMenuComponent } from '../user-menu/user-menu.component';
 
 @Component({
@@ -20,5 +17,10 @@ import { UserMenuComponent } from '../user-menu/user-menu.component';
   styleUrl: './navigation.component.scss',
 })
 export class NavigationComponent extends OutsideClickDirective {
+  public user = inject(UserService);
   public auth = inject(AuthService);
+  private wasm = inject(WasmService);
+  constructor() {
+    super();
+  }
 }

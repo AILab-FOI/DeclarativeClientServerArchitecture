@@ -1,5 +1,5 @@
-import { Component, effect, inject } from '@angular/core';
-import { WasmService } from '../../core';
+import { Component, computed, inject } from '@angular/core';
+import { UserService } from '../../core';
 import { dohvati_studente } from '../../../assets/pkg/client';
 
 @Component({
@@ -10,15 +10,12 @@ import { dohvati_studente } from '../../../assets/pkg/client';
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
-  private wasm = inject(WasmService);
+  public user = inject(UserService);
+  public username = computed(() => {
+    return this.user.user().ime + ' ' + this.user.user().prezime;
+  });
 
   constructor() {
-    effect(() => {
-      this.wasm
-        .callWasmFunction(dohvati_studente(localStorage.getItem('token')))
-        .then((response) => {
-          console.log(response);
-        });
-    });
+    dohvati_studente(localStorage.getItem('AT')).then((e) => console.log(e));
   }
 }
