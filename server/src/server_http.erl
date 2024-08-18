@@ -8,6 +8,8 @@ start() ->
                                 [{"/home/", server_home_handler, []},
                                  {"/student/", server_student_handler, []},
                                  {"/worker/", server_worker_handler, []},
+                                 {"/course/[:id]", server_course_handler, []},
+                                 {"/section/[:id]", server_section_handler, []},
                                  {"/user/[:id]", server_user_handler, []},
                                  {"/login/", server_login_handler, []},
                                  {"/jwt/refresh", server_jwt_refresh_handler, []}]}]),

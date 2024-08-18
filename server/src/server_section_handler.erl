@@ -1,15 +1,15 @@
--module(server_worker_handler).
+-module(server_section_handler).
 
 -behaviour(cowboy_handler).
 
 -export([init/2, allowed_methods/2, content_types_accepted/2, charsets_provided/2,
-         is_authorized/2, from_json/2, content_type_provided/2, to_json/2]).
+         is_authorized/2, delete_resource/2, from_json/2, content_type_provided/2, to_json/2]).
 
 init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PUT">>], Req, State}.
+    {[<<"PUT">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -33,6 +33,22 @@ content_type_provided(Req, State) ->
 charsets_provided(Req, State) ->
     {[<<"utf-8">>], Req, State}.
 
+delete_resource(Req, State) ->
+    case utils:gather_json(Req) of
+        {ok, Map, Req2} ->
+            case course:obrisi_sekciju(
+                     maps:get(<<"id">>, Map))
+            of
+                {atomic, ok} ->
+                    request:send_response(Req2, <<"ok">>, State);
+                {aborted, _} ->
+                    request:err(400, "Greška", Req, State)
+            end;
+        _ ->
+            request:err(400, "Db Error", Req, State)
+    end,
+    {stop, Req, State}.
+
 from_json(Req, State) ->
     json_request(Req, State).
 
@@ -48,14 +64,8 @@ json_request(Req, State) ->
     end.
 
 run_put_request(Map, Req, State) ->
-    case user:dodaj_djelatnika(
-             maps:get(<<"ime">>, Map),
-             maps:get(<<"prezime">>, Map),
-             maps:get(<<"oib">>, Map),
-             maps:get(<<"lozinka">>, Map),
-             maps:get(<<"email">>, Map),
-             maps:get(<<"opis">>, Map, <<"">>),
-             maps:get(<<"kabinet">>, Map, <<"">>))
+    case course:dodaj_sekciju(
+             maps:get(<<"kolegij">>, Map), maps:get(<<"naziv">>, Map), maps:get(<<"opis">>, Map))
     of
         {atomic, Result} ->
             case Result of

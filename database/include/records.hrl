@@ -23,6 +23,7 @@
          id_student = [] :: [id()]}).
 -record(db_katedra,
         {id :: id(), naziv :: binary(), id_djelatnik = [] :: [id()], id_kolegij = [] :: [id()]}).
+% NOTE: Korisnik
 -record(db_korisnik,
         {id :: id(),
          ime :: binary(),
@@ -33,21 +34,35 @@
          email :: binary(),
          opis :: binary(),
          dodatno :: student() | djelatnik()}).
--record(student, {id_kolegij = [] :: [id()]}).
+-record(student, {kolegiji = [] :: [id()]}).
 -record(djelatnik, {kabinet :: binary(), vrijeme_konzultacija = [] :: [datum_vrijeme()]}).
 -record(db_djelatnik_konfiguracija,
         {id :: id(), id_djelatnik :: id(), status :: status_djelatnika()}).
+
+-type korisnik_ref() :: id().
+% NOTE: Kolegij
+-type kolegij() ::
+  #{id := id(),
+    naziv := binary(),
+    skraceno := binary(),
+    sudionici := [korisnik_ref()],
+    sekcije := [sekcija()]}.
+
 -record(db_kolegij,
         {id :: id(),
          naziv :: binary(),
          skraceno :: binary(),
-         id_sudionik :: [id()],
-         sekcija = [] :: [sekcija()]}).
+         sudionici :: [id()],
+         sekcije = [] :: [sekcija_ref()]}).
 
 -type sekcija() ::
-  #{naziv := binary(),
+  #{id := id(),
+    naziv := binary(),
     opis := binary(),
-    sadrzaj := [id()]}.
+    sadrzaj := [sadrzaj()]}.
+-type sekcija_ref() :: id().
+-type sadrzaj_ref() :: id().
+-type kviz_ref() :: id().
 -type dokument() ::
   #{naziv := binary(),
     referenca := binary(),
@@ -65,24 +80,43 @@
     kviz := id(),
     bodovi := float()}.
 -type sadrzaj() ::
-  #{tip := dokument, vrijednost := dokument()} |
-  #{tip := lekcija, vrijednost := lekcija()} |
-  #{tip := poveznica, vrijednost := poveznica()} |
-  #{tip := kviz, vrijednost := kviz_konfiguracija()}.
+  #{id := id(),
+    tip := dokument,
+    vrijednost := dokument()} |
+  #{id := id(),
+    tip := lekcija,
+    vrijednost := lekcija()} |
+  #{id := id(),
+    tip := poveznica,
+    vrijednost := poveznica()} |
+  #{id := id(),
+    tip := kviz,
+    vrijednost := kviz_ref()}.
 
--record(sekcija, {naziv :: binary(), opis :: binary(), sadrzaj = [] :: [sadrzaj()]}).
+-record(db_sekcija,
+        {id :: id(), naziv :: binary(), opis :: binary(), sadrzaj = [] :: [sadrzaj_ref()]}).
 % NOTE: Student nije bitan
--record(sadrzaj,
-        {tip :: dokument | lekcija | poveznica | kviz,
-         vrijednost :: dokument() | lekcija() | poveznica() | kviz_konfiguracija()}).
+-record(db_sadrzaj,
+        {id :: id(),
+         tip :: dokument | lekcija | poveznica | kviz,
+         vrijednost :: dokument() | lekcija() | poveznica() | kviz_ref()}).
 -record(dokument,
-        {naziv :: binary(), referenca :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
+        {id :: id(),
+         naziv :: binary(),
+         referenca :: binary(),
+         vrijeme_kreiranja :: datum_vrijeme()}).
 -record(lekcija,
-        {naziv :: binary(), sadrzaj :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
+        {id :: id(),
+         naziv :: binary(),
+         sadrzaj :: binary(),
+         vrijeme_kreiranja :: datum_vrijeme()}).
 -record(poveznica,
-        {naziv :: binary(), referenca :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
+        {id :: id(),
+         naziv :: binary(),
+         referenca :: binary(),
+         vrijeme_kreiranja :: datum_vrijeme()}).
 % NOTE: Ocjena po studentu
--record(kviz_konfiguracija, {student :: id(), kviz :: id(), bodovi :: float()}).
+-record(db_kviz_konfiguracija, {student :: id(), kviz :: id(), bodovi :: float()}).
 -record(db_kviz,
         {id :: id(),
          naziv :: binary(),

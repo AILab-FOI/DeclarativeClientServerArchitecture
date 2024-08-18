@@ -7,6 +7,7 @@ use reqwest::{self};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
+use web_sys::js_sys::Intl::DateTimeFormat;
 
 #[derive(Serialize, Deserialize)]
 struct Response<T> {
@@ -80,46 +81,19 @@ impl Error {
 
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize)]
-struct Student {
+struct Korisnik {
     id: i32,
     ime: String,
     prezime: String,
     oib: i32,
+    uloga: String,
+    email: String,
     opis: String,
-    kolegiji: Vec<Kolegij>,
+    dodatno: StudentDjelatnik,
 }
 
 #[wasm_bindgen]
-#[derive(Serialize, Deserialize)]
-struct Kolegij {
-    id: i32,
-    naziv: String,
-}
-
-#[wasm_bindgen]
-impl Kolegij {
-    #[wasm_bindgen(getter)]
-    pub fn id(&self) -> i32 {
-        self.id.clone()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_id(&mut self, id: i32) {
-        self.id = id;
-    }
-    #[wasm_bindgen(getter)]
-    pub fn naziv(&self) -> String {
-        self.naziv.clone()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_naziv(&mut self, naziv: String) {
-        self.naziv = naziv;
-    }
-}
-
-#[wasm_bindgen]
-impl Student {
+impl Korisnik {
     #[wasm_bindgen(getter)]
     pub fn id(&self) -> i32 {
         self.id.clone()
@@ -158,12 +132,132 @@ impl Student {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn uloga(&self) -> String {
+        self.uloga.clone()
+    }
+    #[wasm_bindgen(setter)]
+    pub fn set_uloga(&mut self, uloga: String) {
+        self.uloga = uloga;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn email(&self) -> String {
+        self.email.clone()
+    }
+    #[wasm_bindgen(setter)]
+    pub fn set_email(&mut self, email: String) {
+        self.email = email;
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn opis(&self) -> String {
         self.opis.clone()
     }
     #[wasm_bindgen(setter)]
     pub fn set_opis(&mut self, opis: String) {
         self.opis = opis;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn dodatno(&self) -> StudentDjelatnik {
+        self.dodatno.clone()
+    }
+    #[wasm_bindgen(setter)]
+    pub fn set_dodatno(&mut self, dodatno: StudentDjelatnik) {
+        self.dodatno = dodatno;
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize)]
+struct Student {
+    kolegiji: Vec<i32>,
+}
+
+#[wasm_bindgen]
+impl Student {
+    #[wasm_bindgen(getter)]
+    pub fn kolegiji(&self) -> Vec<i32> {
+        self.kolegiji.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_kolegiji(&mut self, kolegiji: Vec<i32>) {
+        self.kolegiji = kolegiji;
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize)]
+struct Djelatnik {
+    kabinet: String,
+    vrijeme_konzultacija: Vec<String>,
+}
+
+#[wasm_bindgen]
+impl Djelatnik {
+    #[wasm_bindgen(getter)]
+    pub fn kabinet(&self) -> String {
+        self.kabinet.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_kabinet(&mut self, kabinet: String) {
+        self.kabinet = kabinet;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn vrijeme_konzultacija(&self) -> Vec<String> {
+        self.vrijeme_konzultacija.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_vrijeme_konzultacija(&mut self, vrijeme_konzultacija: Vec<String>) {
+        self.vrijeme_konzultacija = vrijeme_konzultacija;
+    }
+}
+
+#[wasm_bindgen]
+pub enum StudentDjelatnik {
+    Student(Student),
+    Djelatnik(Djelatnik),
+}
+
+#[wasm_bindgen]
+impl StudentDjelatnik {
+    #[wasm_bindgen]
+    pub fn describe(&self) -> String {
+        match self {
+            StudentDjelatnik::Student(student) => format!("Foo: {}", student.kolegiji()),
+            StudentDjelatnik::Djelatnik(djelatnik) => format!("Bar: {}", djelatnik.kabinet()),
+        }
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize)]
+struct Kolegij {
+    id: i32,
+    naziv: String,
+}
+
+#[wasm_bindgen]
+impl Kolegij {
+    #[wasm_bindgen(getter)]
+    pub fn id(&self) -> i32 {
+        self.id.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_id(&mut self, id: i32) {
+        self.id = id;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn naziv(&self) -> String {
+        self.naziv.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_naziv(&mut self, naziv: String) {
+        self.naziv = naziv;
     }
 }
 
