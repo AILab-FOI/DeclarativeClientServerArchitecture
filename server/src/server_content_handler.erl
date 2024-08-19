@@ -1,4 +1,4 @@
--module(server_section_handler).
+-module(server_content_handler).
 
 -behaviour(cowboy_handler).
 
@@ -36,7 +36,7 @@ charsets_provided(Req, State) ->
 delete_resource(Req, State) ->
     case utils:gather_json(Req) of
         {ok, Map, Req2} ->
-            case course:obrisi_sekciju(
+            case course:obrisi_sadrzaj(
                      maps:get(<<"id">>, Map))
             of
                 {atomic, ok} ->
@@ -64,8 +64,12 @@ json_request(Req, State) ->
     end.
 
 run_put_request(Map, Req, State) ->
-    case course:dodaj_sekciju(
-             maps:get(<<"kolegij">>, Map), maps:get(<<"naziv">>, Map), maps:get(<<"opis">>, Map))
+    case course:dodaj_sadrzaj(
+             maps:get(<<"sekcija">>, Map),
+             maps:get(<<"naziv">>, Map),
+             maps:get(<<"redoslijed">>, Map, 0),
+             maps:get(<<"tip">>, Map),
+             maps:get(<<"vrijednost">>, Map))
     of
         {atomic, Result} ->
             case Result of

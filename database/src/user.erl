@@ -6,7 +6,7 @@
          dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/3, uredi_djelatnika/4]).
 
 dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis) ->
-    Dodatno = #student{kolegiji = []},
+    Dodatno = #student{ocjene = []},
     dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, student, Dodatno).
 
 dodaj_djelatnika(Ime, Prezime, Oib, Lozinka, Email, Opis, Kabinet) ->
@@ -30,6 +30,7 @@ dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, Uloga, Dodatno) ->
                                                     lozinka = {Hash, Salt},
                                                     opis = Opis,
                                                     email = Email,
+                                                    kolegiji = [],
                                                     uloga = Uloga,
                                                     dodatno = Dodatno})
                      of
@@ -44,8 +45,8 @@ obrisi_korisnika(Id) ->
     Fun = fun() -> mnesia:delete({db_korisnik, Id}) end,
     mnesia:transaction(Fun).
 
-uredi_studenta(Id, Opis, Kolegiji) ->
-    Dodatno = #student{kolegiji = Kolegiji},
+uredi_studenta(Id, Opis, Ocjene) ->
+    Dodatno = #student{ocjene = Ocjene},
     uredi_korisnika(Id, Opis, Dodatno).
 
 uredi_djelatnika(Id, Opis, Kabinet, VrijemeKonzultacija) ->
@@ -65,15 +66,8 @@ uredi_korisnika(Id, Opis, Dodatno) ->
     mnesia:transaction(Fun).
 
 dohvati_studenta(Korisnik) ->
-    Kolegiji =
-        lists:map(fun(Kolegij) ->
-                     case mnesia:read({db_kolegij, Kolegij}) of
-                         [#db_kolegij{id = IdK, naziv = NazivK}] -> {IdK, NazivK};
-                         [] -> undefined
-                     end
-                  end,
-                  Korisnik#db_korisnik.dodatno#student.kolegiji),
-    NoviKorisnik = Korisnik#db_korisnik{dodatno = #{kolegiji => Kolegiji}},
+    NoviKorisnik =
+        Korisnik#db_korisnik{dodatno = #{ocjene => Korisnik#db_korisnik.dodatno#student.ocjene}},
     korisnik_object(NoviKorisnik).
 
 dohvati_djelatnika(Korisnik) ->
@@ -88,9 +82,23 @@ dohvati_korisnika(Id) ->
     Fun = fun() ->
              case mnesia:read({db_korisnik, Id}) of
                  [Korisnik] ->
+                     NoviKorisnik =
+                         Korisnik#db_korisnik{kolegiji =
+                                                  lists:map(fun(Kolegij) ->
+                                                               case mnesia:read({db_kolegij,
+                                                                                 Kolegij})
+                                                               of
+                                                                   [#db_kolegij{id = IdK,
+                                                                                naziv = NazivK}] ->
+                                                                       {IdK, NazivK};
+                                                                   [] -> undefined
+                                                               end
+                                                            end,
+                                                            Korisnik#db_korisnik.kolegiji)},
+
                      case Korisnik#db_korisnik.uloga =:= student of
-                         true -> dohvati_studenta(Korisnik);
-                         false -> dohvati_djelatnika(Korisnik)
+                         true -> dohvati_studenta(NoviKorisnik);
+                         false -> dohvati_djelatnika(NoviKorisnik)
                      end;
                  [] -> {error, "Korisnik ne postoji"}
              end
@@ -105,6 +113,7 @@ korisnik_object(Korisnik) ->
       email => Korisnik#db_korisnik.email,
       opis => Korisnik#db_korisnik.opis,
       uloga => Korisnik#db_korisnik.uloga,
+      kolegiji => Korisnik#db_korisnik.kolegiji,
       dodatno => Korisnik#db_korisnik.dodatno}.
 
 dohvati_korisnike() ->
@@ -115,8 +124,19 @@ dohvati_korisnike() ->
                            opis = Opis,
                            uloga = Uloga,
                            email = Email,
+                           kolegiji = Kolegiji,
                            dodatno = Dodatno},
               Acc) ->
+             NoviKolegiji =
+                 lists:map(fun(Kolegij) ->
+                              case mnesia:read({db_kolegij, Kolegij}) of
+                                  [#db_kolegij{id = IdK, naziv = NazivK}] ->
+                                      #{id => IdK, naziv => NazivK};
+                                  [] -> undefined
+                              end
+                           end,
+                           Kolegiji),
+
              Extra = model_switch(Uloga, Dodatno),
              [#{id => Id,
                 ime => Ime,
@@ -124,6 +144,7 @@ dohvati_korisnike() ->
                 oib => Oib,
                 email => Email,
                 opis => Opis,
+                kolegiji => NoviKolegiji,
                 uloga => parse_role(Uloga),
                 dodatno => Extra}
               | Acc]
@@ -139,8 +160,8 @@ parse_role(djelatnik) ->
 model_switch(Role, Extra) ->
     case Role of
         student ->
-            #student{kolegiji = Kolegij} = Extra,
-            #{kolegij => Kolegij};
+            #student{ocjene = Ocjene} = Extra,
+            #{ocjene => Ocjene};
         djelatnik ->
             #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = VrijemeKonz} = Extra,
             #{kabinet => Kabinet, vrijeme_konzultacija => VrijemeKonz}
