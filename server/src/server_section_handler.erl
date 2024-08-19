@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PUT">>, <<"DELETE">>], Req, State}.
+    {[<<"POST">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -60,10 +60,10 @@ json_request(Req, State) ->
         {error, Reason, _} ->
             request:err(400, Reason, Req, State);
         {ok, Map, Req2} ->
-            run_put_request(Map, Req2, State)
+            run_post_request(Map, Req2, State)
     end.
 
-run_put_request(Map, Req, State) ->
+run_post_request(Map, Req, State) ->
     case course:dodaj_sekciju(
              maps:get(<<"kolegij">>, Map), maps:get(<<"naziv">>, Map), maps:get(<<"opis">>, Map))
     of

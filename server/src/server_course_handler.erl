@@ -8,7 +8,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"PUT">>, <<"POST">>, <<"DELETE">>], Req, State}.
+    {[<<"GET">>, <<"POST">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -98,33 +98,12 @@ json_request(Req, State) ->
         {error, Reason, _} ->
             request:err(400, Reason, Req, State);
         {ok, Map, Req2} ->
-            case cowboy_req:method(Req2) of
-                <<"POST">> ->
-                    run_post_request(Map, Req, State);
-                <<"PUT">> ->
-                    run_put_request(Map, Req2, State)
-            end
-    end.
-
-run_put_request(Map, Req, State) ->
-    case course:dodaj_kolegij(
-             maps:get(<<"naziv">>, Map), maps:get(<<"skraceno">>, Map))
-    of
-        {atomic, Result} ->
-            case Result of
-                {error, Reason} ->
-                    request:err(403, Reason, Req, State);
-                {ok, Id} ->
-                    request:send_response(Req, Id, State)
-            end;
-        {aborted, Reason} ->
-            request:err(403, Reason, Req, State)
+            run_post_request(Map, Req2, State)
     end.
 
 run_post_request(Map, Req, State) ->
-    io:format("POST"),
-    case course:dodaj_studenta_na_kolegij(
-             maps:get(<<"student">>, Map), maps:get(<<"kolegij">>, Map))
+    case course:dodaj_kolegij(
+             maps:get(<<"naziv">>, Map), maps:get(<<"skraceno">>, Map))
     of
         {atomic, Result} ->
             case Result of

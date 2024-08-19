@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PUT">>, <<"DELETE">>], Req, State}.
+    {[<<"POST">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of

@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PUT">>], Req, State}.
+    {[<<"POST">>, <<"PATCH">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -44,10 +44,38 @@ json_request(Req, State) ->
         {error, Reason, _} ->
             request:err(400, Reason, Req, State);
         {ok, Map, Req2} ->
-            run_put_request(Map, Req2, State)
+            case cowboy_req:method(Req2) of
+                <<"POST">> ->
+                    run_post_request(Map, Req2, State);
+                <<"PATCH">> ->
+                    PathInfo = cowboy_req:path_info(Req2),
+                    io:format("~p~n", [erlang:length(PathInfo)]),
+                    case erlang:length(PathInfo) of
+                        1 ->
+                            case PathInfo of
+                                undefined ->
+                                    cowboy_req:reply(404, Req2);
+                                _ ->
+                                    LastPath = lists:last(PathInfo),
+                                    case LastPath of
+                                        <<"add">> ->
+                                            run_patch_add_request(Map, Req2, State);
+                                        <<"delete">> ->
+                                            run_patch_delete_request(Map, Req2, State);
+                                        _ ->
+                                            io:format("~p~n", [LastPath]),
+                                            Reply = cowboy_req:reply(404, Req),
+                                            {stop, Reply, State}
+                                    end
+                            end;
+                        _ ->
+                            Reply = cowboy_req:reply(404, Req),
+                            {stop, Reply, State}
+                    end
+            end
     end.
 
-run_put_request(Map, Req, State) ->
+run_post_request(Map, Req, State) ->
     case user:dodaj_studenta(
              maps:get(<<"ime">>, Map),
              maps:get(<<"prezime">>, Map),
@@ -55,6 +83,36 @@ run_put_request(Map, Req, State) ->
              maps:get(<<"lozinka">>, Map),
              maps:get(<<"email">>, Map),
              maps:get(<<"opis">>, Map, <<"">>))
+    of
+        {atomic, Result} ->
+            case Result of
+                {error, Reason} ->
+                    request:err(403, Reason, Req, State);
+                {ok, Id} ->
+                    request:send_response(Req, Id, State)
+            end;
+        {aborted, Reason} ->
+            request:err(403, Reason, Req, State)
+    end.
+
+run_patch_add_request(Map, Req, State) ->
+    case course:dodaj_studenta_na_kolegij(
+             maps:get(<<"student">>, Map), maps:get(<<"kolegij">>, Map))
+    of
+        {atomic, Result} ->
+            case Result of
+                {error, Reason} ->
+                    request:err(403, Reason, Req, State);
+                {ok, Id} ->
+                    request:send_response(Req, Id, State)
+            end;
+        {aborted, Reason} ->
+            request:err(403, Reason, Req, State)
+    end.
+
+run_patch_delete_request(Map, Req, State) ->
+    case course:obrisi_studenta_sa_kolegija(
+             maps:get(<<"student">>, Map), maps:get(<<"kolegij">>, Map))
     of
         {atomic, Result} ->
             case Result of

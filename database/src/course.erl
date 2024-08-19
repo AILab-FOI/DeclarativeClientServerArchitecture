@@ -3,8 +3,9 @@
 -include_lib("database/include/records.hrl").
 
 -export([dohvati_kolegij/1, dodaj_kolegij/2, dohvati_kolegije/0, obrisi_kolegij/1,
-         dodaj_studenta_na_kolegij/2, obrisi_studenta_sa_kolegija/2, dodaj_sekciju/3,
-         obrisi_sekciju/1, uredi_sekciju/4, dodaj_sadrzaj/5, obrisi_sadrzaj/1, uredi_sadrzaj/3]).
+         dodaj_studenta_na_kolegij/2, obrisi_studenta_sa_kolegija/2, dodaj_djelatnika_na_kolegij/2,
+         obrisi_djelatnika_sa_kolegija/2, dodaj_sekciju/3, obrisi_sekciju/1, uredi_sekciju/4,
+         dodaj_sadrzaj/5, obrisi_sadrzaj/1, uredi_sadrzaj/3]).
 
 dodaj_kolegij(Naziv, Skraceno) ->
     Id = ?ID,
@@ -142,6 +143,74 @@ dohvati_kolegije() ->
     {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_kolegij) end),
     Record.
 
+% TODO: Spojiti djelatnike sa kolegijem (Status - Asistent, Predavač, Nositelj,...)
+
+dodaj_djelatnika_na_kolegij(IdDjelatnik, IdKolegij) ->
+    Fun = fun() ->
+             operations:read_secure(function,
+                                    db_kolegij,
+                                    IdKolegij,
+                                    fun(Kolegij) ->
+                                       Sudionici = Kolegij#db_kolegij.sudionici ++ [IdDjelatnik],
+                                       operations:write_secure(function,
+                                                               Kolegij#db_kolegij{sudionici =
+                                                                                      Sudionici},
+                                                               fun() ->
+                                                                  operations:read_secure(function,
+                                                                                         db_korisnik,
+                                                                                         IdDjelatnik,
+                                                                                         fun(Korisnik) ->
+                                                                                            Kolegiji =
+                                                                                                Korisnik#db_korisnik.kolegiji
+                                                                                                ++ [IdKolegij],
+                                                                                            operations:write_secure(object,
+                                                                                                                    Korisnik#db_korisnik{kolegiji
+                                                                                                                                             =
+                                                                                                                                             Kolegiji},
+                                                                                                                    {ok,
+                                                                                                                     done})
+                                                                                         end)
+                                                               end)
+                                    end)
+          end,
+    mnesia:transaction(Fun).
+
+obrisi_djelatnika_sa_kolegija(IdDjelatnik, IdKolegij) ->
+    Fun = fun() ->
+             operations:read_secure(function,
+                                    db_kolegij,
+                                    IdKolegij,
+                                    fun(Kolegij) ->
+                                       Sudionici =
+                                           [Sudionik
+                                            || Sudionik <- Kolegij#db_kolegij.sudionici,
+                                               Sudionik /= IdDjelatnik],
+                                       operations:write_secure(function,
+                                                               Kolegij#db_kolegij{sudionici =
+                                                                                      Sudionici},
+                                                               fun() ->
+                                                                  operations:read_secure(function,
+                                                                                         db_korisnik,
+                                                                                         IdDjelatnik,
+                                                                                         fun(Korisnik) ->
+                                                                                            Kolegiji =
+                                                                                                [Kolegij2
+                                                                                                 || Kolegij2
+                                                                                                        <- Korisnik#db_korisnik.kolegiji,
+                                                                                                    Kolegij2
+                                                                                                    /= IdKolegij],
+                                                                                            operations:write_secure(object,
+                                                                                                                    Korisnik#db_korisnik{kolegiji
+                                                                                                                                             =
+                                                                                                                                             Kolegiji},
+                                                                                                                    {ok,
+                                                                                                                     done})
+                                                                                         end)
+                                                               end)
+                                    end)
+          end,
+    mnesia:transaction(Fun).
+
 dodaj_studenta_na_kolegij(IdStudent, IdKolegij) ->
     Fun = fun() ->
              operations:read_secure(function,
@@ -216,7 +285,7 @@ dodaj_sekciju(IdKolegij, Naziv, Opis) ->
                                     IdKolegij,
                                     fun(Kolegij) ->
                                        Sekcija =
-                                           #db_sekcija{id = ?ID,
+                                           #db_sekcija{id = Id,
                                                        naziv = Naziv,
                                                        opis = Opis,
                                                        sadrzaj = []},

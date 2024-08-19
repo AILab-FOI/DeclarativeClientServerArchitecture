@@ -6,8 +6,8 @@ start() ->
     Dispatch =
         cowboy_router:compile([{'_',
                                 [{"/home/", server_home_handler, []},
-                                 {"/student/", server_student_handler, []},
-                                 {"/worker/", server_worker_handler, []},
+                                 {"/student/[...]", server_student_handler, []},
+                                 {"/worker/[...]", server_worker_handler, []},
                                  {"/course/[:id]", server_course_handler, []},
                                  {"/section/[:id]", server_section_handler, []},
                                  {"/content/[:id]", server_content_handler, []},
