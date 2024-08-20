@@ -67,8 +67,7 @@
         {id_fakultet :: fakultet_ref(), id_korisnik :: korisnik_ref()}).
 -record(db_fakultet_katedra,
         {id_fakultet :: fakultet_ref(), id_katedra :: katedra_ref()}).
--record(db_katedra,
-        {id :: id(), naziv :: binary(), id_djelatnik = [] :: [id()], id_kolegij = [] :: [id()]}).
+-record(db_katedra, {id :: id(), naziv :: binary()}).
 -record(db_katedra_djelatnik,
         {id_katedra :: katedra_ref(), id_djelatnik :: korisnik_ref()}).
 -record(db_korisnik,
@@ -84,11 +83,8 @@
 -record(student, {nadimak :: binary()}).
 -record(djelatnik, {kabinet :: binary(), vrijeme_konzultacija = [] :: [datum_vrijeme()]}).
 -record(db_djelatnik_kolegij,
-        {id_kolegij :: kolegij_ref(),
-         id_djelatnik :: korisnik_ref(),
-         status :: status_djelatnika()}).
--record(db_student_kolegij,
-        {id_student :: korisnik_ref(), id_kolegij :: kolegij_ref(), ocjene :: [{}]}).
+        {id :: {korisnik_ref(), kolegij_ref()}, status :: status_djelatnika()}).
+-record(db_student_kolegij, {id :: {korisnik_ref(), kolegij_ref()}, ocjene :: [{}]}).
 -record(db_kolegij, {id :: id(), naziv :: binary(), skraceno :: binary()}).
 -record(db_kolegij_sekcija, {id_kolegij :: kolegij_ref(), id_sekcija :: sekcija_ref()}).
 -record(db_sekcija, {id :: id(), naziv :: binary(), opis :: binary()}).
@@ -97,7 +93,6 @@
         {id :: id(),
          naziv :: binary(),
          tip :: dokument | lekcija | poveznica | kviz,
-         redoslijed :: id(),
          vrijednost :: dokument() | lekcija() | poveznica() | kviz_ref()}).
 -record(dokument, {referenca :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
 -record(lekcija, {sadrzaj :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
@@ -113,6 +108,5 @@
          pitanje_odgovor :: [{pitanje_ref(), odgovor()}],
          vrijeme_rjesavanja :: datum_vrijeme(),
          bodovi :: float()}).
--record(db_pitanje,
-        {id :: id(), kviz :: kviz_ref(), naslov :: binary(), odgovori = [] :: [odgovor()]}).
+-record(db_pitanje, {id :: id(), naziv :: binary(), odgovori = [] :: [odgovor()]}).
 -record(odgovor, {id :: id(), vrijednost :: binary(), tocan :: boolean()}).

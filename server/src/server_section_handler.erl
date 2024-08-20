@@ -36,7 +36,7 @@ charsets_provided(Req, State) ->
 delete_resource(Req, State) ->
     case utils:gather_json(Req) of
         {ok, Map, Req2} ->
-            case course:obrisi_sekciju(
+            case section:obrisi_sekciju(
                      maps:get(<<"id">>, Map))
             of
                 {atomic, ok} ->
@@ -64,8 +64,8 @@ json_request(Req, State) ->
     end.
 
 run_post_request(Map, Req, State) ->
-    case course:dodaj_sekciju(
-             maps:get(<<"kolegij">>, Map), maps:get(<<"naziv">>, Map), maps:get(<<"opis">>, Map))
+    case section:dodaj_sekcija(
+             maps:get(<<"naziv">>, Map), maps:get(<<"opis">>, Map, <<"">>))
     of
         {atomic, Result} ->
             case Result of

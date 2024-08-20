@@ -1,9 +1,12 @@
 -module(user).
 
 -include_lib("database/include/records.hrl").
+-include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dodaj_studenta/7, dodaj_djelatnika/7, prijava/2, dohvati_korisnika/1,
-         dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/3, uredi_djelatnika/4]).
+         dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/3, uredi_djelatnika/4,
+         dodaj_studenta_na_kolegij/2, dodaj_djelatnika_na_kolegij/3, dodaj_djelatnika_na_katedru/2,
+         dohvati_studenta_na_kolegiju/2, dohvati_kolegije_studenta/1]).
 
 dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis, Nadimak) ->
     Dodatno = #student{nadimak = Nadimak},
@@ -55,7 +58,8 @@ uredi_djelatnika(Id, Opis, Kabinet, VrijemeKonzultacija) ->
 uredi_korisnika(Id, Opis, Dodatno) ->
     Fun = fun() ->
              utils:read_secure(function,
-                               {db_korisnik, Id},
+                               db_korisnik,
+                               Id,
                                fun(Korisnik) ->
                                   NoviKorisnik =
                                       Korisnik#db_korisnik{opis = Opis, dodatno = Dodatno},
@@ -87,6 +91,60 @@ dohvati_korisnika(Id) ->
                          false -> dohvati_djelatnika(Korisnik)
                      end;
                  [] -> {error, "Korisnik ne postoji"}
+             end
+          end,
+    mnesia:transaction(Fun).
+
+dodaj_studenta_na_kolegij(IdStudent, IdKolegij) ->
+    Fun = fun() -> mnesia:write(#db_student_kolegij{id = {IdStudent, IdKolegij}, ocjene = []})
+          end,
+    mnesia:transaction(Fun).
+
+dodaj_djelatnika_na_kolegij(IdDjelatnik, IdKolegij, Status) ->
+    Fun = fun() ->
+             mnesia:write(#db_djelatnik_kolegij{id = {IdDjelatnik, IdKolegij}, status = Status})
+          end,
+    mnesia:transaction(Fun).
+
+dodaj_djelatnika_na_katedru(IdDjelatnik, IdKatedra) ->
+    Fun = fun() ->
+             mnesia:write(#db_katedra_djelatnik{id_katedra = IdKatedra, id_djelatnik = IdDjelatnik})
+          end,
+    mnesia:transaction(Fun).
+
+dohvati_studenta_na_kolegiju(IdStudent, IdKolegij) ->
+    Fun = fun() ->
+             Match =
+                 ets:fun2ms(fun(#db_student_kolegij{id = {Student, Kolegij}, ocjene = Ocjene})
+                               when Student =:= IdStudent andalso Kolegij =:= IdKolegij ->
+                               {Student, Ocjene}
+                            end),
+             case mnesia:select(db_student_kolegij, Match) of
+                 [] -> {"Student nije na kolegiju"};
+                 [{StudentId, Ocjene}] ->
+                     {atomic, Result} = dohvati_korisnika(StudentId),
+                     #{student => Result, ocjene => Ocjene}
+             end
+          end,
+    mnesia:transaction(Fun).
+
+dohvati_kolegije_studenta(IdStudent) ->
+    Fun = fun() ->
+             Match =
+                 ets:fun2ms(fun(#db_student_kolegij{id = {Student, Kolegij}, ocjene = Ocjene})
+                               when Student =:= IdStudent ->
+                               Kolegij
+                            end),
+             case mnesia:select(db_student_kolegij, Match) of
+                 [] -> {"Student nema kolegija"};
+                 Kolegiji ->
+                     NoviKolegiji =
+                         lists:map(fun(Kolegij) ->
+                                      {atomic, Result} = course:dohvati_kolegij(Kolegij),
+                                      Result
+                                   end,
+                                   Kolegiji),
+                     #{student => IdStudent, kolegiji => NoviKolegiji}
              end
           end,
     mnesia:transaction(Fun).
@@ -134,7 +192,7 @@ model_switch(Role, Extra) ->
     case Role of
         student ->
             #student{nadimak = Nadimak} = Extra,
-            #{ocjene => Nadimak};
+            #{nadimak => Nadimak};
         djelatnik ->
             #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = VrijemeKonz} = Extra,
             #{kabinet => Kabinet, vrijeme_konzultacija => VrijemeKonz}

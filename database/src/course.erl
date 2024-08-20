@@ -1,27 +1,22 @@
 -module(course).
 
 -include_lib("database/include/records.hrl").
+-include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dohvati_kolegij/1, dodaj_kolegij/2, dohvati_kolegije/0, obrisi_kolegij/1,
-         dodaj_studenta_na_kolegij/2, obrisi_studenta_sa_kolegija/2, dodaj_djelatnika_na_kolegij/2,
-         obrisi_djelatnika_sa_kolegija/2, dodaj_sekciju/3, obrisi_sekciju/1, uredi_sekciju/4,
-         dodaj_sadrzaj/5, obrisi_sadrzaj/1, uredi_sadrzaj/3]).
+         uredi_kolegij/3, dodaj_sekciju_na_kolegij/2, dohvati_sekcije_na_kolegiju/1,
+         dohvati_sekciju_na_kolegiju/2]).
 
 dodaj_kolegij(Naziv, Skraceno) ->
     Id = ?ID,
     Fun = fun() ->
-             case mnesia:index_read(db_kolegij, Naziv, #db_kolegij.naziv) == [] of
-                 false -> {error, "Korisnik postoji"};
-                 true ->
-                     case mnesia:write(#db_kolegij{id = Id,
-                                                   naziv = Naziv,
-                                                   skraceno = Skraceno,
-                                                   sekcije = [],
-                                                   sudionici = []})
-                     of
-                         ok -> {ok, Id};
-                         _ -> {error, "Transakcija neuspješna"}
-                     end
+             io:format("~p~n~p~n", [Naziv, Skraceno]),
+             case mnesia:write(#db_kolegij{id = Id,
+                                           naziv = Naziv,
+                                           skraceno = Skraceno})
+             of
+                 ok -> {ok, Id};
+                 _ -> {error, "Transakcija neuspješna"}
              end
           end,
     mnesia:transaction(Fun).
@@ -33,45 +28,10 @@ obrisi_kolegij(Id) ->
 dohvati_kolegij(Id) ->
     Fun = fun() ->
              case mnesia:read({db_kolegij, Id}) of
-                 [#db_kolegij{naziv = Naziv,
-                              skraceno = Skraceno,
-                              sudionici = Sudionici,
-                              sekcije = Sekcije}] ->
-                     NoveSekcije =
-                         lists:map(fun(Sekcija) ->
-                                      case mnesia:read({db_sekcija, Sekcija}) of
-                                          [#db_sekcija{id = IdS,
-                                                       naziv = NazivS,
-                                                       opis = Opis,
-                                                       sadrzaj = Sadrzaj}] ->
-                                              NoviSadrzaj =
-                                                  lists:map(fun(S) ->
-                                                               case mnesia:read({db_sadrzaj, S}) of
-                                                                   [#db_sadrzaj{id = IdSadrzaj,
-                                                                                tip = Tip,
-                                                                                vrijednost =
-                                                                                    Vrijednost}] ->
-                                                                       #{id => IdSadrzaj,
-                                                                         tip => Tip,
-                                                                         vrijednost => Vrijednost};
-                                                                   [] -> undefined
-                                                               end
-                                                            end,
-                                                            Sadrzaj),
-                                              #{id => IdS,
-                                                naziv => NazivS,
-                                                opis => Opis,
-                                                sadrzaj => NoviSadrzaj};
-                                          [] -> undefined
-                                      end
-                                   end,
-                                   Sekcije),
-
+                 [#db_kolegij{naziv = Naziv, skraceno = Skraceno}] ->
                      #{id => Id,
                        naziv => Naziv,
-                       skraceno => Skraceno,
-                       sudionici => Sudionici,
-                       sekcije => NoveSekcije};
+                       skraceno => Skraceno};
                  [] -> {error, "Kolegij ne postoji"}
              end
           end,
@@ -80,311 +40,70 @@ dohvati_kolegij(Id) ->
 dohvati_kolegije() ->
     Fun = fun(#db_kolegij{id = Id,
                           naziv = Naziv,
-                          skraceno = Skraceno,
-                          sudionici = Sudionici,
-                          sekcije = Sekcije},
+                          skraceno = Skraceno},
               Acc) ->
-             io:format("~p~n", [Sudionici]),
-             NoviSudionici =
-                 lists:map(fun(Sudionik) ->
-                              case mnesia:read({db_korisnik, Sudionik}) of
-                                  [#db_korisnik{id = IdKorisnik,
-                                                ime = Ime,
-                                                prezime = Prezime}] ->
-                                      #{id => IdKorisnik,
-                                        ime => Ime,
-                                        prezime => Prezime};
-                                  [] -> undefined
-                              end
-                           end,
-                           Sudionici),
-             NoveSekcije =
-                 lists:map(fun(Sekcija) ->
-                              case mnesia:read({db_sekcija, Sekcija}) of
-                                  [#db_sekcija{id = IdS,
-                                               naziv = NazivS,
-                                               opis = Opis,
-                                               sadrzaj = Sadrzaj}] ->
-                                      NoviSadrzaj =
-                                          lists:map(fun(S) ->
-                                                       case mnesia:read({db_sadrzaj, S}) of
-                                                           [#db_sadrzaj{id = IdSadrzaj,
-                                                                        tip = Tip,
-                                                                        naziv = NazivSadr,
-                                                                        redoslijed = Redoslijed,
-                                                                        vrijednost = Vrijednost}] ->
-                                                               io:format("~p~n", [Sadrzaj]),
-                                                               #{id => IdSadrzaj,
-                                                                 tip => Tip,
-                                                                 naziv => NazivSadr,
-                                                                 redoslijed => Redoslijed,
-                                                                 vrijednost => Vrijednost};
-                                                           [] -> undefined
-                                                       end
-                                                    end,
-                                                    Sadrzaj),
-
-                                      #{id => IdS,
-                                        naziv => NazivS,
-                                        opis => Opis,
-                                        sadrzaj => NoviSadrzaj};
-                                  [] -> undefined
-                              end
-                           end,
-                           Sekcije),
-
              [#{id => Id,
                 naziv => Naziv,
-                skraceno => Skraceno,
-                sudionici => NoviSudionici,
-                sekcije => NoveSekcije}
+                skraceno => Skraceno}
               | Acc]
           end,
     {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_kolegij) end),
     Record.
 
-% TODO: Spojiti djelatnike sa kolegijem (Status - Asistent, Predavač, Nositelj,...)
-
-dodaj_djelatnika_na_kolegij(IdDjelatnik, IdKolegij) ->
+uredi_kolegij(Id, Naziv, Skraceno) ->
     Fun = fun() ->
-             operations:read_secure(function,
-                                    db_kolegij,
-                                    IdKolegij,
-                                    fun(Kolegij) ->
-                                       Sudionici = Kolegij#db_kolegij.sudionici ++ [IdDjelatnik],
-                                       operations:write_secure(function,
-                                                               Kolegij#db_kolegij{sudionici =
-                                                                                      Sudionici},
-                                                               fun() ->
-                                                                  operations:read_secure(function,
-                                                                                         db_korisnik,
-                                                                                         IdDjelatnik,
-                                                                                         fun(Korisnik) ->
-                                                                                            Kolegiji =
-                                                                                                Korisnik#db_korisnik.kolegiji
-                                                                                                ++ [IdKolegij],
-                                                                                            operations:write_secure(object,
-                                                                                                                    Korisnik#db_korisnik{kolegiji
-                                                                                                                                             =
-                                                                                                                                             Kolegiji},
-                                                                                                                    {ok,
-                                                                                                                     done})
-                                                                                         end)
-                                                               end)
-                                    end)
+             case mnesia:write(#db_kolegij{id = Id,
+                                           naziv = Naziv,
+                                           skraceno = Skraceno})
+             of
+                 ok -> {ok, Id};
+                 _ -> {error, "Transakcija neuspješna"}
+             end
           end,
     mnesia:transaction(Fun).
 
-obrisi_djelatnika_sa_kolegija(IdDjelatnik, IdKolegij) ->
+dodaj_sekciju_na_kolegij(IdKolegij, IdSekcija) ->
     Fun = fun() ->
-             operations:read_secure(function,
-                                    db_kolegij,
-                                    IdKolegij,
-                                    fun(Kolegij) ->
-                                       Sudionici =
-                                           [Sudionik
-                                            || Sudionik <- Kolegij#db_kolegij.sudionici,
-                                               Sudionik /= IdDjelatnik],
-                                       operations:write_secure(function,
-                                                               Kolegij#db_kolegij{sudionici =
-                                                                                      Sudionici},
-                                                               fun() ->
-                                                                  operations:read_secure(function,
-                                                                                         db_korisnik,
-                                                                                         IdDjelatnik,
-                                                                                         fun(Korisnik) ->
-                                                                                            Kolegiji =
-                                                                                                [Kolegij2
-                                                                                                 || Kolegij2
-                                                                                                        <- Korisnik#db_korisnik.kolegiji,
-                                                                                                    Kolegij2
-                                                                                                    /= IdKolegij],
-                                                                                            operations:write_secure(object,
-                                                                                                                    Korisnik#db_korisnik{kolegiji
-                                                                                                                                             =
-                                                                                                                                             Kolegiji},
-                                                                                                                    {ok,
-                                                                                                                     done})
-                                                                                         end)
-                                                               end)
-                                    end)
+             mnesia:write(#db_kolegij_sekcija{id_kolegij = IdKolegij, id_sekcija = IdSekcija})
           end,
     mnesia:transaction(Fun).
 
-dodaj_studenta_na_kolegij(IdStudent, IdKolegij) ->
+dohvati_sekcije_na_kolegiju(IdKolegij) ->
     Fun = fun() ->
-             operations:read_secure(function,
-                                    db_kolegij,
-                                    IdKolegij,
-                                    fun(Kolegij) ->
-                                       Sudionici = Kolegij#db_kolegij.sudionici ++ [IdStudent],
-                                       operations:write_secure(function,
-                                                               Kolegij#db_kolegij{sudionici =
-                                                                                      Sudionici},
-                                                               fun() ->
-                                                                  operations:read_secure(function,
-                                                                                         db_korisnik,
-                                                                                         IdStudent,
-                                                                                         fun(Korisnik) ->
-                                                                                            Kolegiji =
-                                                                                                Korisnik#db_korisnik.kolegiji
-                                                                                                ++ [IdKolegij],
-                                                                                            operations:write_secure(object,
-                                                                                                                    Korisnik#db_korisnik{kolegiji
-                                                                                                                                             =
-                                                                                                                                             Kolegiji},
-                                                                                                                    {ok,
-                                                                                                                     done})
-                                                                                         end)
-                                                               end)
-                                    end)
+             Match =
+                 ets:fun2ms(fun(#db_kolegij_sekcija{id_kolegij = Kolegij, id_sekcija = Sekcija})
+                               when Kolegij =:= IdKolegij ->
+                               Sekcija
+                            end),
+             case mnesia:select(db_kolegij_sekcija, Match) of
+                 [] -> {"Fakultet nema korisnika"};
+                 S ->
+                     {atomic, Kolegij} = dohvati_kolegij(IdKolegij),
+                     Sekcije =
+                         lists:map(fun(Sekcija) ->
+                                      {atomic, Result} = section:dohvati_sekcija(Sekcija),
+                                      Result
+                                   end,
+                                   S),
+                     #{kolegij => Kolegij, sekcije => Sekcije}
+             end
           end,
     mnesia:transaction(Fun).
 
-obrisi_studenta_sa_kolegija(IdStudent, IdKolegij) ->
+dohvati_sekciju_na_kolegiju(IdKolegij, IdSekcija) ->
     Fun = fun() ->
-             operations:read_secure(function,
-                                    db_kolegij,
-                                    IdKolegij,
-                                    fun(Kolegij) ->
-                                       Sudionici =
-                                           [Sudionik
-                                            || Sudionik <- Kolegij#db_kolegij.sudionici,
-                                               Sudionik /= IdStudent],
-                                       operations:write_secure(function,
-                                                               Kolegij#db_kolegij{sudionici =
-                                                                                      Sudionici},
-                                                               fun() ->
-                                                                  operations:read_secure(function,
-                                                                                         db_korisnik,
-                                                                                         IdStudent,
-                                                                                         fun(Korisnik) ->
-                                                                                            Kolegiji =
-                                                                                                [Kolegij2
-                                                                                                 || Kolegij2
-                                                                                                        <- Korisnik#db_korisnik.kolegiji,
-                                                                                                    Kolegij2
-                                                                                                    /= IdKolegij],
-                                                                                            operations:write_secure(object,
-                                                                                                                    Korisnik#db_korisnik{kolegiji
-                                                                                                                                             =
-                                                                                                                                             Kolegiji},
-                                                                                                                    {ok,
-                                                                                                                     done})
-                                                                                         end)
-                                                               end)
-                                    end)
-          end,
-    mnesia:transaction(Fun).
-
-dodaj_sekciju(IdKolegij, Naziv, Opis) ->
-    Id = ?ID,
-    Fun = fun() ->
-             operations:read_secure(function,
-                                    db_kolegij,
-                                    IdKolegij,
-                                    fun(Kolegij) ->
-                                       Sekcija =
-                                           #db_sekcija{id = Id,
-                                                       naziv = Naziv,
-                                                       opis = Opis,
-                                                       sadrzaj = []},
-                                       operations:write_secure(function,
-                                                               Sekcija,
-                                                               fun() ->
-                                                                  NoviKolegij =
-                                                                      Kolegij#db_kolegij{sekcije =
-                                                                                             [Sekcija#db_sekcija.id
-                                                                                              | Kolegij#db_kolegij.sekcije]},
-                                                                  operations:write_secure(object,
-                                                                                          NoviKolegij,
-                                                                                          {ok, Id})
-                                                               end)
-                                    end)
-          end,
-    mnesia:transaction(Fun).
-
-uredi_sekciju(Id, Naziv, Opis, Sadrzaj) ->
-    Fun = fun() ->
-             operations:read_secure(function,
-                                    db_sekcija,
-                                    Id,
-                                    fun(Sekcija) ->
-                                       NovaSekcija =
-                                           Sekcija#db_sekcija{naziv = Naziv,
-                                                              opis = Opis,
-                                                              sadrzaj = Sadrzaj},
-                                       operations:write_secure(obj, NovaSekcija, {ok, Id})
-                                    end)
-          end,
-    mnesia:transaction(Fun).
-
-obrisi_sekciju(Id) ->
-    Fun = fun() ->
-             mnesia:delete({db_sekcija, Id}),
-
-             Kolegiji = mnesia:foldl(fun(Kolegij, Acc) -> [Kolegij | Acc] end, [], db_kolegij),
-             lists:foreach(fun(Kolegij) ->
-                              NoveSekcije =
-                                  [Sekcija || Sekcija <- Kolegij#db_kolegij.sekcije, Sekcija /= Id],
-                              mnesia:write(Kolegij#db_kolegij{sekcije = NoveSekcije})
-                           end,
-                           Kolegiji),
-             ok
-          end,
-    mnesia:transaction(Fun).
-
-dodaj_sadrzaj(IdSekcija, Naziv, Redoslijed, Tip, Obj) ->
-    Id = ?ID,
-    Fun = fun() ->
-             operations:read_secure(function,
-                                    db_sekcija,
-                                    IdSekcija,
-                                    fun(Sekcija) ->
-                                       Sadrzaj =
-                                           #db_sadrzaj{id = Id,
-                                                       naziv = Naziv,
-                                                       tip = Tip,
-                                                       redoslijed = Redoslijed,
-                                                       vrijednost = Obj},
-                                       operations:write_secure(function,
-                                                               Sadrzaj,
-                                                               fun() ->
-                                                                  NovaSekcija =
-                                                                      Sekcija#db_sekcija{sadrzaj =
-                                                                                             [Sadrzaj#db_sadrzaj.id
-                                                                                              | Sekcija#db_sekcija.sadrzaj]},
-                                                                  operations:write_secure(object,
-                                                                                          NovaSekcija,
-                                                                                          {ok, Id})
-                                                               end)
-                                    end)
-          end,
-    mnesia:transaction(Fun).
-
-uredi_sadrzaj(IdSadrzaj, Tip, Obj) ->
-    Fun = fun() ->
-             operations:read_secure(function,
-                                    {db_sadrzaj, IdSadrzaj},
-                                    fun(Sadrzaj) ->
-                                       NoviSadrzaj =
-                                           Sadrzaj#db_sadrzaj{tip = Tip, vrijednost = Obj},
-                                       operations:write_secure(object, NoviSadrzaj, {ok, IdSadrzaj})
-                                    end)
-          end,
-    mnesia:transaction(Fun).
-
-obrisi_sadrzaj(Id) ->
-    Fun = fun() ->
-             mnesia:delete({db_sadrzaj, Id}),
-
-             Sekcije = mnesia:foldl(fun(Sekcija, Acc) -> [Sekcija | Acc] end, [], db_sekcija),
-             lists:foreach(fun(Sekcija) ->
-                              NoviSadrzaj =
-                                  [Sadrzaj || Sadrzaj <- Sekcija#db_sekcija.sadrzaj, Sadrzaj /= Id],
-                              mnesia:write(Sekcija#db_sekcija{sadrzaj = NoviSadrzaj})
-                           end,
-                           Sekcije),
-             ok
+             Match =
+                 ets:fun2ms(fun(#db_kolegij_sekcija{id_kolegij = Kolegij, id_sekcija = Sekcija})
+                               when Kolegij =:= IdKolegij andalso Sekcija =:= IdSekcija ->
+                               Sekcija
+                            end),
+             case mnesia:select(db_kolegij_sekcija, Match) of
+                 [Obj] ->
+                     io:format("~p~n", [Obj]),
+                     {atomic, Kolegij} = dohvati_kolegij(IdKolegij),
+                     {atomic, Sekcija} = section:dohvati_sekcija(Obj),
+                     #{kolegij => Kolegij, sekcija => Sekcija};
+                 [] -> {"Sekcija nije unutar kolegija"}
+             end
           end,
     mnesia:transaction(Fun).

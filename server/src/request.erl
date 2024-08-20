@@ -9,8 +9,7 @@ send_response(Req, Data, State) ->
     {stop, Reply, State}.
 
 err(Code, Reason, Req, State) ->
-    io:format("~p~n", [Reason]),
-    Formatted = iolist_to_binary(Reason),
+    Formatted = iolist_to_binary(io_lib:format("~p", [Reason])),
     Body = json:encode(#{data => Formatted}),
     Req2 = cowboy_req:set_resp_body(Body, Req),
     Reply = cowboy_req:reply(Code, Req2),
