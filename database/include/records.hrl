@@ -64,12 +64,13 @@
 
 -record(db_fakultet, {id :: id(), naziv :: binary(), adresa :: adresa()}).
 -record(db_fakultet_korisnik,
-        {id_fakultet :: fakultet_ref(), id_korisnik :: korisnik_ref()}).
+        {id_korisnik :: korisnik_ref(), id_fakultet :: fakultet_ref()}).
 -record(db_fakultet_katedra,
-        {id_fakultet :: fakultet_ref(), id_katedra :: katedra_ref()}).
+        {id_katedra :: katedra_ref(), id_fakultet :: fakultet_ref()}).
 -record(db_katedra, {id :: id(), naziv :: binary()}).
 -record(db_katedra_djelatnik,
         {id_katedra :: katedra_ref(), id_djelatnik :: korisnik_ref()}).
+-record(db_katedra_kolegij, {id_kolegij :: kolegij_ref(), id_katedra :: katedra_ref()}).
 -record(db_korisnik,
         {id :: id(),
          ime :: binary(),
@@ -88,7 +89,7 @@
 -record(db_kolegij, {id :: id(), naziv :: binary(), skraceno :: binary()}).
 -record(db_kolegij_sekcija, {id_kolegij :: kolegij_ref(), id_sekcija :: sekcija_ref()}).
 -record(db_sekcija, {id :: id(), naziv :: binary(), opis :: binary()}).
--record(db_sekcija_sadrzaj, {id_sekcija :: sekcija_ref(), id_sadrzaj :: sadrzaj_ref()}).
+-record(db_sekcija_sadrzaj, {id_sadrzaj :: sadrzaj_ref(), id_sekcija :: sekcija_ref()}).
 -record(db_sadrzaj,
         {id :: id(),
          naziv :: binary(),

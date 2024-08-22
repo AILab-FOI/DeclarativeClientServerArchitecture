@@ -3,6 +3,7 @@
 -export([send_response/3, err/4]).
 
 send_response(Req, Data, State) ->
+    io:format("~p~n", [Data]),
     Body = json:encode(#{data => Data}),
     Req2 = cowboy_req:set_resp_body(Body, Req),
     Reply = cowboy_req:reply(200, Req2),

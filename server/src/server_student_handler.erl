@@ -82,7 +82,8 @@ run_post_request(Map, Req, State) ->
              maps:get(<<"oib">>, Map),
              maps:get(<<"lozinka">>, Map),
              maps:get(<<"email">>, Map),
-             maps:get(<<"opis">>, Map, <<"">>))
+             maps:get(<<"opis">>, Map, <<"">>),
+             maps:get(<<"nadimak">>, Map, <<"">>))
     of
         {atomic, Result} ->
             case Result of

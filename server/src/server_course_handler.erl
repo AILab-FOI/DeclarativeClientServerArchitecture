@@ -71,11 +71,11 @@ html_request(Req, State) ->
     end.
 
 run_get_all_request(Req, State) ->
-    Result = course:dohvati_kolegije(),
+    {atomic, Result} = kolegij:dohvati(),
     request:send_response(Req, Result, State).
 
 run_get_request(Req, Id, State) ->
-    case course:dohvati_kolegij(binary_to_integer(Id)) of
+    case kolegij:dohvati(binary_to_integer(Id)) of
         {atomic, Result} ->
             case Result of
                 {error, Reason} ->
@@ -83,8 +83,8 @@ run_get_request(Req, Id, State) ->
                 _ ->
                     request:send_response(Req, Result, State)
             end;
-        {aborted, _} ->
-            request:err(404, "Database error", Req, State)
+        {aborted, Reason} ->
+            request:err(404, Reason, Req, State)
     end.
 
 from_json(Req, State) ->
@@ -102,7 +102,7 @@ json_request(Req, State) ->
     end.
 
 run_post_request(Map, Req, State) ->
-    case course:dodaj_kolegij(
+    case kolegij:dodaj(
              maps:get(<<"naziv">>, Map), maps:get(<<"skraceno">>, Map))
     of
         {atomic, Result} ->
