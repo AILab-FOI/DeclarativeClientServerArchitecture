@@ -53,13 +53,13 @@ dohvati_kolegije(IdStudent) ->
 dohvati_studenta_na_kolegiju(IdStudent, IdKolegij) ->
     Fun = fun() ->
              case mnesia:read({db_student_kolegij, {IdStudent, IdKolegij}}) of
-                 [#db_student_kolegij{id = {StudentId, KolegijId}, ocjene = Ocjene}] ->
-                     {atomic, Student} = user:dohvati_korisnika(StudentId),
-                     {atomic, Kolegij} = kolegij:dohvati(sekcije, KolegijId),
+                 [#db_student_kolegij{id = _, ocjene = Ocjene}] ->
+                     {atomic, Student} = korisnik:dohvati_korisnika(core, IdStudent),
+                     {atomic, Kolegij} = kolegij:dohvati(sekcije, IdKolegij),
                      #{student => Student,
                        kolegij => Kolegij,
                        ocjene => Ocjene};
-                 _ -> {error, 'Student nije na kolegiju'}
+                 _ -> {error, "Student nije na kolegiju"}
              end
           end,
     mnesia:transaction(Fun).

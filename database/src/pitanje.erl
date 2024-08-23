@@ -12,7 +12,7 @@ dohvati() ->
 dohvati(Id) ->
     Fun = fun() ->
              case mnesia:read({db_pitanje, Id}) of
-                 [Pitanje] -> ucitaj(full, Pitanje);
+                 [Pitanje] -> ucitaj(core, Pitanje);
                  [] -> {error, "Pitanje ne postoji"}
              end
           end,
@@ -60,10 +60,7 @@ uredi(Id, Naziv, Odgovori) ->
     mnesia:transaction(Fun).
 
 ucitaj(core, R) ->
-    transform_pitanje(R);
-ucitaj(full, R) ->
-    M0 = transform_pitanje(R),
-    pitanje_sadrzaj:ucitaj_sekcije(M0).
+    transform_pitanje(R).
 
 transform_pitanje(#db_pitanje{id = Id,
                               naziv = Naziv,

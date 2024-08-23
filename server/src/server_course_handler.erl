@@ -1,117 +1,74 @@
 -module(server_course_handler).
 
--export([init/2, allowed_methods/2, content_types_accepted/2, charsets_provided/2,
-         is_authorized/2, content_type_provided/2, from_html/2, to_html/2, delete_resource/2,
-         from_json/2, to_json/2]).
+-behaviour(cowboy_handler).
+
+-export([init/2, allowed_methods/2, charsets_provided/2, is_authorized/2,
+         content_type_provided/2, content_types_accepted/2, to_html/2, delete_resource/2,
+         from_json/2]).
 
 init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"PUT">>, <<"DELETE">>], Req, State}.
+    {[<<"GET">>, <<"PATCH">>, <<"PUT">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
-    case cowboy_req:header(<<"authorization">>, Req) of
-        undefined ->
-            {{false, <<"Bearer token_type=\"JWT\"">>}, Req, State};
-        <<"Bearer ", Token/binary>> ->
-            case jwt_manager:verify_access_token(Token) of
-                {ok, _} ->
-                    {true, Req, State};
-                {error, _} ->
-                    {{false, <<"Bearer token_type=\"JWT\"">>}, Req, State}
-            end
-    end.
+    request:auth(Req, State).
 
 content_types_accepted(Req, State) ->
-    {[{{<<"application">>, <<"json">>, []}, from_json},
-      {{<<"application">>, <<"json">>, []}, from_json}],
-     Req,
-     State}.
+    {[{{<<"application">>, <<"json">>, []}, from_json}], Req, State}.
 
 content_type_provided(Req, State) ->
-    {[{{<<"application">>, <<"json">>, []}, to_json},
-      {{<<"application">>, <<"json">>, []}, to_json}],
-     Req,
-     State}.
+    {[{{<<"application">>, <<"json">>, []}, to_html}], Req, State}.
 
 charsets_provided(Req, State) ->
     {[<<"utf-8">>], Req, State}.
 
 delete_resource(Req, State) ->
-    case utils:gather_json(Req) of
-        {ok, Map, Req2} ->
-            case kolegij:obrisi(
-                     maps:get(<<"id">>, Map))
-            of
-                {atomic, ok} ->
-                    request:send_response(Req2, <<"ok">>, State);
-                {aborted, Reason} ->
-                    request:err(400, Reason, Req, State)
-            end;
-        _ ->
-            request:err(400, "Db Error", Req, State)
-    end,
-    {stop, Req, State}.
-
-from_html(Req, State) ->
-    html_request(Req, State).
+    request:delete(Req, State, fun(Id) -> kolegij:obrisi(Id) end).
 
 to_html(Req, State) ->
     html_request(Req, State).
+
+from_json(Req, State) ->
+    json_request(Req, State).
 
 html_request(Req, State) ->
     case utils:gather_html(Req) of
         {error, Reason, _} ->
             request:err(400, Reason, Req, State);
         {ok, #{id := Id}, Req2} ->
-            run_get_request(Req2, Id, State);
+            request:response(Req2, State, fun() -> kolegij:dohvati(binary_to_integer(Id)) end);
         {ok, _, Req2} ->
-            run_get_all_request(Req2, State)
+            request:response(Req2, State, fun() -> kolegij:dohvati() end)
     end.
-
-run_get_all_request(Req, State) ->
-    {atomic, Result} = kolegij:dohvati(),
-    request:send_response(Req, Result, State).
-
-run_get_request(Req, Id, State) ->
-    case kolegij:dohvati(binary_to_integer(Id)) of
-        {atomic, Result} ->
-            case Result of
-                {error, Reason} ->
-                    request:err(404, Reason, Req, State);
-                _ ->
-                    request:send_response(Req, Result, State)
-            end;
-        {aborted, Reason} ->
-            request:err(404, Reason, Req, State)
-    end.
-
-from_json(Req, State) ->
-    json_request(Req, State).
-
-to_json(Req, State) ->
-    json_request(Req, State).
 
 json_request(Req, State) ->
     case utils:gather_json(Req) of
         {error, Reason, _} ->
             request:err(400, Reason, Req, State);
         {ok, Map, Req2} ->
-            run_post_request(Map, Req2, State)
+            gather_method(Map, Req2, State)
     end.
 
-run_post_request(Map, Req, State) ->
-    case kolegij:dodaj(
-             maps:get(<<"naziv">>, Map), maps:get(<<"skraceno">>, Map))
-    of
-        {atomic, Result} ->
-            case Result of
-                {error, Reason} ->
-                    request:err(403, Reason, Req, State);
-                {ok, Id} ->
-                    request:send_response(Req, Id, State)
-            end;
-        {aborted, Reason} ->
-            request:err(403, Reason, Req, State)
+gather_method(Map, Req, State) ->
+    case cowboy_req:method(Req) of
+        <<"PUT">> ->
+            run_put_request(Map, Req, State);
+        <<"PATCH">> ->
+            run_patch_request(Map, Req, State)
     end.
+
+run_put_request(#{<<"naziv">> := Naziv, <<"skraceno">> := Skraceno}, Req, State) ->
+    request:response(Req, State, fun() -> kolegij:dodaj(Naziv, Skraceno) end);
+run_put_request(_, Req, State) ->
+    request:err(400, <<"Wrong keys">>, Req, State).
+
+run_patch_request(#{<<"id">> := Id,
+                    <<"naziv">> := Naziv,
+                    <<"skraceno">> := Skraceno},
+                  Req,
+                  State) ->
+    request:response(Req, State, fun() -> kolegij:uredi(Id, Naziv, Skraceno) end);
+run_patch_request(_, Req, State) ->
+    request:err(400, <<"Wrong keys">>, Req, State).

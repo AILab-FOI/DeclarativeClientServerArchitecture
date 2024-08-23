@@ -105,8 +105,7 @@ transform_korisnik(Korisnik) ->
 
 dohvati_korisnike() ->
     Fun = fun(#db_korisnik{} = M, Acc) -> [ucitaj(kolegiji, M) | Acc] end,
-    {atomic, Record} = mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_korisnik) end),
-    Record.
+    mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_korisnik) end).
 
 parse_role(student) ->
     <<"Student">>;

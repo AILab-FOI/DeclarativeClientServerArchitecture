@@ -64,14 +64,14 @@ ucitaj(core, R) ->
     transform_fakultet(R);
 ucitaj(katedre, R) ->
     M0 = transform_fakultet(R),
-    fakultet_katedra:dohvati_katedre(M0);
+    fakultet_katedra:ucitaj_katedre(M0);
 ucitaj(korisnici, R) ->
     M0 = transform_fakultet(R),
-    fakultet_korisnik:dohvati_korisnike(M0);
+    fakultet_korisnik:ucitaj_korisnike(M0);
 ucitaj(full, R) ->
     M0 = transform_fakultet(R),
-    M1 = fakultet_katedra:dohvati_katedre(M0),
-    fakultet_korisnik:dohvati_korisnike(M1).
+    M1 = fakultet_katedra:ucitaj_katedre(M0),
+    fakultet_korisnik:ucitaj_korisnike(M1).
 
 transform_fakultet(#db_fakultet{id = Id,
                                 naziv = Naziv,

@@ -6,7 +6,7 @@
 -define(ACCESS_TOKEN_SECRET, <<"ABXw3mqeOO40n/SzaU31lD2ENJePJ1Mr9ZQE1ZBBQAU=">>).
 -define(REFRESH_TOKEN_SECRET,
         <<"7d9a3e394a52b064b064dd76924604b82a6b0b231c4b958006520b64420cfbfd">>).
--define(ACCESS_TOKEN_LIFETIME, 2 * 24 * 60 * 60).
+-define(ACCESS_TOKEN_LIFETIME, 60 * 24 * 60 * 60).
 -define(REFRESH_TOKEN_LIFETIME, 30 * 24 * 60 * 60).
 
 generate_tokens(Id) ->

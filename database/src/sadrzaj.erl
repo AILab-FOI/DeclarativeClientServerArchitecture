@@ -12,7 +12,7 @@ dohvati() ->
 dohvati(Id) ->
     Fun = fun() ->
              case mnesia:read({db_sadrzaj, Id}) of
-                 [Sadrzaj] -> ucitaj(full, Sadrzaj);
+                 [Sadrzaj] -> ucitaj(core, Sadrzaj);
                  [] -> {error, "Sadrzaj ne postoji"}
              end
           end,
