@@ -2,8 +2,8 @@
 
 -behaviour(cowboy_handler).
 
--export([init/2, allowed_methods/2, content_types_accepted/2, charsets_provided/2,
-         is_authorized/2, content_type_provided/2, from_html/2, to_html/2, delete_resource/2]).
+-export([init/2, allowed_methods/2, charsets_provided/2, is_authorized/2, from_html/2,
+         to_html/2, delete_resource/2]).
 
 init(Req, State) ->
     {cowboy_rest, Req, State}.
@@ -24,25 +24,19 @@ is_authorized(Req, State) ->
             end
     end.
 
-content_types_accepted(Req, State) ->
-    {[{{<<"application">>, <<"html">>, []}, from_html}], Req, State}.
-
-content_type_provided(Req, State) ->
-    {[{{<<"application">>, <<"html">>, []}, to_html}], Req, State}.
-
 charsets_provided(Req, State) ->
     {[<<"utf-8">>], Req, State}.
 
 delete_resource(Req, State) ->
     case utils:gather_json(Req) of
         {ok, Map, Req2} ->
-            case user:obrisi_korisnika(
+            case korisnik:obrisi_korisnika(
                      maps:get(<<"id">>, Map))
             of
                 {atomic, ok} ->
                     request:send_response(Req2, <<"ok">>, State);
                 {aborted, _} ->
-                    request:err(400, "Greška", Req, State)
+                    request:err(400, <<"Greška">>, Req, State)
             end;
         _ ->
             request:err(400, "Db Error", Req, State)
@@ -66,19 +60,18 @@ html_request(Req, State) ->
     end.
 
 run_get_all_request(Req, State) ->
-    Result = user:dohvati_korisnike(),
+    Result = korisnik:dohvati_korisnike(),
     request:send_response(Req, Result, State).
 
 run_get_request(Req, Id, State) ->
-    case user:dohvati_korisnika(binary_to_integer(Id)) of
+    case korisnik:dohvati_korisnika(kolegiji, binary_to_integer(Id)) of
         {atomic, Result} ->
             case Result of
                 {error, Reason} ->
                     request:err(404, Reason, Req, State);
                 _ ->
-                    io:format("~p~n", [Result]),
                     request:send_response(Req, Result, State)
             end;
         {aborted, _} ->
-            request:err(404, "Database error", Req, State)
+            request:err(404, <<"Database error">>, Req, State)
     end.

@@ -25,7 +25,7 @@ dohvati_sekcije(IdKolegij) ->
                             end),
              Sekcije = mnesia:select(db_kolegij_sekcija, Match),
              lists:map(fun(Sekcija) ->
-                          {atomic, Result} = section:dohvati_sekcija(Sekcija),
+                          {atomic, Result} = sekcija:dohvati(Sekcija),
                           Result
                        end,
                        Sekcije)

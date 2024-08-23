@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"POST">>, <<"DELETE">>], Req, State}.
+    {[<<"PUT">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -36,7 +36,7 @@ charsets_provided(Req, State) ->
 delete_resource(Req, State) ->
     case utils:gather_json(Req) of
         {ok, Map, Req2} ->
-            case section:obrisi_sekciju(
+            case sekcija:obrisi(
                      maps:get(<<"id">>, Map))
             of
                 {atomic, ok} ->
@@ -64,7 +64,7 @@ json_request(Req, State) ->
     end.
 
 run_post_request(Map, Req, State) ->
-    case section:dodaj_sekcija(
+    case sekcija:dodaj(
              maps:get(<<"naziv">>, Map), maps:get(<<"opis">>, Map, <<"">>))
     of
         {atomic, Result} ->

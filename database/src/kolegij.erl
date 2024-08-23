@@ -42,7 +42,8 @@ dodaj(Naziv, Skraceno) ->
 
 obrisi(Id) ->
     Fun = fun() ->
-             kolegij_djelatnik:obrisi_kolegij(Id),
+             djelatnik_kolegij:obrisi_kolegij(Id),
+             student_kolegij:obrisi_kolegij(Id),
              kolegij_sekcija:obrisi_kolegij(Id),
              mnesia:delete({db_kolegij, Id})
           end,

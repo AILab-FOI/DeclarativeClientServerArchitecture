@@ -8,7 +8,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"POST">>, <<"DELETE">>], Req, State}.
+    {[<<"GET">>, <<"PUT">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -24,13 +24,13 @@ is_authorized(Req, State) ->
     end.
 
 content_types_accepted(Req, State) ->
-    {[{{<<"application">>, <<"html">>, []}, from_html},
+    {[{{<<"application">>, <<"json">>, []}, from_json},
       {{<<"application">>, <<"json">>, []}, from_json}],
      Req,
      State}.
 
 content_type_provided(Req, State) ->
-    {[{{<<"application">>, <<"html">>, []}, to_html},
+    {[{{<<"application">>, <<"json">>, []}, to_json},
       {{<<"application">>, <<"json">>, []}, to_json}],
      Req,
      State}.
@@ -41,13 +41,13 @@ charsets_provided(Req, State) ->
 delete_resource(Req, State) ->
     case utils:gather_json(Req) of
         {ok, Map, Req2} ->
-            case user:obrisi_korisnika(
+            case kolegij:obrisi(
                      maps:get(<<"id">>, Map))
             of
                 {atomic, ok} ->
                     request:send_response(Req2, <<"ok">>, State);
-                {aborted, _} ->
-                    request:err(400, "Greška", Req, State)
+                {aborted, Reason} ->
+                    request:err(400, Reason, Req, State)
             end;
         _ ->
             request:err(400, "Db Error", Req, State)

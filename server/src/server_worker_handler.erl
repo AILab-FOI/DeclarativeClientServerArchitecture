@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"POST">>, <<"PATCH">>], Req, State}.
+    {[<<"PUT">>, <<"PATCH">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:header(<<"authorization">>, Req) of
@@ -45,38 +45,25 @@ json_request(Req, State) ->
             request:err(400, Reason, Req, State);
         {ok, Map, Req2} ->
             case cowboy_req:method(Req2) of
-                <<"POST">> ->
-                    run_post_request(Map, Req2, State);
+                <<"PUT">> ->
+                    case has_keys_put(Map) of
+                        true ->
+                            run_put_request(Map, Req2, State);
+                        false ->
+                            request:err(400, <<"Wrong keys">>, Req, State)
+                    end;
                 <<"PATCH">> ->
-                    PathInfo = cowboy_req:path_info(Req2),
-                    io:format("~p~n", [erlang:length(PathInfo)]),
-                    case erlang:length(PathInfo) of
-                        1 ->
-                            case PathInfo of
-                                undefined ->
-                                    cowboy_req:reply(404, Req2);
-                                _ ->
-                                    LastPath = lists:last(PathInfo),
-                                    case LastPath of
-                                        <<"add">> ->
-                                            run_patch_add_request(Map, Req2, State);
-                                        <<"delete">> ->
-                                            run_patch_delete_request(Map, Req2, State);
-                                        _ ->
-                                            io:format("~p~n", [LastPath]),
-                                            Reply = cowboy_req:reply(404, Req),
-                                            {stop, Reply, State}
-                                    end
-                            end;
-                        _ ->
-                            Reply = cowboy_req:reply(404, Req),
-                            {stop, Reply, State}
+                    case has_keys_patch(Map) of
+                        true ->
+                            run_patch_request(Map, Req2, State);
+                        false ->
+                            request:err(400, <<"Wrong keys">>, Req, State)
                     end
             end
     end.
 
-run_post_request(Map, Req, State) ->
-    case user:dodaj_djelatnika(
+run_put_request(Map, Req, State) ->
+    case korisnik:dodaj_djelatnika(
              maps:get(<<"ime">>, Map),
              maps:get(<<"prezime">>, Map),
              maps:get(<<"oib">>, Map),
@@ -96,9 +83,15 @@ run_post_request(Map, Req, State) ->
             request:err(403, Reason, Req, State)
     end.
 
-run_patch_add_request(Map, Req, State) ->
-    case course:dodaj_djelatnika_na_kolegij(
-             maps:get(<<"student">>, Map), maps:get(<<"kolegij">>, Map))
+run_patch_request(Map, Req, State) ->
+    case korisnik:uredi_djelatnika(
+             maps:get(<<"ime">>, Map),
+             maps:get(<<"prezime">>, Map),
+             maps:get(<<"oib">>, Map),
+             maps:get(<<"lozinka">>, Map),
+             maps:get(<<"email">>, Map),
+             maps:get(<<"opis">>, Map, <<"">>),
+             maps:get(<<"kabinet">>, Map, <<"">>))
     of
         {atomic, Result} ->
             case Result of
@@ -111,17 +104,25 @@ run_patch_add_request(Map, Req, State) ->
             request:err(403, Reason, Req, State)
     end.
 
-run_patch_delete_request(Map, Req, State) ->
-    case course:obrisi_djelatnika_sa_kolegija(
-             maps:get(<<"student">>, Map), maps:get(<<"kolegij">>, Map))
-    of
-        {atomic, Result} ->
-            case Result of
-                {error, Reason} ->
-                    request:err(403, Reason, Req, State);
-                {ok, Id} ->
-                    request:send_response(Req, Id, State)
-            end;
-        {aborted, Reason} ->
-            request:err(403, Reason, Req, State)
-    end.
+has_keys_patch(#{<<"id">> := _,
+                 <<"ime">> := _,
+                 <<"prezime">> := _,
+                 <<"oib">> := _,
+                 <<"lozinka">> := _,
+                 <<"email">> := _,
+                 <<"opis">> := _,
+                 <<"kabinet">> := _} =
+                   _) ->
+    true;
+has_keys_patch(_) ->
+    false.
+
+has_keys_put(#{<<"ime">> := _,
+               <<"prezime">> := _,
+               <<"oib">> := _,
+               <<"lozinka">> := _,
+               <<"email">> := _} =
+                 _) ->
+    true;
+has_keys_put(_) ->
+    false.

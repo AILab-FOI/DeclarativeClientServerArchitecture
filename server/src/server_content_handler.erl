@@ -36,13 +36,13 @@ charsets_provided(Req, State) ->
 delete_resource(Req, State) ->
     case utils:gather_json(Req) of
         {ok, Map, Req2} ->
-            case course:obrisi_sadrzaj(
+            case sadrzaj:obrisi(
                      maps:get(<<"id">>, Map))
             of
                 {atomic, ok} ->
                     request:send_response(Req2, <<"ok">>, State);
-                {aborted, _} ->
-                    request:err(400, <<"Greška">>, Req, State)
+                {aborted, Reason} ->
+                    request:err(403, Reason, Req, State)
             end;
         _ ->
             request:err(400, "Db Error", Req, State)
@@ -64,8 +64,7 @@ json_request(Req, State) ->
     end.
 
 run_put_request(Map, Req, State) ->
-    case course:dodaj_sadrzaj(
-             maps:get(<<"sekcija">>, Map),
+    case sadrzaj:dodaj(
              maps:get(<<"naziv">>, Map),
              maps:get(<<"redoslijed">>, Map, 0),
              maps:get(<<"tip">>, Map),
