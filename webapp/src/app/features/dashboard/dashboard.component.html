@@ -1,1 +1,14 @@
-<h1>Welcome, {{ username() }}</h1>
+<div class="Dashboard">
+  <h1 class="DashboardHeading">Welcome, {{ username() }}</h1>
+
+  @if (courses()) {
+    <div class="DashboardSection">
+      <h2 class="DashboardSectionHeading">Courses</h2>
+      @for (course of courses(); track course) {
+        <app-course-card [course]="course"></app-course-card>
+      }
+    </div>
+  } @else {
+    <div>Loading...</div>
+  }
+</div>

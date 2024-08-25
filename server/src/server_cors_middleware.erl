@@ -19,7 +19,7 @@ execute(Req, Env) ->
 handle_cors_request(Origin, #{method := Method} = Req, Env) ->
     Req2 = cowboy_req:set_resp_header(<<"access-control-allow-origin">>, Origin, Req),
     Req3 = cowboy_req:set_resp_header(<<"vary">>, <<"Origin">>, Req2),
-    Req4 = cowboy_req:set_resp_header(<<"allow">>, <<"GET, POST, OPTIONS">>, Req3),
+    Req4 = cowboy_req:set_resp_header(<<"allow">>, <<"GET, PUT, POST, OPTIONS">>, Req3),
     case Method of
         <<"OPTIONS">> ->
             Req5 =

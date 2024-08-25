@@ -1,11 +1,12 @@
 import { Component, computed, inject } from '@angular/core';
 import { UserService } from '../../core';
-import { dohvati_studente } from '../../../assets/pkg/client';
+import { CourseCardComponent } from '../../shared/course-card/course-card.component';
+import { dohvati_korisnika_na_kolegiju } from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [],
+  imports: [CourseCardComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -15,7 +16,9 @@ export class DashboardComponent {
     return this.user.user().ime + ' ' + this.user.user().prezime;
   });
 
-  constructor() {
-    dohvati_studente(localStorage.getItem('AT')).then((e) => console.log(e));
-  }
+  public courses = computed(() => {
+    return this.user.user().kolegiji;
+  });
+
+  constructor() {}
 }

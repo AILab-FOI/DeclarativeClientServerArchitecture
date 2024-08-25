@@ -2,7 +2,6 @@ import { Component, inject, input, model } from '@angular/core';
 import { AuthService, Korisnik } from '../../core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Student } from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-user-menu',

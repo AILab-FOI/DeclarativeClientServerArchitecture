@@ -35,7 +35,7 @@ json_request(Req, State) ->
     end.
 
 run_post_request(Map, Req, State) ->
-    case user:prijava(
+    case korisnik:prijava(
              maps:get(<<"email">>, Map), maps:get(<<"password">>, Map))
     of
         {atomic, Result} ->

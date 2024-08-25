@@ -1,21 +1,18 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
-import { dohvati_korisnika, Student } from '../../../assets/pkg/client';
-import { Response, WasmService } from './wasm.service';
+import { Injectable, signal } from '@angular/core';
+import { dohvati_korisnika } from '../../../assets/pkg/client';
 import { jwtDecode } from 'jwt-decode';
-import { AuthService } from './auth.service';
-
-export type Korisnik = {
-  id: number;
-  ime: string;
-  prezime: string;
-  opis: string;
-};
+import { Korisnik } from '../types/elevated_types';
 
 const defaultKorisnik: () => Korisnik = () => ({
   id: 0,
   ime: '',
   prezime: '',
   opis: '',
+  oib: 0,
+  email: '',
+  dodatno: {},
+  uloga: '',
+  kolegiji: [],
 });
 
 @Injectable({
@@ -23,15 +20,17 @@ const defaultKorisnik: () => Korisnik = () => ({
 })
 export class UserService {
   public user = signal<Korisnik>(defaultKorisnik());
-  constructor() {}
 
-  public dohvatiKorisnika() {
+  constructor() {
+    this.dohvati_korisnika();
+  }
+
+  public dohvati_korisnika() {
     if (localStorage.getItem('AT')) {
       let token = localStorage.getItem('AT');
       let id = parseInt(jwtDecode(token).sub);
-      dohvati_korisnika(id, token).then((res: Response<Student>) => {
-        console.log(res);
-        this.user.set({ ...res.data });
+      dohvati_korisnika(id, token).then((res: Korisnik) => {
+        this.user.set(res);
       });
     }
   }

@@ -1,0 +1,35 @@
+@import '../../../styles/variables.scss';
+
+.Card {
+  display: flex;
+  flex-direction: column;
+  background: $background;
+  width: 20%;
+  border-radius: 8px;
+  max-height: 200px;
+  flex: 0 0 20%;
+  box-shadow: -2px 4px 12px -4px rgba(102, 107, 102, 0.84);
+
+  &Header {
+    height: 100%;
+    background: $white;
+  }
+
+  &Content {
+
+    padding: 10px;
+
+    &Heading {
+      font-size: 22px;
+    }
+
+    &Label {
+      font-size: 14px;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+}

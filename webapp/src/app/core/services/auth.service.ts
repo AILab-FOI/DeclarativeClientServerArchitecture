@@ -1,14 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Response, WasmService } from './wasm.service';
-import {
-  dohvati_korisnika,
-  dohvati_studente,
-  Error,
-  login,
-  Student,
-  Tokens,
-} from '../../../assets/pkg/client';
+import { Error, login, Tokens } from '../../../assets/pkg/client';
 import { jwtDecode } from 'jwt-decode';
 import { UserService } from './user.service';
 
@@ -28,7 +21,7 @@ export class AuthService {
       .then((e: Response<Tokens>) => {
         localStorage.setItem('AT', e.data.access_token);
         localStorage.setItem('RT', e.data.refresh_token);
-        this.user.dohvatiKorisnika();
+        this.user.dohvati_korisnika();
         return {
           status: true,
           data: '',

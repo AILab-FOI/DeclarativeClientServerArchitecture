@@ -1,12 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {
-  AuthService,
-  OutsideClickDirective,
-  UserService,
-  WasmService,
-} from '../../core';
+import { AuthService, OutsideClickDirective, UserService } from '../../core';
 import { UserMenuComponent } from '../user-menu/user-menu.component';
 
 @Component({
@@ -19,7 +14,6 @@ import { UserMenuComponent } from '../user-menu/user-menu.component';
 export class NavigationComponent extends OutsideClickDirective {
   public user = inject(UserService);
   public auth = inject(AuthService);
-  private wasm = inject(WasmService);
   constructor() {
     super();
   }

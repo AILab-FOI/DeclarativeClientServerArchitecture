@@ -90,7 +90,7 @@ ucitaj(kolegiji, R) ->
             io:format("~p~n", [M0]),
             student_kolegij:ucitaj_kolegije(M0);
         false ->
-            djelatnik_kolegij:ucitaj_djelatnike(M0)
+            djelatnik_kolegij:ucitaj_kolegije(M0)
     end.
 
 transform_korisnik(Korisnik) ->

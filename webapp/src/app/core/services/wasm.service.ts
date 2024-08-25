@@ -17,7 +17,7 @@ export class WasmService {
   async loadWasmModule() {
     if (!this.wasm) {
       this.wasm = await import('../../../assets/pkg/client');
-      await init();
+      await init({ wasm: this.wasm });
     }
     return this.wasm;
   }

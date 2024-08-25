@@ -14,6 +14,6 @@ export class AppComponent {
   title = 'client';
   user = inject(UserService);
   constructor() {
-    this.user.dohvatiKorisnika();
+    console.log('AS');
   }
 }
