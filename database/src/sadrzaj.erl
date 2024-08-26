@@ -32,14 +32,48 @@ dodaj(Naziv, Tip, Vrijednost) ->
     Fun = fun() ->
              case mnesia:write(#db_sadrzaj{id = Id,
                                            naziv = Naziv,
-                                           tip = Tip,
-                                           vrijednost = Vrijednost})
+                                           tip = parse_tip(to_atom, Tip),
+                                           vrijednost =
+                                               generate_vrijednost(parse_tip(to_atom, Tip),
+                                                                   Vrijednost)})
              of
                  ok -> {ok, Id};
                  _ -> {error, "Transakcija neuspješna"}
              end
           end,
     mnesia:transaction(Fun).
+
+generate_vrijednost(poveznica, #{<<"referenca">> := Referenca}) ->
+    #poveznica{referenca = Referenca, vrijeme_kreiranja = calendar:universal_time()};
+generate_vrijednost(dokument, Vrijednost) ->
+    Vrijednost#dokument{vrijeme_kreiranja = calendar:universal_time()};
+generate_vrijednost(lekcija, Vrijednost) ->
+    Vrijednost#lekcija{vrijeme_kreiranja = calendar:universal_time()};
+generate_vrijednost(kviz, Vrijednost) ->
+    Vrijednost.
+
+parse_tip(to_string, Status) ->
+    case Status of
+        poveznica ->
+            <<"poveznica">>;
+        lekcija ->
+            <<"lekcija">>;
+        kviz ->
+            <<"kviz">>;
+        dokument ->
+            <<"dokument">>
+    end;
+parse_tip(to_atom, Status) ->
+    case Status of
+        <<"poveznica">> ->
+            poveznica;
+        <<"lekcija">> ->
+            lekcija;
+        <<"kviz">> ->
+            kviz;
+        <<"dokument">> ->
+            dokument
+    end.
 
 obrisi(Id) ->
     Fun = fun() ->
@@ -68,7 +102,15 @@ transform_sadrzaj(#db_sadrzaj{id = Id,
                               naziv = Naziv,
                               tip = Tip,
                               vrijednost = Vrijednost}) ->
+    io:format("DSA"),
+    NovaVrijednost = transform_vrijednost(Tip, Vrijednost),
     #{id => Id,
       naziv => Naziv,
-      tip => Tip,
-      vrijednost => Vrijednost}.
+      tip => parse_tip(to_string, Tip),
+      vrijednost => NovaVrijednost}.
+
+transform_vrijednost(poveznica,
+                     #poveznica{referenca = Referenca, vrijeme_kreiranja = VrijemeKreiranja}) ->
+    io:format("ASD"),
+    #{referenca => Referenca,
+      vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)}.

@@ -1,0 +1,53 @@
+@import '../../../styles/variables.scss';
+
+.Content {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  gap: 20px;
+  border-radius: 8px;
+  border: 1px solid $background;
+  box-shadow: 0px 0px 20px -10px rgba(0, 0, 0, 1);
+
+  &:hover {
+    border: 1px solid $green;
+    cursor: pointer;
+  }
+
+  &Img {
+    flex: 0 0 24px;
+    max-height: 24px;
+    margin: auto;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &Text {
+    color: $black;
+    margin: auto 0;
+    font-weight: 500;
+    font-size: 18;
+    flex: 1 1 100%;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &Side {
+    color: $black;
+    text-align: right;
+    flex: 0 1 20%;
+    margin: auto 0;
+    font-weight: 200;
+    font-size: 12px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+
+}

@@ -65,7 +65,7 @@ ucitaj(core, R) ->
     transform_kviz(R);
 ucitaj(full, R) ->
     M0 = transform_kviz(R),
-    kviz_sadrzaj:ucitaj_sekcije(M0).
+    M0.
 
 transform_kviz(#db_kviz{id = Id,
                         naziv = Naziv,

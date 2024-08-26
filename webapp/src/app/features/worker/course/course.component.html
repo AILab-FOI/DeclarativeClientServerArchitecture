@@ -1,6 +1,9 @@
 <div class="Course">
   <div class="CourseHeader">
-    <h1>{{ course()?.naziv }}</h1>
+    <div class="CourseHeaderHeading">
+      <h1>{{ course()?.naziv }}</h1>
+      <h3>{{ course()?.skraceno }}</h3>
+    </div>
     <div class="CourseHeaderNav">
       <button
         class="CourseHeaderNavItem"
@@ -16,27 +19,20 @@
       >
         Participants
       </button>
-      <button
-        class="CourseHeaderNavItem"
-        [class.active]="page() === 2"
-        (click)="setPage(2)"
-      >
-        Grades
-      </button>
     </div>
   </div>
   <hr />
   <div class="CourseContent">
     @if (page() === 0) {
       @for (sekcija of course()?.sekcije; track sekcija) {
-        <div>{{ sekcija.naziv }}</div>
+        <app-section [sekcija]="sekcija"></app-section>
       } @empty {
         <h1>Nema sekcija na kolegiju</h1>
       }
     } @else if (page() === 1) {
-      <app-participants></app-participants>
-    } @else {
-      <app-grades></app-grades>
+      <app-worker-participants
+        [participants]="participants()"
+      ></app-worker-participants>
     }
   </div>
 </div>

@@ -3,14 +3,14 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dohvati_djelatnike/1, dohvati_kolegije/1, dodaj_djelatnika_na_kolegij/2,
+-export([dohvati_djelatnike/1, dohvati_kolegije/1, dodaj_djelatnika_na_kolegij/3,
          dohvati_djelatnika_na_kolegiju/2, ucitaj_djelatnike/1, obrisi_djelatnika/1,
          obrisi_djelatnika_na_kolegiju/2, obrisi_kolegij/1, ucitaj_kolegije/1]).
 
-dodaj_djelatnika_na_kolegij(IdDjelatnik, IdKolegij) ->
+dodaj_djelatnika_na_kolegij(IdDjelatnik, IdKolegij, Status) ->
     Fun = fun() ->
              case mnesia:write(#db_djelatnik_kolegij{id = {IdDjelatnik, IdKolegij},
-                                                     status = nositelj})
+                                                     status = parse_status(to_atom, Status)})
              of
                  ok -> true;
                  _ -> false
@@ -43,7 +43,7 @@ dohvati_kolegije(IdDjelatnik) ->
                             end),
              Kolegiji = mnesia:select(db_djelatnik_kolegij, Match),
              lists:map(fun(Kolegij) ->
-                          {atomic, Result} = kolegij:dohvati(Kolegij),
+                          {atomic, Result} = kolegij:dohvati(core, Kolegij),
                           Result
                        end,
                        Kolegiji)
@@ -53,7 +53,12 @@ dohvati_kolegije(IdDjelatnik) ->
 dohvati_djelatnika_na_kolegiju(IdDjelatnik, IdKolegij) ->
     Fun = fun() ->
              case mnesia:read({db_djelatnik_kolegij, {IdDjelatnik, IdKolegij}}) of
-                 [Obj] -> io:format("~p~n", [Obj]);
+                 [#db_djelatnik_kolegij{status = Status}] ->
+                     {atomic, Student} = korisnik:dohvati_korisnika(core, IdDjelatnik),
+                     {atomic, Kolegij} = kolegij:dohvati(full, IdKolegij),
+                     #{djelatnik => Student,
+                       kolegij => Kolegij,
+                       status => parse_status(to_string, Status)};
                  _ -> {error, 'Djelatnik nije na kolegiju'}
              end
           end,
@@ -96,3 +101,18 @@ ucitaj_djelatnike(#{id := Id} = M) ->
 ucitaj_kolegije(#{id := Id} = M) ->
     {atomic, Kolegiji} = dohvati_kolegije(Id),
     M#{kolegiji => Kolegiji}.
+
+parse_status(to_string, Status) ->
+    case Status of
+        nositelj ->
+            <<"Nositelj">>;
+        asistent ->
+            <<"Asistent">>
+    end;
+parse_status(to_atom, Status) ->
+    case Status of
+        <<"Nositelj">> ->
+            nositelj;
+        <<"Asistent">> ->
+            asistent
+    end.

@@ -63,6 +63,12 @@
 -type djelatnik_konfiguracija_ref() :: id().
 
 -record(db_fakultet, {id :: id(), naziv :: binary(), adresa :: adresa()}).
+-record(adresa,
+        {grad :: binary(),
+         ulica :: binary(),
+         postanski_broj :: number(),
+         drzava :: binary(),
+         kucni_broj :: binary()}).
 -record(db_fakultet_korisnik,
         {id_korisnik :: korisnik_ref(), id_fakultet :: fakultet_ref()}).
 -record(db_fakultet_katedra,

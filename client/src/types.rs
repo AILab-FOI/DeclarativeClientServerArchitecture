@@ -410,6 +410,55 @@ impl StudentKolegij {
 
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Clone)]
+pub struct DjelatnikKolegij {
+    djelatnik: Korisnik,
+    kolegij: Kolegij,
+    status: String,
+}
+
+#[wasm_bindgen]
+impl DjelatnikKolegij {
+    #[wasm_bindgen(getter)]
+    pub fn djelatnik(&self) -> Korisnik {
+        self.djelatnik.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_djelatnik(&mut self, djelatnik: Korisnik) {
+        self.djelatnik = djelatnik;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn kolegij(&self) -> Kolegij {
+        self.kolegij.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_kolegij(&mut self, kolegij: Kolegij) {
+        self.kolegij = kolegij;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn status(&self) -> String {
+        self.status.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_status(&mut self, status: String) {
+        self.status = status;
+    }
+
+    // #[wasm_bindgen(getter)]
+    // pub fn ocjene(&self) -> Vec<i32> {
+    //     self.ocjene.clone()
+    // }
+    //
+    // #[wasm_bindgen(setter)]
+    // pub fn set_ocjene(&mut self, ocjene: Vec<i32>) {
+    //     self.ocjene = ocjene;
+    // }
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Katedra {
     id: i32,
     naziv: String,
@@ -443,6 +492,8 @@ pub struct Sekcija {
     id: i32,
     naziv: String,
     opis: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    sadrzaj: Option<Vec<Sadrzaj>>,
 }
 
 #[wasm_bindgen]
@@ -475,6 +526,15 @@ impl Sekcija {
     pub fn set_opis(&mut self, opis: String) {
         self.opis = opis;
     }
+    #[wasm_bindgen(getter)]
+    pub fn sadrzaj(&self) -> Vec<Sadrzaj> {
+        self.sadrzaj.clone().expect("sadrzaj")
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_sadrzaj(&mut self, sadrzaj: Vec<Sadrzaj>) {
+        self.sadrzaj = Some(sadrzaj);
+    }
 }
 
 #[wasm_bindgen]
@@ -483,7 +543,7 @@ pub struct Sadrzaj {
     id: i32,
     naziv: String,
     tip: String,
-    vrijednost: Dokument,
+    vrijednost: Poveznica,
 }
 
 #[wasm_bindgen]
@@ -518,13 +578,43 @@ impl Sadrzaj {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn vrijednost(&self) -> Dokument {
+    pub fn vrijednost(&self) -> Poveznica {
         self.vrijednost.clone()
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_vrijednost(&mut self, vrijednost: Dokument) {
+    pub fn set_vrijednost(&mut self, vrijednost: Poveznica) {
         self.vrijednost = vrijednost;
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Poveznica {
+    referenca: String,
+    vrijeme_kreiranja: u64,
+}
+
+#[wasm_bindgen]
+impl Poveznica {
+    #[wasm_bindgen(getter)]
+    pub fn referenca(&self) -> String {
+        self.referenca.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_referenca(&mut self, referenca: String) {
+        self.referenca = referenca;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn vrijeme_kreiranja(&self) -> u64 {
+        self.vrijeme_kreiranja.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_vrijeme_kreiranja(&mut self, vrijeme_kreiranja: u64) {
+        self.vrijeme_kreiranja = vrijeme_kreiranja;
     }
 }
 

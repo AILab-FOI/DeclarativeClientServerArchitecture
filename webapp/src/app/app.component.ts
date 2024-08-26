@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavigationComponent } from './shared';
-import { UserService } from './core';
 
 @Component({
   selector: 'app-root',
@@ -12,8 +11,4 @@ import { UserService } from './core';
 })
 export class AppComponent {
   title = 'client';
-  user = inject(UserService);
-  constructor() {
-    console.log('AS');
-  }
 }

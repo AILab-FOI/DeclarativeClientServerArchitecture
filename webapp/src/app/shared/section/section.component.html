@@ -1,0 +1,25 @@
+<div class="Section">
+  <div class="SectionHeader" (click)="open.set(!open())">
+    @if (open()) {
+      <img
+        class="SectionHeaderClosable"
+        src="../../../assets/icons/collapse-arrow-24.png"
+      />
+    } @else {
+      <img
+        class="SectionHeaderClosable"
+        src="../../../assets/icons/expand-arrow-24.png"
+      />
+    }
+    <h2 class="SectionHeaderHeading">{{ sekcija().naziv }}</h2>
+  </div>
+  @if (open()) {
+    <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>
+    <div class="SectionContent">
+      @for (sadrzaj of sekcija().sadrzaj; track sadrzaj) {
+        <app-content [sadrzaj]="sadrzaj"></app-content>
+      }
+    </div>
+  }
+  <hr class="SectionSeparator" />
+</div>

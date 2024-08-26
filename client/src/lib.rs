@@ -126,7 +126,7 @@ pub async fn dohvati_korisnika(id: i32, token: String) -> Result<JsValue, JsValu
 }
 
 #[wasm_bindgen]
-pub async fn dohvati_korisnika_na_kolegiju(
+pub async fn dohvati_studenta_na_kolegiju(
     id_korisnik: i32,
     id_kolegij: i32,
     token: String,
@@ -141,6 +141,27 @@ pub async fn dohvati_korisnika_na_kolegiju(
     .await
     {
         Ok(response) => parse_data::<types::StudentKolegij>(response).await,
+        Err(_) => parse_network_err(),
+    };
+    result
+}
+
+#[wasm_bindgen]
+pub async fn dohvati_djelatnika_na_kolegiju(
+    id_korisnik: i32,
+    id_kolegij: i32,
+    token: String,
+) -> Result<JsValue, JsValue> {
+    let result = match create_get_request(
+        &format!(
+            "http://localhost:5000/worker/course/{}/{}",
+            id_korisnik, id_kolegij
+        ),
+        token,
+    )
+    .await
+    {
+        Ok(response) => parse_data::<types::DjelatnikKolegij>(response).await,
         Err(_) => parse_network_err(),
     };
     result

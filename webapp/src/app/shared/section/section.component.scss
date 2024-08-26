@@ -1,0 +1,35 @@
+@import '../../../styles/variables.scss';
+
+.Section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &Header {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    user-select: none;
+
+    &Closable {
+      margin: auto 0;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &Content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &Separator {
+    border: 1px solid $gray;
+    opacity: .6;
+    width: 80%;
+    margin: 0 auto;
+  }
+}

@@ -1,7 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { UserService } from '../../core';
 import { CourseCardComponent } from '../../shared/course-card/course-card.component';
-import { dohvati_korisnika_na_kolegiju } from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-dashboard',

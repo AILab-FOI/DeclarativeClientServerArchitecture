@@ -1,7 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { dohvati_korisnika } from '../../../assets/pkg/client';
 import { jwtDecode } from 'jwt-decode';
 import { Korisnik } from '../types/elevated_types';
+import { TokenService } from './token.service';
 
 const defaultKorisnik: () => Korisnik = () => ({
   id: 0,
@@ -20,18 +21,26 @@ const defaultKorisnik: () => Korisnik = () => ({
 })
 export class UserService {
   public user = signal<Korisnik>(defaultKorisnik());
+  public readonly isWorker = computed(() => {
+    return this.user().uloga === 'Djelatnik';
+  });
+  public readonly routePrefix = computed(() => {
+    if (this.isWorker()) return 'worker/';
+    return 'student/';
+  });
 
-  constructor() {
-    this.dohvati_korisnika();
-  }
+  private token = inject(TokenService);
+
+  constructor() {}
 
   public dohvati_korisnika() {
-    if (localStorage.getItem('AT')) {
-      let token = localStorage.getItem('AT');
+    if (this.token.exists()) {
+      let token = this.token.accessToken();
       let id = parseInt(jwtDecode(token).sub);
-      dohvati_korisnika(id, token).then((res: Korisnik) => {
-        this.user.set(res);
-      });
+      return dohvati_korisnika(id, token);
     }
+    return new Promise((resolve) => {
+      resolve(defaultKorisnik());
+    });
   }
 }

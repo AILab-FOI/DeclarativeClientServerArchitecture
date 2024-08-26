@@ -1,5 +1,5 @@
 import { Component, inject, input } from '@angular/core';
-import { Kolegij } from '../../core';
+import { Kolegij, UserService } from '../../core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,8 +12,12 @@ import { Router } from '@angular/router';
 export class CourseCardComponent {
   public course = input.required<Kolegij>();
   public router = inject(Router);
+  public user = inject(UserService);
 
   public goTo(): void {
-    this.router.navigate(['course', this.course().id]);
+    this.router.navigate([
+      `${this.user.routePrefix()}course`,
+      this.course().id,
+    ]);
   }
 }

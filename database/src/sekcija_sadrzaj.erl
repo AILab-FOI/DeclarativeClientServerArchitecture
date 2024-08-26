@@ -6,7 +6,7 @@
 -export([dohvati_sadrzaj/1, dohvati_sekcije/1, dodaj_sadrzaj_na_sekciju/2,
          obrisi_sadrzaj/1, obrisi_sekcije/1, ucitaj_sadrzaj/1]).
 
-dodaj_sadrzaj_na_sekciju(IdSekcija, IdSadrzaj) ->
+dodaj_sadrzaj_na_sekciju(IdSadrzaj, IdSekcija) ->
     Fun = fun() ->
              case mnesia:write(#db_sekcija_sadrzaj{id_sadrzaj = IdSadrzaj, id_sekcija = IdSekcija})
              of
