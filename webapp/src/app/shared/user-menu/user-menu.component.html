@@ -1,16 +1,30 @@
 <button (click)="userMenu.set(!this.userMenu())" class="User">
-  <img class="UserImg" src="asd" />
-  <label>{{ user().ime }}</label>
+  <img class="UserImg" src="http://localhost:5000/images/21104.png" />
 </button>
 @if (userMenu()) {
   <div class="List">
-    <a class="ListItem" routerLinkActive="active" routerLink="profile">
+    <a
+      class="ListItem"
+      routerLinkActive="active"
+      routerLink="profile"
+      (click)="userMenu.set(!this.userMenu())"
+    >
       Profile
     </a>
-    <a class="ListItem" routerLinkActive="active" routerLink="messages">
+    <a
+      class="ListItem"
+      routerLinkActive="active"
+      routerLink="messages"
+      (click)="userMenu.set(!this.userMenu())"
+    >
       Messages
     </a>
-    <a class="ListItem" routerLinkActive="active" routerLink="preferences">
+    <a
+      class="ListItem"
+      routerLinkActive="active"
+      routerLink="preferences"
+      (click)="userMenu.set(!this.userMenu())"
+    >
       Preferences
     </a>
     <hr class="ListDivider" />

@@ -10,13 +10,31 @@
     flex-direction: row;
     gap: 10px;
     user-select: none;
+    justify-content: space-between;
+    background: rgba($orange, .2);
+    padding: 10px;
+    border-radius: 8px;
 
-    &Closable {
-      margin: auto 0;
+    &Left {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+
+      &Closable {
+        margin: auto 0;
+      }
     }
 
     &:hover {
       cursor: pointer;
+    }
+
+    &Right {
+
+      &Edit {
+        width: 24px;
+        margin-left: auto;
+      }
     }
   }
 

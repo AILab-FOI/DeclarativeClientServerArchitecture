@@ -1,0 +1,17 @@
+<div class="Header">
+  <div class="HeaderTitle">
+    <img
+      (click)="close()"
+      class="HeaderTitleClose"
+      src="../../../assets/icons/close.svg"
+    />
+    <h1 class="HeaderTitleText">{{ title() }}</h1>
+  </div>
+  <button class="HeaderButton" (click)="save()">
+    <img class="HeaderButtonImg" src="../../../assets/icons/check.svg" />
+    <p class="HeaderButtonLabel">Save</p>
+  </button>
+</div>
+<div class="Content">
+  <ng-container #view></ng-container>
+</div>

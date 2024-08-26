@@ -27,7 +27,7 @@ dohvati_djelatnike(IdKatedra) ->
                             end),
              Djelatnici = mnesia:select(db_katedra_djelatnik, Match),
              lists:map(fun(Djelatnik) ->
-                          {atomic, Result} = user:dohvati_korisnika(Djelatnik),
+                          {atomic, Result} = korisnik:dohvati_korisnika(Djelatnik),
                           Result
                        end,
                        Djelatnici)

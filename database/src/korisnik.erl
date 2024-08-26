@@ -83,14 +83,18 @@ dohvati_korisnika(Type, Id) ->
 
 ucitaj(core, R) ->
     transform_korisnik(R);
+ucitaj(fakultet, R) ->
+    M0 = transform_korisnik(R),
+    fakultet_korisnik:ucitaj_fakultet(M0);
 ucitaj(kolegiji, R) ->
     M0 = transform_korisnik(R),
+    M1 = fakultet_korisnik:ucitaj_fakultet(M0),
     case R#db_korisnik.uloga =:= student of
         true ->
-            io:format("~p~n", [M0]),
-            student_kolegij:ucitaj_kolegije(M0);
+            student_kolegij:ucitaj_kolegije(M1);
         false ->
-            djelatnik_kolegij:ucitaj_kolegije(M0)
+            M2 = djelatnik_kolegij:ucitaj_kolegije(M1),
+            katedra_djelatnik:ucitaj_katedre(M2)
     end.
 
 transform_korisnik(Korisnik) ->

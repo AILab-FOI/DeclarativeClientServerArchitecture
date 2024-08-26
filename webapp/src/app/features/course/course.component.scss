@@ -1,0 +1,56 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins.scss';
+
+@include layout() {
+  &Header {
+    padding: 0, 20px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    &Heading {
+      display: flex;
+      flex-direction: column;
+
+      h1,
+      h3 {
+
+        margin: 0 auto;
+      }
+    }
+
+    &Nav {
+      height: 50px;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      padding: 5px 0;
+
+      &Item {
+        border: none;
+        outline: none;
+        background: $background;
+        border-radius: 6px;
+        min-width: 100px;
+        transition: linear .2s;
+
+        &:hover {
+          cursor: pointer;
+          border: 1px solid $orange;
+        }
+      }
+    }
+  }
+
+  &Page {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+}
+
+.active {
+  border: 1px solid $orange;
+}

@@ -1,18 +1,32 @@
 @import '../../../styles/variables.scss';
 
+:host {
+  display: flex;
+  height: fit-content;
+}
+
 .Card {
   display: flex;
   flex-direction: column;
   background: $background;
-  width: 20%;
+  width: 200px;
   border-radius: 8px;
-  max-height: 200px;
+  height: 200px;
   flex: 0 0 20%;
-  box-shadow: -2px 4px 12px -4px rgba(102, 107, 102, 0.84);
+  box-shadow: -2px 0px 12px -4px rgba(102, 107, 102, 0.84);
 
   &Header {
     height: 100%;
     background: $white;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    &Img {
+      max-width: 200px;
+      border-top-right-radius: 8px;
+      border-top-left-radius: 50px;
+    }
   }
 
   &Content {

@@ -1,17 +1,28 @@
 <div class="Section">
-  <div class="SectionHeader" (click)="open.set(!open())">
-    @if (open()) {
-      <img
-        class="SectionHeaderClosable"
-        src="../../../assets/icons/collapse-arrow-24.png"
-      />
-    } @else {
-      <img
-        class="SectionHeaderClosable"
-        src="../../../assets/icons/expand-arrow-24.png"
-      />
+  <div class="SectionHeader">
+    <div class="SectionHeaderLeft" (click)="open.set(!open())">
+      @if (open()) {
+        <img
+          class="SectionHeaderLeftClosable"
+          src="../../../assets/icons/collapse-arrow-24.png"
+        />
+      } @else {
+        <img
+          class="SectionHeaderLeftClosable"
+          src="../../../assets/icons/expand-arrow-24.png"
+        />
+      }
+      <h2 class="SectionHeaderLeftHeading">{{ sekcija().naziv }}</h2>
+    </div>
+    @if (isWorker()) {
+      <div class="SectionHeaderRight">
+        <img
+          (click)="openEdit()"
+          class="SectionHeaderRightEdit"
+          src="../../../assets/icons/icons8-edit-24.png"
+        />
+      </div>
     }
-    <h2 class="SectionHeaderHeading">{{ sekcija().naziv }}</h2>
   </div>
   @if (open()) {
     <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>

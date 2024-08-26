@@ -45,10 +45,10 @@ dodaj(Naziv, Tip, Vrijednost) ->
 
 generate_vrijednost(poveznica, #{<<"referenca">> := Referenca}) ->
     #poveznica{referenca = Referenca, vrijeme_kreiranja = calendar:universal_time()};
-generate_vrijednost(dokument, Vrijednost) ->
-    Vrijednost#dokument{vrijeme_kreiranja = calendar:universal_time()};
-generate_vrijednost(lekcija, Vrijednost) ->
-    Vrijednost#lekcija{vrijeme_kreiranja = calendar:universal_time()};
+generate_vrijednost(dokument, #{<<"referenca">> := Referenca}) ->
+    #dokument{referenca = Referenca, vrijeme_kreiranja = calendar:universal_time()};
+generate_vrijednost(lekcija, #{<<"sadrzaj">> := Sadrzaj}) ->
+    #lekcija{sadrzaj = Sadrzaj, vrijeme_kreiranja = calendar:universal_time()};
 generate_vrijednost(kviz, Vrijednost) ->
     Vrijednost.
 
@@ -111,6 +111,13 @@ transform_sadrzaj(#db_sadrzaj{id = Id,
 
 transform_vrijednost(poveznica,
                      #poveznica{referenca = Referenca, vrijeme_kreiranja = VrijemeKreiranja}) ->
-    io:format("ASD"),
     #{referenca => Referenca,
+      vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)};
+transform_vrijednost(dokument,
+                     #dokument{referenca = Referenca, vrijeme_kreiranja = VrijemeKreiranja}) ->
+    #{referenca => Referenca,
+      vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)};
+transform_vrijednost(lekcija,
+                     #lekcija{sadrzaj = Sadrzaj, vrijeme_kreiranja = VrijemeKreiranja}) ->
+    #{sadrzaj => Sadrzaj,
       vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)}.

@@ -1,0 +1,58 @@
+<div class="Content">
+  <div class="ContentHeader">
+    <div class="ContentHeaderHeading">
+      <h1>{{ course()?.naziv }}</h1>
+      <h3>{{ course()?.skraceno }}</h3>
+    </div>
+    <div class="ContentHeaderNav">
+      <button
+        class="ContentHeaderNavItem"
+        [class.active]="page() === 0"
+        (click)="page.set(0)"
+      >
+        Content
+      </button>
+      <button
+        class="ContentHeaderNavItem"
+        [class.active]="page() === 1"
+        (click)="page.set(1)"
+      >
+        Participants
+      </button>
+      @if (!user.isWorker()) {
+        <button
+          class="ContentHeaderNavItem"
+          [class.active]="page() === 2"
+          (click)="page.set(2)"
+        >
+          Grades
+        </button>
+      }
+    </div>
+  </div>
+  <hr />
+  <div class="ContentPage">
+    @if (page() === 0) {
+      @for (sekcija of course()?.sekcije; track sekcija) {
+        <app-section
+          [isWorker]="user.isWorker()"
+          [sekcija]="sekcija"
+        ></app-section>
+      } @empty {
+        <h1>Nema sekcija na kolegiju</h1>
+      }
+    } @else if (page() === 1) {
+      @if (user.isWorker()) {
+        <app-worker-participants
+          [participants]="participants()"
+        ></app-worker-participants>
+      } @else {
+        <app-student-participants
+          [participants]="participants()"
+        ></app-student-participants>
+      }
+    } @else if (page() === 2) {
+      <app-student-grades></app-student-grades>
+    }
+  </div>
+</div>

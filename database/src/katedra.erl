@@ -11,7 +11,7 @@ dohvati() ->
 dohvati(Id) ->
     Fun = fun() ->
              case mnesia:read({db_katedra, Id}) of
-                 [Katedra] -> ucitaj(full, Katedra);
+                 [Katedra] -> ucitaj(core, Katedra);
                  [] -> {error, "Katedra ne postoji"}
              end
           end,

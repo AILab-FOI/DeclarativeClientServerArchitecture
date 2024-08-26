@@ -1,0 +1,47 @@
+<div class="Content">
+  <div class="ContentHeader">
+    <h1 class="ContentHeaderHeading">Profile</h1>
+    <img
+      (click)="openEdit()"
+      class="ContentHeaderEdit"
+      src="../../../assets/icons/icons8-edit-48.png"
+    />
+  </div>
+
+  <div class="ContentUser">
+    <img class="ContentUserImg" src="http://localhost:5000/images/21104.png" />
+    <div class="ContentUserInfo">
+      <label class="ContentUserInfoText">Name: {{ user.user().ime }} </label>
+      <label class="ContentUserInfoText"
+        >Surname: {{ user.user().prezime }}</label
+      >
+      <label class="ContentUserInfoText"
+        >Short name: {{ user.user().dodatno.nadimak }}</label
+      >
+      <label class="ContentUserInfoText">Email: {{ user.user().email }}</label>
+      <label class="ContentUserInfoText">Address: {{ user.user().oib }}</label>
+      <label class="ContentUserInfoText">City: {{ user.user().ime }}</label>
+      <label class="ContentUserInfoText"
+        >Faculty: {{ user.user()?.fakultet?.naziv }}</label
+      >
+    </div>
+  </div>
+
+  <hr class="ContentSeparator" />
+  <div class="ContentHeader">
+    <h2 class="ContentHeaderHeading">Faculty</h2>
+  </div>
+
+  <hr class="ContentSeparator" />
+  <div class="ContentHeader">
+    <h2 class="ContentHeaderHeading">Courses</h2>
+  </div>
+
+  <div class="ContentCourses">
+    @for (course of courses(); track course) {
+      <app-course-card [course]="course"></app-course-card>
+    }
+  </div>
+
+  <hr class="ContentSeparator" />
+</div>

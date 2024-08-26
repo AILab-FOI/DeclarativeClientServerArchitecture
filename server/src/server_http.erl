@@ -30,6 +30,7 @@ start() ->
                                  {"/user/[:id]", server_user_handler, []},
                                  {"/question/[:id]", server_question_handler, []},
                                  {"/login/", server_login_handler, []},
+                                 {"/images/[...]", cowboy_static, {priv_dir, server, "assets"}},
                                  {"/jwt/refresh", server_jwt_refresh_handler, []}]}]),
 
     cowboy:start_clear(server_http_listener,

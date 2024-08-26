@@ -13,6 +13,7 @@ import { StudentParticipantsComponent } from './participants/participants.compon
 import { StudentGradesComponent } from './grades/grades.component';
 import { ButtonComponent } from '../../../shared/button/button.component';
 import { TokenService } from '../../../core/services/token.service';
+import { SectionComponent } from '../../../shared';
 
 @Component({
   selector: 'app-course',
@@ -21,6 +22,7 @@ import { TokenService } from '../../../core/services/token.service';
     ButtonComponent,
     StudentParticipantsComponent,
     StudentGradesComponent,
+    SectionComponent,
   ],
   templateUrl: './course.component.html',
   styleUrl: './course.component.scss',

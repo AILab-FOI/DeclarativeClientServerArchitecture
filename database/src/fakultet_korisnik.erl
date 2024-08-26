@@ -4,7 +4,7 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dohvati_fakultet/1, dodaj_korisnika_na_fakultet/2, dohvati_korisnike/1,
-         ucitaj_korisnike/1, obrisi_fakultet/1, obrisi_korisnika/1]).
+         ucitaj_korisnike/1, ucitaj_fakultet/1, obrisi_fakultet/1, obrisi_korisnika/1]).
 
 dodaj_korisnika_na_fakultet(IdKorisnik, IdFakultet) ->
     Fun = fun() ->
@@ -24,7 +24,7 @@ dohvati_korisnike(IdFakultet) ->
                  K ->
                      Korisnici =
                          lists:map(fun(Korisnik) ->
-                                      {atomic, Result} = user:dohvati_korisnika(Korisnik),
+                                      {atomic, Result} = korisnik:dohvati_korisnika(core, Korisnik),
                                       Result
                                    end,
                                    K),
@@ -38,9 +38,10 @@ dohvati_fakultet(IdKorisnik) ->
     Fun = fun() ->
              case mnesia:read({db_fakultet_korisnik, IdKorisnik}) of
                  [Obj] ->
-                     {atomic, Fakultet} = fakultet:dohvati(Obj#db_fakultet_korisnik.id_fakultet),
+                     {atomic, Fakultet} =
+                         fakultet:dohvati(core, Obj#db_fakultet_korisnik.id_fakultet),
                      Fakultet;
-                 _ -> {"Korisnik nije povezan na fakultet"}
+                 _ -> undefined
              end
           end,
     mnesia:transaction(Fun).
@@ -67,3 +68,12 @@ obrisi_korisnika(IdKorisnik) ->
 ucitaj_korisnike(#{id := Id} = M) ->
     {atomic, Korisnici} = dohvati_korisnike(Id),
     M#{korisnici => Korisnici}.
+
+ucitaj_fakultet(#{id := Id} = M) ->
+    {atomic, Fakultet} = dohvati_fakultet(Id),
+    case Fakultet of
+        undefined ->
+            M;
+        _ ->
+            M#{fakultet => Fakultet}
+    end.

@@ -20,6 +20,25 @@ export const routes: Routes = [
     loadComponent: () => import('./features').then((c) => c.CoursesComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'profile',
+    title: 'Profile',
+    loadComponent: () => import('./features').then((c) => c.ProfileComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'preferences',
+    title: 'Preferences',
+    loadComponent: () =>
+      import('./features').then((c) => c.PreferencesComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'messages',
+    title: 'Messages',
+    loadComponent: () => import('./features').then((c) => c.MessagesComponent),
+    canActivate: [authGuard],
+  },
 
   {
     path: 'worker',
@@ -31,7 +50,19 @@ export const routes: Routes = [
         path: 'course/:id',
         title: 'Course',
         loadComponent: () =>
-          import('./features').then((c) => c.WorkerCourseComponent),
+          import('./features').then((c) => c.CourseComponent),
+      },
+      {
+        path: 'content/:id',
+        title: 'Content',
+        loadComponent: () =>
+          import('./features').then((c) => c.WorkerContentComponent),
+      },
+      {
+        path: 'quiz/:id',
+        title: 'Quiz',
+        loadComponent: () =>
+          import('./features').then((c) => c.WorkerQuizComponent),
       },
     ],
   },
@@ -46,7 +77,19 @@ export const routes: Routes = [
         path: 'course/:id',
         title: 'Course',
         loadComponent: () =>
-          import('./features').then((c) => c.StudentCourseComponent),
+          import('./features').then((c) => c.CourseComponent),
+      },
+      {
+        path: 'content/:id',
+        title: 'Content',
+        loadComponent: () =>
+          import('./features').then((c) => c.StudentContentComponent),
+      },
+      {
+        path: 'quiz/:id',
+        title: 'Quiz',
+        loadComponent: () =>
+          import('./features').then((c) => c.StudentQuizComponent),
       },
     ],
   },

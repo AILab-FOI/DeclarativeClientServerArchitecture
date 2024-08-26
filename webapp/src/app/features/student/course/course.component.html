@@ -26,16 +26,10 @@
     </div>
   </div>
   <hr />
-  <div class="CourseContent">
+  <div class="ContentPage">
     @if (page() === 0) {
       @for (sekcija of course()?.sekcije; track sekcija) {
-        <div>{{ sekcija.naziv }}</div>
-
-        @for (sadrzaj of sekcija.sadrzaj; track sadrzaj) {
-          <a href="{{ sadrzaj.vrijednost.referenca }}" target="_blank">{{
-            sadrzaj.naziv
-          }}</a>
-        }
+        <app-section [sekcija]="sekcija"></app-section>
       } @empty {
         <h1>Nema sekcija na kolegiju</h1>
       }
@@ -43,8 +37,6 @@
       <app-student-participants
         [participants]="participants()"
       ></app-student-participants>
-    } @else {
-      <app-student-grades></app-student-grades>
     }
   </div>
 </div>

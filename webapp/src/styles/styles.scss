@@ -1,4 +1,5 @@
 @import './variables.scss';
+@import '@angular/cdk/overlay-prebuilt.css';
 
 @font-face {
   font-family: 'Roboto';
@@ -13,6 +14,16 @@
   box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
+
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba($orange, .5);
 }
 
 html,
@@ -24,4 +35,9 @@ body {
 a {
   text-decoration: none;
   color: $white;
+}
+
+.backdropBackgroud {
+  background: rgba(25, 25, 24, .5);
+  backdrop-filter: blur(5px);
 }

@@ -1,9 +1,9 @@
-<div class="Dashboard">
-  <h1 class="DashboardHeading">Welcome, {{ username() }}</h1>
+<div class="Content">
+  <h1 class="ContentHeading">Welcome, {{ username() }}</h1>
 
   @if (courses()) {
-    <div class="DashboardSection">
-      <h2 class="DashboardSectionHeading">Courses</h2>
+    <div class="ContentSection">
+      <h2 class="ContentSectionHeading">Courses</h2>
       @for (course of courses(); track course) {
         <app-course-card [course]="course"></app-course-card>
       }

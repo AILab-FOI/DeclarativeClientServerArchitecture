@@ -1,8 +1,53 @@
-<a class="Content" href="{{ sadrzaj().vrijednost.referenca }}" target="_blank">
-  <img
-    class="ContentImg"
-    src="../../../../assets/icons/url/external-link-24.png"
-  />
-  <label class="ContentText">{{ sadrzaj().naziv }}</label>
-  <label class="ContentSide">{{ datum() }}</label>
-</a>
+<ng-container [ngTemplateOutlet]="outlet()"></ng-container>
+<ng-template #lekcija>
+  <a
+    class="Content"
+    routerLink="/{{ user.routePrefix() }}/content/{{ sadrzaj().id }}"
+    target="_blank"
+  >
+    <img
+      class="ContentImg"
+      src="../../../../assets/icons/lesson/lesson-24.png"
+    />
+    <label class="ContentText">{{ sadrzaj().naziv }}</label>
+    <label class="ContentSide">{{ datum() }}</label>
+  </a>
+</ng-template>
+
+<ng-template #poveznica>
+  <a
+    class="Content"
+    href="{{ sadrzaj().vrijednost.referenca }}"
+    target="_blank"
+  >
+    <img
+      class="ContentImg"
+      src="../../../../assets/icons/url/external-link-24.png"
+    />
+    <label class="ContentText">{{ sadrzaj().naziv }}</label>
+    <label class="ContentSide">{{ datum() }}</label>
+  </a>
+</ng-template>
+
+<ng-template #kviz>
+  <a class="Content" [routerLink]="['/quiz', sadrzaj().id]" target="_blank">
+    <img class="ContentImg" src="../../../../assets/icons/quiz/quiz-24.png" />
+    <label class="ContentText">{{ sadrzaj().naziv }}</label>
+    <label class="ContentSide">{{ datum() }}</label>
+  </a>
+</ng-template>
+
+<ng-template #dokument>
+  <a
+    class="Content"
+    href="{{ sadrzaj().vrijednost.referenca }}"
+    target="_blank"
+  >
+    <img
+      class="ContentImg"
+      src="../../../../assets/icons/document/document-24.png"
+    />
+    <label class="ContentText">{{ sadrzaj().naziv }}</label>
+    <label class="ContentSide">{{ datum() }}</label>
+  </a>
+</ng-template>

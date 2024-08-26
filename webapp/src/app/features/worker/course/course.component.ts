@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { dohvati_djelatnika_na_kolegiju } from '../../../../assets/pkg/client';
-import { StudentKolegij, UserService } from '../../../core';
+import { DjelatnikKolegij, StudentKolegij, UserService } from '../../../core';
 import { WorkerParticipantsComponent } from './participants/participants.component';
 import { TokenService } from '../../../core/services/token.service';
 import { ButtonComponent } from '../../../shared/button/button.component';
@@ -27,10 +27,7 @@ export class WorkerCourseComponent {
   public course = computed(() => {
     return this.student_course()?.kolegij;
   });
-  public participants = computed(() => {
-    return this.course()?.studenti;
-  });
-  public student_course = signal<StudentKolegij>(undefined);
+  public student_course = signal<DjelatnikKolegij>(undefined);
   public page = signal<number>(0);
 
   constructor() {
