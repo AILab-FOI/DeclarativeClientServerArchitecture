@@ -21,7 +21,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'profile',
+    path: 'profile/:id',
     title: 'Profile',
     loadComponent: () => import('./features').then((c) => c.ProfileComponent),
     canActivate: [authGuard],
@@ -56,14 +56,14 @@ export const routes: Routes = [
         path: 'content/:id',
         title: 'Content',
         loadComponent: () =>
-          import('./features').then((c) => c.WorkerContentComponent),
+          import('./features').then((c) => c.ContentComponent),
       },
-      {
-        path: 'quiz/:id',
-        title: 'Quiz',
-        loadComponent: () =>
-          import('./features').then((c) => c.WorkerQuizComponent),
-      },
+      // {
+      //   path: 'quiz/:id',
+      //   title: 'Quiz',
+      //   loadComponent: () =>
+      //     import('./features').then((c) => c.WorkerQuizComponent),
+      // },
     ],
   },
 
@@ -83,14 +83,14 @@ export const routes: Routes = [
         path: 'content/:id',
         title: 'Content',
         loadComponent: () =>
-          import('./features').then((c) => c.StudentContentComponent),
+          import('./features').then((c) => c.ContentComponent),
       },
-      {
-        path: 'quiz/:id',
-        title: 'Quiz',
-        loadComponent: () =>
-          import('./features').then((c) => c.StudentQuizComponent),
-      },
+      // {
+      //   path: 'quiz/:id',
+      //   title: 'Quiz',
+      //   loadComponent: () =>
+      //     import('./features').then((c) => c.StudentQuizComponent),
+      // },
     ],
   },
 ];

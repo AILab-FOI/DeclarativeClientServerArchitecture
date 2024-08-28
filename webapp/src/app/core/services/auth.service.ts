@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Response } from './wasm.service';
-import { Error, login, Tokens } from '../../../assets/pkg/client';
+import { MyError, login, Tokens } from '../../../assets/pkg/client';
 import { UserService } from './user.service';
 import { TokenService } from './token.service';
 
@@ -27,7 +27,7 @@ export class AuthService {
           };
         });
       })
-      .catch((err: Error) => ({ status: false, data: err.message }));
+      .catch((err: MyError) => ({ status: false, data: err.message }));
   }
 
   logout(): void {

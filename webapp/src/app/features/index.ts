@@ -8,5 +8,6 @@ export * from './preferences/preferences.component';
 export * from './messages/messages.component';
 export * from './courses/courses.component';
 export * from './course/course.component';
-export * from './worker';
-export * from './student';
+export * from './worker/worker.component';
+export * from './student/student.component';
+export * from './content/content.component';

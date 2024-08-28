@@ -1,13 +1,14 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { Sekcija } from '../../core';
-import { ContentComponent } from '../content/content.component';
+import { ContentCardComponent } from '../content-card/content-card.component';
 import { openModal } from '../modal/modal.component';
 import { Dialog, DialogRef } from '@angular/cdk/dialog';
+import { SectionEditComponent } from '../section-edit/section-edit.component';
 
 @Component({
   selector: 'app-section',
   standalone: true,
-  imports: [ContentComponent],
+  imports: [ContentCardComponent],
   templateUrl: './section.component.html',
   styleUrl: './section.component.scss',
 })
@@ -24,7 +25,7 @@ export class SectionComponent {
   openEdit(): void {
     let ref = openModal<Sekcija>(this.dialog, {
       data: structuredClone(this.sekcija()),
-      tool: { view: SectionComponent },
+      tool: { view: SectionEditComponent },
       inputs: {},
       title: 'Edit section',
     });

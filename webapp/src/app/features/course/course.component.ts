@@ -7,21 +7,17 @@ import {
   input,
   signal,
 } from '@angular/core';
-import {
-  DjelatnikKolegij,
-  Kolegij,
-  StudentKolegij,
-  UserService,
-} from '../../core';
-import { WorkerParticipantsComponent } from '../../features/worker/course/participants/participants.component';
-import { StudentParticipantsComponent } from '../../features/student/course/participants/participants.component';
-import { StudentGradesComponent } from '../../features/student/course/grades/grades.component';
+import { DjelatnikKolegij, StudentKolegij, UserService } from '../../core';
 import {
   dohvati_djelatnika_na_kolegiju,
   dohvati_studenta_na_kolegiju,
 } from '../../../assets/pkg/client';
 import { TokenService } from '../../core/services/token.service';
-import { SectionComponent } from '../../shared';
+import {
+  GradesComponent,
+  ParticipantsComponent,
+  SectionComponent,
+} from '../../shared';
 
 @Component({
   selector: 'app-course',
@@ -29,9 +25,8 @@ import { SectionComponent } from '../../shared';
   imports: [
     CommonModule,
     SectionComponent,
-    WorkerParticipantsComponent,
-    StudentParticipantsComponent,
-    StudentGradesComponent,
+    ParticipantsComponent,
+    GradesComponent,
   ],
   templateUrl: './course.component.html',
   styleUrl: './course.component.scss',

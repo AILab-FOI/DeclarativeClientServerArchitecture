@@ -34,41 +34,129 @@ from_multipart(Req0, State) ->
             end;
         {done, Req} ->
             [{Type, Object}, {Extension, File}] = State,
-            handle(Type, Object, File, Extension, Req, State),
-
-            {stop, Req, State}
+            {Res} = handle(Type, Object, File, Extension),
+            request:send_response(Req, Res, State)
     end.
 
-handle(<<"korisnik">>, #{slika := Slika}, File, Extension, Req, State) ->
+handle(<<"korisnik">>,
+       #{id := Id,
+         opis := Opis,
+         uloga := Uloga,
+         dodatno := Dodatno,
+         slika := Slika},
+       File,
+       Extension) ->
     case Slika =:= <<"21104.png">> of
-        % file:write_file(, File),
         true ->
-            io:format("TRUE");
+            handle_data(no_delete,
+                        Extension,
+                        Slika,
+                        fun(FileName) ->
+                           NewDodatno =
+                               case Uloga =:= <<"Student">> of
+                                   true -> korisnik:map_to_record_student(Dodatno);
+                                   false -> korisnik:map_to_record_djelatnik(Dodatno)
+                               end,
+                           korisnik:uredi_korisnika(Id, Opis, NewDodatno, FileName),
+                           {FileName}
+                        end,
+                        File);
         false ->
-            io:format("FALSE")
-    end,
-    [];
+            handle_data(delete,
+                        Extension,
+                        Slika,
+                        fun(FileName) ->
+                           NewDodatno =
+                               case Uloga =:= <<"Student">> of
+                                   true -> korisnik:map_to_record_student(Dodatno);
+                                   false -> korisnik:map_to_record_djelatnik(Dodatno)
+                               end,
+                           korisnik:uredi_korisnika(Id, Opis, NewDodatno, FileName),
+                           {FileName}
+                        end,
+                        File)
+    end;
 handle(<<"fakultet">>,
        #{id := IdFakultet,
          naziv := Naziv,
          adresa := Adresa,
          logo := Logo},
        File,
-       Extension,
-       Req,
-       State) ->
+       Extension) ->
     case Logo =:= <<"21104.png">> of
         true ->
-            % file:write_file(, File),
-            io:format("~p~n", [integer_to_binary(erlang:unique_integer([positive]))]);
+            handle_data(no_delete,
+                        Extension,
+                        Logo,
+                        fun(FileName) ->
+                           fakultet:uredi(IdFakultet,
+                                          Naziv,
+                                          fakultet:map_to_record_adresa(Adresa),
+                                          FileName),
+                           {FileName}
+                        end,
+                        File);
         false ->
-            {WritePath, DeletePath, FileName} = generate_paths(Extension, Logo),
-            delete_assets(DeletePath),
-            Res = file:write_file(binary_to_list(WritePath), File),
-            io:format("~p~n", [Res]),
-            fakultet:uredi(IdFakultet, Naziv, fakultet:map_to_record_adresa(Adresa), FileName)
-    end,
-    [].
+            handle_data(delete,
+                        Extension,
+                        Logo,
+                        fun(FileName) ->
+                           fakultet:uredi(IdFakultet,
+                                          Naziv,
+                                          fakultet:map_to_record_adresa(Adresa),
+                                          FileName),
+                           {FileName}
+                        end,
+                        File)
+    end;
+handle(<<"kolegij">>,
+       #{id := Id,
+         naziv := Naziv,
+         skraceno := Skraceno,
+         slika := Slika},
+       File,
+       Extension) ->
+    case Slika =:= <<"21104.png">> of
+        true ->
+            handle_data(no_delete,
+                        Extension,
+                        Slika,
+                        fun(FileName) ->
+                           kolegij:uredi(Id, Naziv, Skraceno, FileName),
+                           {FileName}
+                        end,
+                        File);
+        false ->
+            handle_data(delete,
+                        Extension,
+                        Slika,
+                        fun(FileName) ->
+                           kolegij:uredi(Id, Naziv, Skraceno, FileName),
+                           {FileName}
+                        end,
+                        File)
+    end;
+handle(<<"sadrzaj">>,
+       #{id := Id,
+         naziv := Naziv,
+         skraceno := Skraceno,
+         slika := Slika},
+       File,
+       Extension) ->
+    case Slika =:= <<"21104.png">> of
+        true ->
+            handle_data(no_delete,
+                        Extension,
+                        Slika,
+                        fun(FileName) -> kolegij:uredi(Id, Naziv, Skraceno, FileName) end,
+                        File);
+        false ->
+            handle_data(delete,
+                        Extension,
+                        Slika,
+                        fun(FileName) -> kolegij:uredi(Id, Naziv, Skraceno, FileName) end,
+                        File)
+    end.
 
 generate_paths(Extension, Logo) ->
     Id = integer_to_binary(erlang:unique_integer([positive])),
@@ -95,8 +183,15 @@ write_assets(WritePath, File) ->
             error
     end.
 
-handle_data() ->
-    [].
+handle_data(delete, Extension, Logo, F, File) ->
+    {WritePath, DeletePath, FileName} = generate_paths(Extension, Logo),
+    delete_assets(DeletePath),
+    write_assets(WritePath, File),
+    F(FileName);
+handle_data(no_delete, Extension, Logo, F, File) ->
+    {WritePath, _, FileName} = generate_paths(Extension, Logo),
+    write_assets(WritePath, File),
+    F(FileName).
 
 get(<<"korisnik">> = Field, Id, State, Req) ->
     get_data(fun() -> korisnik:dohvati_korisnika(core, binary_to_integer(Id)) end,

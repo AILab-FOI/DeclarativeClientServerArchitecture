@@ -6,7 +6,7 @@
     <a
       class="ListItem"
       routerLinkActive="active"
-      routerLink="profile"
+      [routerLink]="['profile', user().id]"
       (click)="userMenu.set(!this.userMenu())"
     >
       Profile

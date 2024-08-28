@@ -42,17 +42,9 @@
         <h1>Nema sekcija na kolegiju</h1>
       }
     } @else if (page() === 1) {
-      @if (user.isWorker()) {
-        <app-worker-participants
-          [participants]="participants()"
-        ></app-worker-participants>
-      } @else {
-        <app-student-participants
-          [participants]="participants()"
-        ></app-student-participants>
-      }
+      <app-participants [participants]="participants()"></app-participants>
     } @else if (page() === 2) {
-      <app-student-grades></app-student-grades>
+      <app-grades></app-grades>
     }
   </div>
 </div>

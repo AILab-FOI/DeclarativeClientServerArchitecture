@@ -4,7 +4,8 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dodaj_studenta/7, dodaj_djelatnika/7, prijava/2, dohvati_korisnika/2,
-         dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/3, uredi_djelatnika/4]).
+         dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/4, uredi_djelatnika/5,
+         uredi_korisnika/4, map_to_record/1, map_to_record_student/1, map_to_record_djelatnik/1]).
 
 dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis, Nadimak) ->
     Dodatno = #student{nadimak = Nadimak},
@@ -52,24 +53,28 @@ obrisi_korisnika(Id) ->
           end,
     mnesia:transaction(Fun).
 
-uredi_studenta(Id, Opis, Nadimak) ->
+uredi_studenta(Id, Opis, Nadimak, Slika) ->
     Dodatno = #student{nadimak = Nadimak},
-    uredi_korisnika(Id, Opis, Dodatno).
+    uredi_korisnika(Id, Opis, Dodatno, Slika).
 
-uredi_djelatnika(Id, Opis, Kabinet, VrijemeKonzultacija) ->
+uredi_djelatnika(Id, Opis, Kabinet, VrijemeKonzultacija, Slika) ->
     Dodatno = #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = VrijemeKonzultacija},
-    uredi_korisnika(Id, Opis, Dodatno).
+    uredi_korisnika(Id, Opis, Dodatno, Slika).
 
-uredi_korisnika(Id, Opis, Dodatno) ->
+uredi_korisnika(Id, Opis, Dodatno, Slika) ->
     Fun = fun() ->
-             utils:read_secure(function,
-                               db_korisnik,
-                               Id,
-                               fun(Korisnik) ->
-                                  NoviKorisnik =
-                                      Korisnik#db_korisnik{opis = Opis, dodatno = Dodatno},
-                                  utils:write_secure(object, NoviKorisnik, {ok, Id})
-                               end)
+             operations:read_secure(function,
+                                    db_korisnik,
+                                    Id,
+                                    fun(Korisnik) ->
+                                       io:format("~p~n", [Slika]),
+                                       NoviKorisnik =
+                                           Korisnik#db_korisnik{opis = Opis,
+                                                                dodatno = Dodatno,
+                                                                slika = Slika},
+                                       io:format("~p~n", [NoviKorisnik]),
+                                       operations:write_secure(object, NoviKorisnik, {ok, Id})
+                                    end)
           end,
     mnesia:transaction(Fun).
 
@@ -81,6 +86,46 @@ dohvati_korisnika(Type, Id) ->
              end
           end,
     mnesia:transaction(Fun).
+
+map_to_record(#{<<"id">> := Id,
+                <<"ime">> := Ime,
+                <<"prezime">> := Prezime,
+                <<"oib">> := Oib,
+                <<"lozinka">> := Lozinka,
+                <<"email">> := Email,
+                <<"uloga">> := Uloga,
+                <<"opis">> := Opis,
+                <<"dodatno">> := Dodatno,
+                <<"slika">> := Slika}) ->
+    case Uloga =:= student of
+        true ->
+            #db_korisnik{ime = Ime,
+                         prezime = Prezime,
+                         oib = Oib,
+                         lozinka = Lozinka,
+                         email = Email,
+                         uloga = Uloga,
+                         opis = Opis,
+                         slika = Slika,
+                         dodatno = map_to_record_student(Dodatno)};
+        false ->
+            #db_korisnik{ime = Ime,
+                         prezime = Prezime,
+                         oib = Oib,
+                         lozinka = Lozinka,
+                         email = Email,
+                         uloga = Uloga,
+                         opis = Opis,
+                         slika = Slika,
+                         dodatno = map_to_record_djelatnik(Dodatno)}
+    end.
+
+map_to_record_student(#{nadimak := Nadimak}) ->
+    #student{nadimak = Nadimak}.
+
+map_to_record_djelatnik(#{kabinet := Kabinet,
+                          vrijeme_konzultacija := VrijemeKonzultacija}) ->
+    #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = VrijemeKonzultacija}.
 
 ucitaj(core, R) ->
     transform_korisnik(R);

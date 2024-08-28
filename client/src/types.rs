@@ -42,16 +42,16 @@ impl Tokens {
 
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize)]
-pub struct Error {
+pub struct MyError {
     code: i32,
     message: String,
 }
 
 #[wasm_bindgen]
-impl Error {
+impl MyError {
     #[wasm_bindgen(constructor)]
     pub fn new(code: i32, message: &str) -> Self {
-        Error {
+        MyError {
             code,
             message: message.to_string(),
         }

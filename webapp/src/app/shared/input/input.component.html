@@ -1,9 +1,24 @@
-<input
-  #input
-  class="Input"
-  [value]="value()"
-  [type]="type()"
-  [placeholder]="placeholder()"
-  [style]="style()"
-  (keyup)="change(input.value)"
-/>
+@if (type() === "textarea") {
+  <textarea
+    #input
+    class="Input"
+    [value]="value()"
+    [placeholder]="placeholder()"
+    style="width: {{ style().width }};height: {{ style().height }};font-size:{{
+      style().font_size
+    }} ;"
+    (keyup)="change(input.value)"
+  ></textarea>
+} @else {
+  <input
+    #input
+    class="Input"
+    [value]="value()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    style="width: {{ style().width }};height: {{ style().height }};font-size:{{
+      style().font_size
+    }} ;"
+    (keyup)="change(input.value)"
+  />
+}

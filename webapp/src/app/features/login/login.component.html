@@ -3,11 +3,13 @@
   <app-input
     [(value)]="email"
     [type]="'email'"
+    [style]="{ width: '200px', height: '50px', font_size: '16px' }"
     [placeholder]="'Insert e-mail'"
   ></app-input>
   <app-input
     [(value)]="password"
     [type]="'password'"
+    [style]="{ width: '200px', height: '50px', font_size: '16px' }"
     [placeholder]="'Insert password'"
   ></app-input>
   <button type="button" (click)="submit()">Submit</button>

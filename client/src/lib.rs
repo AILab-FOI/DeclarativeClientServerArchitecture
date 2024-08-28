@@ -1,10 +1,11 @@
 use std::future::Future;
 
-use reqwest::{self};
+use reqwest::multipart;
 use serde::de::DeserializeOwned;
 use serde_wasm_bindgen::{from_value, to_value};
-use types::Response;
 use wasm_bindgen::prelude::*;
+use js_sys::Uint8Array;
+use web_sys::console;
 
 mod types;
 
@@ -193,16 +194,62 @@ pub async fn login(email: String, password: String) -> Result<JsValue, JsValue> 
             } else {
                 let body = response.text().await.unwrap();
                 let json_data: types::Response<String> = serde_json::from_str(&body).unwrap();
-                let err = types::Error::new(status.as_u16() as i32, &json_data.data.to_string());
+                let err = types::MyError::new(status.as_u16() as i32, &json_data.data.to_string());
                 Err(to_value(&err).unwrap())
             }
         }
         Err(_) => {
-            let err = types::Error::new(500, "Network error");
+            let err = types::MyError::new(500, "Network error");
             Err(to_value(&err).unwrap())
         }
     };
     result
+}
+
+#[wasm_bindgen]
+pub async fn send_multipart(
+    database: &str,
+    id: &str,
+    data: &[u8],
+    filetype: &str,
+    filename: &str,
+) -> Result<JsValue, JsValue> {
+    let client = reqwest::Client::new();
+    let form = multipart::Form::new().part("file", multipart::Part::bytes(data.to_vec()));
+    let result = match client
+        .post("http://localhost:5000/upload")
+        .multipart(form)
+        .send()
+        .await
+    {
+        Ok(response) => {
+            console::log_1(&"ASD".into());
+            Ok(to_value(&"ASD").unwrap())
+        }
+        Err(_) => {
+            let err = types::MyError::new(500, "Network error");
+            Err(to_value(&err).unwrap())
+        }
+    };
+    result
+}
+
+#[wasm_bindgen]
+pub async fn upload_file(database: String, id: String, file: web_sys::File) {
+    let reader = web_sys::FileReader::new().unwrap();
+    let filename = file.name();
+    let onload = Closure::wrap(Box::new(move |event: web_sys::ProgressEvent| {
+        let target = event.target().unwrap();
+        let reader = target.dyn_into::<web_sys::FileReader>().unwrap();
+        let result = reader.result().unwrap();
+        let array = Uint8Array::new(&result);
+        let data = array.to_vec();
+        send_multipart(&database, &id, &data,&"png", &filename.clone());
+    }) as Box<dyn FnMut(_)>);
+
+    reader.set_onload(Some(onload.as_ref().unchecked_ref()));
+    reader.read_as_array_buffer(&file).unwrap();
+    onload.forget();
 }
 
 #[wasm_bindgen]
@@ -228,12 +275,12 @@ pub async fn refresh_tokens(token: String) -> Result<JsValue, JsValue> {
             } else {
                 let body = response.text().await.unwrap();
                 let json_data: types::Response<String> = serde_json::from_str(&body).unwrap();
-                let err = types::Error::new(status.as_u16() as i32, &json_data.data.to_string());
+                let err = types::MyError::new(status.as_u16() as i32, &json_data.data.to_string());
                 Err(to_value(&err).unwrap())
             }
         }
         Err(_) => {
-            let err = types::Error::new(500, "Network error");
+            let err = types::MyError::new(500, "Network error");
             Err(to_value(&err).unwrap())
         }
     };
@@ -249,7 +296,7 @@ pub fn create_get_request(
 }
 
 pub fn parse_network_err() -> Result<JsValue, JsValue> {
-    let err = types::Error::new(500, "Network error");
+    let err = types::MyError::new(500, "Network error");
     Err(to_value(&err).unwrap())
 }
 

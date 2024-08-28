@@ -1,28 +1,28 @@
 <div class="Content">
   <div class="ContentHeader">
     <h1 class="ContentHeaderHeading">Profile</h1>
-    <img
-      (click)="openEdit()"
-      class="ContentHeaderEdit"
-      src="../../../assets/icons/icons8-edit-48.png"
-    />
+    @if (isCurrenUser()) {
+      <img
+        (click)="openEdit()"
+        class="ContentHeaderEdit"
+        src="../../../assets/icons/icons8-edit-48.png"
+      />
+    }
   </div>
 
   <div class="ContentUser">
     <img class="ContentUserImg" src="http://localhost:5000/images/21104.png" />
     <div class="ContentUserInfo">
-      <label class="ContentUserInfoText">Name: {{ user.user().ime }} </label>
+      <label class="ContentUserInfoText">Name: {{ user().ime }} </label>
+      <label class="ContentUserInfoText">Surname: {{ user().prezime }}</label>
       <label class="ContentUserInfoText"
-        >Surname: {{ user.user().prezime }}</label
+        >Short name: {{ user().dodatno.nadimak }}</label
       >
+      <label class="ContentUserInfoText">Email: {{ user().email }}</label>
+      <label class="ContentUserInfoText">Address: {{ user().oib }}</label>
+      <label class="ContentUserInfoText">City: {{ user().ime }}</label>
       <label class="ContentUserInfoText"
-        >Short name: {{ user.user().dodatno.nadimak }}</label
-      >
-      <label class="ContentUserInfoText">Email: {{ user.user().email }}</label>
-      <label class="ContentUserInfoText">Address: {{ user.user().oib }}</label>
-      <label class="ContentUserInfoText">City: {{ user.user().ime }}</label>
-      <label class="ContentUserInfoText"
-        >Faculty: {{ user.user()?.fakultet?.naziv }}</label
+        >Faculty: {{ user()?.fakultet?.naziv }}</label
       >
     </div>
   </div>
@@ -38,7 +38,7 @@
   </div>
 
   <div class="ContentCourses">
-    @for (course of courses(); track course) {
+    @for (course of courses(); track course.id) {
       <app-course-card [course]="course"></app-course-card>
     }
   </div>

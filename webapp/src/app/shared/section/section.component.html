@@ -28,7 +28,7 @@
     <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>
     <div class="SectionContent">
       @for (sadrzaj of sekcija().sadrzaj; track sadrzaj) {
-        <app-content [sadrzaj]="sadrzaj"></app-content>
+        <app-content-card [sadrzaj]="sadrzaj"></app-content-card>
       }
     </div>
   }
