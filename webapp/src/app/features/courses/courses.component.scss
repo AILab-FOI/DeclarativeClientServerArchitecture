@@ -23,7 +23,8 @@
 
   &Courses {
     display: flex;
-    justify-content: space-evenly;
+    padding: 0 auto;
+    justify-content: space-between;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;

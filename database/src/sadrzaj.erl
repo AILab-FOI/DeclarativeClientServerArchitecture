@@ -102,7 +102,6 @@ transform_sadrzaj(#db_sadrzaj{id = Id,
                               naziv = Naziv,
                               tip = Tip,
                               vrijednost = Vrijednost}) ->
-    io:format("DSA"),
     NovaVrijednost = transform_vrijednost(Tip, Vrijednost),
     #{id => Id,
       naziv => Naziv,
@@ -118,6 +117,9 @@ transform_vrijednost(dokument,
     #{referenca => Referenca,
       vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)};
 transform_vrijednost(lekcija,
-                     #lekcija{sadrzaj = Sadrzaj, vrijeme_kreiranja = VrijemeKreiranja}) ->
+                     #lekcija{sadrzaj = Sadrzaj,
+                              slika = Slika,
+                              vrijeme_kreiranja = VrijemeKreiranja}) ->
     #{sadrzaj => Sadrzaj,
+      slika => Slika,
       vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)}.

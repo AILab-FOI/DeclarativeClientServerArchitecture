@@ -62,7 +62,8 @@
 -type pitanje_ref() :: id().
 -type djelatnik_konfiguracija_ref() :: id().
 
--record(db_fakultet, {id :: id(), naziv :: binary(), adresa :: adresa()}).
+-record(db_fakultet,
+        {id :: id(), logo :: binary(), naziv :: binary(), adresa :: adresa()}).
 -record(adresa,
         {grad :: binary(),
          ulica :: binary(),
@@ -82,6 +83,7 @@
          ime :: binary(),
          prezime :: binary(),
          oib :: integer(),
+         slika :: binary(),
          lozinka :: lozinka(),
          uloga :: student | djelatnik,
          email :: binary(),
@@ -92,7 +94,8 @@
 -record(db_djelatnik_kolegij,
         {id :: {korisnik_ref(), kolegij_ref()}, status :: status_djelatnika()}).
 -record(db_student_kolegij, {id :: {korisnik_ref(), kolegij_ref()}, ocjene :: [{}]}).
--record(db_kolegij, {id :: id(), naziv :: binary(), skraceno :: binary()}).
+-record(db_kolegij,
+        {id :: id(), slika :: binary(), naziv :: binary(), skraceno :: binary()}).
 -record(db_kolegij_sekcija, {id_kolegij :: kolegij_ref(), id_sekcija :: sekcija_ref()}).
 -record(db_sekcija, {id :: id(), naziv :: binary(), opis :: binary()}).
 -record(db_sekcija_sadrzaj, {id_sadrzaj :: sadrzaj_ref(), id_sekcija :: sekcija_ref()}).
@@ -102,7 +105,8 @@
          tip :: dokument | lekcija | poveznica | kviz,
          vrijednost :: dokument() | lekcija() | poveznica() | kviz_ref()}).
 -record(dokument, {referenca :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
--record(lekcija, {sadrzaj :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
+-record(lekcija,
+        {sadrzaj :: binary(), slika :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
 -record(poveznica, {referenca :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
 -record(db_kviz,
         {id :: id(),

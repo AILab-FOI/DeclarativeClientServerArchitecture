@@ -3,7 +3,8 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/3]).
+-export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/4,
+         map_to_record_adresa/1]).
 
 dohvati() ->
     Fun = fun(Fakultet, Acc) -> [ucitaj(full, Fakultet) | Acc] end,
@@ -32,6 +33,7 @@ dodaj(Naziv, Adresa) ->
     Fun = fun() ->
              case mnesia:write(#db_fakultet{id = Id,
                                             naziv = Naziv,
+                                            logo = <<"21104.png">>,
                                             adresa = Adresa})
              of
                  ok -> {ok, Id};
@@ -48,10 +50,11 @@ obrisi(Id) ->
           end,
     mnesia:transaction(Fun).
 
-uredi(Id, Naziv, Adresa) ->
+uredi(Id, Naziv, Adresa, Logo) ->
     Fun = fun() ->
              case mnesia:write(#db_fakultet{id = Id,
                                             naziv = Naziv,
+                                            logo = Logo,
                                             adresa = Adresa})
              of
                  ok -> {ok, Id};
@@ -61,6 +64,7 @@ uredi(Id, Naziv, Adresa) ->
     mnesia:transaction(Fun).
 
 ucitaj(core, R) ->
+    io:format("~p~n", [R]),
     transform_fakultet(R);
 ucitaj(katedre, R) ->
     M0 = transform_fakultet(R),
@@ -75,7 +79,30 @@ ucitaj(full, R) ->
 
 transform_fakultet(#db_fakultet{id = Id,
                                 naziv = Naziv,
-                                adresa = Adresa}) ->
+                                logo = Logo,
+                                adresa =
+                                    #adresa{grad = Grad,
+                                            ulica = Ulica,
+                                            drzava = Drzava,
+                                            kucni_broj = KucniBroj,
+                                            postanski_broj = PostanskiBroj}}) ->
     #{id => Id,
       naziv => Naziv,
-      adresa => Adresa}.
+      logo => Logo,
+      adresa =>
+          #{grad => Grad,
+            ulica => Ulica,
+            drzava => Drzava,
+            kucni_broj => KucniBroj,
+            postanski_broj => PostanskiBroj}}.
+
+map_to_record_adresa(#{grad := Grad,
+                       ulica := Ulica,
+                       postanski_broj := PostanskiBroj,
+                       drzava := Drzava,
+                       kucni_broj := KucniBroj}) ->
+    #adresa{ulica = Ulica,
+            grad = Grad,
+            postanski_broj = PostanskiBroj,
+            drzava = Drzava,
+            kucni_broj = KucniBroj}.

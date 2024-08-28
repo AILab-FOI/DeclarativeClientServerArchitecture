@@ -26,7 +26,7 @@ dohvati_katedre(IdFakultet) ->
                             end),
              Katedre = mnesia:select(db_fakultet_katedra, Match),
              lists:map(fun(Katedra) ->
-                          {atomic, Result} = department:dohvati_katedru(Katedra),
+                          {atomic, Result} = katedra:dohvati(Katedra),
                           Result
                        end,
                        Katedre)

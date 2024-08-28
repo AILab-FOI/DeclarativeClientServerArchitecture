@@ -30,6 +30,7 @@ dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, Uloga, Dodatno) ->
                                                     oib = Oib,
                                                     lozinka = {Hash, Salt},
                                                     opis = Opis,
+                                                    slika = <<"21104.png">>,
                                                     email = Email,
                                                     uloga = Uloga,
                                                     dodatno = Dodatno})
@@ -102,6 +103,7 @@ transform_korisnik(Korisnik) ->
       ime => Korisnik#db_korisnik.ime,
       prezime => Korisnik#db_korisnik.prezime,
       oib => Korisnik#db_korisnik.oib,
+      slika => Korisnik#db_korisnik.slika,
       email => Korisnik#db_korisnik.email,
       opis => Korisnik#db_korisnik.opis,
       uloga => parse_role(Korisnik#db_korisnik.uloga),
