@@ -36,10 +36,14 @@ json_request(Req, State) ->
             run_put_request(Map, Req2, State)
     end.
 
-run_put_request(#{<<"djelatnik">> := Djelatnik, <<"katedra">> := Katedra}, Req, State) ->
+run_put_request(#{<<"djelatnik">> := Djelatnik,
+                  <<"katedra">> := Katedra,
+                  <<"tip">> := Tip},
+                Req,
+                State) ->
     request:response(Req,
                      State,
-                     fun() -> katedra_djelatnik:dodaj_djelatnika_na_katedru(Djelatnik, Katedra)
+                     fun() -> katedra_djelatnik:dodaj_djelatnika_na_katedru(Djelatnik, Katedra, Tip)
                      end);
 run_put_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).

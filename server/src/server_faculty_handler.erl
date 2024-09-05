@@ -11,7 +11,12 @@ allowed_methods(Req, State) ->
     {[<<"GET">>, <<"PATCH">>, <<"PUT">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
-    request:auth(Req, State).
+    case cowboy_req:method(Req) of
+        <<"GET">> ->
+            {true, Req, State};
+        _ ->
+            request:auth(Req, State)
+    end.
 
 content_types_accepted(Req, State) ->
     {[{{<<"application">>, <<"json">>, []}, from_json}], Req, State}.
@@ -57,18 +62,26 @@ gather_method(Map, Req, State) ->
             run_patch_request(Map, Req, State)
     end.
 
-run_put_request(#{<<"naziv">> := Naziv, <<"adresa">> := #{<<"ulica">> := _} = Adresa},
+run_put_request(#{<<"naziv">> := Naziv,
+                  <<"opis">> := Opis,
+                  <<"lat">> := Lat,
+                  <<"long">> := Long,
+                  <<"adresa">> := #{<<"ulica">> := _} = Adresa},
                 Req,
                 State) ->
-    request:response(Req, State, fun() -> fakultet:dodaj(Naziv, Adresa) end);
+    request:response(Req,
+                     State,
+                     fun() -> fakultet:dodaj(Naziv, Opis, Adresa, {Lat, Long}) end);
 run_put_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).
 
 run_patch_request(#{<<"id">> := Id,
                     <<"naziv">> := Naziv,
+                    <<"opis">> := Opis,
+                    <<"logo">> := Logo,
                     <<"adresa">> := #{<<"ulica">> := _} = Adresa},
                   Req,
                   State) ->
-    request:response(Req, State, fun() -> fakultet:uredi(Id, Naziv, Adresa) end);
+    request:response(Req, State, fun() -> fakultet:uredi(Id, Naziv, Opis, Adresa, Logo) end);
 run_patch_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).

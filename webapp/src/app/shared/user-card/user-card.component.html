@@ -1,1 +1,4 @@
-<p>user-card works!</p>
+<div (click)="goTo()">
+  <img [src]="'http://localhost:5000/images/' + user().slika" />
+  <label>{{ user().ime }} {{ user().prezime }}</label>
+</div>

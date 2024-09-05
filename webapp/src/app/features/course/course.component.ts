@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   Component,
   computed,
@@ -18,6 +18,7 @@ import {
   ParticipantsComponent,
   SectionComponent,
 } from '../../shared';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-course',
@@ -34,6 +35,7 @@ import {
 export class CourseComponent {
   public user = inject(UserService);
   private token = inject(TokenService);
+  private toast = inject(ToastrService);
   public course = computed(() => {
     return this.data()?.kolegij;
   });
@@ -43,6 +45,7 @@ export class CourseComponent {
     return this.course().studenti;
   });
   public page = signal(0);
+  private location = inject(Location);
 
   constructor() {
     effect(() => {
@@ -51,17 +54,27 @@ export class CourseComponent {
           this.user.user().id,
           this.id(),
           this.token.accessToken(),
-        ).then((res) => {
-          this.data.set(res as DjelatnikKolegij);
-        });
+        )
+          .then((res) => {
+            this.data.set(res as DjelatnikKolegij);
+          })
+          .catch((err) => {
+            this.toast.error('User not on Course');
+            this.location.back();
+          });
       } else {
         dohvati_studenta_na_kolegiju(
           this.user.user().id,
           this.id(),
           this.token.accessToken(),
-        ).then((res) => {
-          this.data.set(res as StudentKolegij);
-        });
+        )
+          .then((res) => {
+            this.data.set(res as StudentKolegij);
+          })
+          .catch((err) => {
+            this.toast.error('User not on Course');
+            this.location.back();
+          });
       }
     });
   }

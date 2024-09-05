@@ -1,3 +1,10 @@
 <div class="Content">
-  <h1>Home</h1>
+  <div class="ContentHeader">
+    <h1 class="ContentHeaderHeading">Home</h1>
+  </div>
+  <div class="ContentCourses">
+    @for (faculty of faculties(); track faculty.id) {
+      <app-faculty-card [faculty]="faculty"></app-faculty-card>
+    }
+  </div>
 </div>

@@ -1,0 +1,49 @@
+@import '../../../styles/variables.scss';
+
+:host {
+  display: flex;
+  height: fit-content;
+  flex: 0 1 200px;
+}
+
+.Card {
+  display: flex;
+  flex-direction: column;
+  background: $background;
+  border-radius: 8px;
+  box-shadow: -2px 0px 12px -4px rgba(102, 107, 102, 0.84);
+
+  &Header {
+    height: 100%;
+    background: $white;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    &Img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      border-top-right-radius: 8px;
+      border-top-left-radius: 50px;
+    }
+  }
+
+  &Content {
+
+    padding: 10px;
+
+    &Heading {
+      font-size: 22px;
+    }
+
+    &Label {
+      font-size: 14px;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+}

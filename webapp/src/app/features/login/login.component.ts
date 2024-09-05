@@ -3,6 +3,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { InputComponent } from '../../shared';
 import { AuthService } from '../../core';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 export type ErrorLogin = {
   is: boolean;
@@ -25,13 +26,15 @@ export class LoginComponent {
   });
   private auth = inject(AuthService);
   private router = inject(Router);
+  private toast = inject(ToastrService);
 
   submit(): void {
     this.auth.login(this.email(), this.password()).then((isLogedIn) => {
       if (isLogedIn.status) {
+        this.toast.success('Logged in!');
         this.router.navigate(['dashboard']);
       } else {
-        this.error.set({ is: true, value: isLogedIn.data });
+        this.toast.error(isLogedIn.data);
       }
     });
   }

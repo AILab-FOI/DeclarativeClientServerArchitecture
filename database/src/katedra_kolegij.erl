@@ -25,7 +25,7 @@ dohvati_kolegije(IdKatedra) ->
                             end),
              Kolegiji = mnesia:select(db_katedra_kolegij, Match),
              lists:map(fun(Kolegij) ->
-                          {atomic, Result} = course:dohvati_kolegij(Kolegij),
+                          {atomic, Result} = kolegij:dohvati(core, Kolegij),
                           Result
                        end,
                        Kolegiji)

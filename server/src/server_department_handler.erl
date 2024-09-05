@@ -11,7 +11,12 @@ allowed_methods(Req, State) ->
     {[<<"GET">>, <<"PATCH">>, <<"PUT">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
-    request:auth(Req, State).
+    case cowboy_req:method(Req) of
+        <<"GET">> ->
+            {true, Req, State};
+        _ ->
+            request:auth(Req, State)
+    end.
 
 content_types_accepted(Req, State) ->
     {[{{<<"application">>, <<"json">>, []}, from_json}], Req, State}.
@@ -36,7 +41,9 @@ html_request(Req, State) ->
         {error, Reason, _} ->
             request:err(400, Reason, Req, State);
         {ok, #{id := Id}, Req2} ->
-            request:response(Req2, State, fun() -> katedra:dohvati(binary_to_integer(Id)) end);
+            request:response(Req2,
+                             State,
+                             fun() -> katedra:dohvati(full, binary_to_integer(Id)) end);
         {ok, _, Req2} ->
             request:response(Req2, State, fun() -> katedra:dohvati() end)
     end.
@@ -57,12 +64,16 @@ gather_method(Map, Req, State) ->
             run_patch_request(Map, Req, State)
     end.
 
-run_put_request(#{<<"naziv">> := Naziv}, Req, State) ->
-    request:response(Req, State, fun() -> katedra:dodaj(Naziv) end);
+run_put_request(#{<<"naziv">> := Naziv, <<"opis">> := Opis}, Req, State) ->
+    request:response(Req, State, fun() -> katedra:dodaj(Naziv, Opis) end);
 run_put_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).
 
-run_patch_request(#{<<"id">> := Id, <<"naziv">> := Naziv}, Req, State) ->
-    request:response(Req, State, fun() -> katedra:uredi(Id, Naziv) end);
+run_patch_request(#{<<"id">> := Id,
+                    <<"naziv">> := Naziv,
+                    <<"opis">> := Opis},
+                  Req,
+                  State) ->
+    request:response(Req, State, fun() -> katedra:uredi(Id, Naziv, Opis) end);
 run_patch_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).

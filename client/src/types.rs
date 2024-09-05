@@ -1,3 +1,6 @@
+use core::f32;
+
+use js_sys::Boolean;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -82,6 +85,7 @@ pub struct Korisnik {
     id: i32,
     ime: String,
     prezime: String,
+    slika: String,
     oib: i32,
     uloga: String,
     email: String,
@@ -95,6 +99,8 @@ pub struct Korisnik {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     katedre: Option<Vec<Katedra>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tip: Option<String>,
 }
 
 #[wasm_bindgen]
@@ -116,6 +122,15 @@ impl Korisnik {
     #[wasm_bindgen(setter)]
     pub fn set_ime(&mut self, ime: String) {
         self.ime = ime;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn slika(&self) -> String {
+        self.slika.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_slika(&mut self, slika: String) {
+        self.slika = slika;
     }
 
     #[wasm_bindgen(getter)]
@@ -198,6 +213,15 @@ impl Korisnik {
     pub fn set_katedre(&mut self, katedre: Vec<Katedra>) {
         self.katedre = Some(katedre);
     }
+    #[wasm_bindgen(getter)]
+    pub fn tip(&self) -> String {
+        self.tip.clone().expect("Tip")
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_tip(&mut self, tip: String) {
+        self.tip = Some(tip);
+    }
 }
 
 #[wasm_bindgen]
@@ -251,6 +275,10 @@ pub struct Fakultet {
     id: i32,
     naziv: String,
     adresa: Adresa,
+    logo: String,
+    skraceno: String,
+    opis: String,
+    lokacija: Lokacija,
     #[serde(skip_serializing_if = "Option::is_none")]
     katedre: Option<Vec<Katedra>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -278,6 +306,35 @@ impl Fakultet {
     pub fn set_naziv(&mut self, naziv: String) {
         self.naziv = naziv;
     }
+    #[wasm_bindgen(getter)]
+    pub fn opis(&self) -> String {
+        self.opis.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_opis(&mut self, opis: String) {
+        self.opis = opis;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn logo(&self) -> String {
+        self.logo.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_logo(&mut self, logo: String) {
+        self.logo = logo;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn skraceno(&self) -> String {
+        self.skraceno.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_skraceno(&mut self, skraceno: String) {
+        self.skraceno = skraceno;
+    }
 
     #[wasm_bindgen(getter)]
     pub fn adresa(&self) -> Adresa {
@@ -287,6 +344,16 @@ impl Fakultet {
     #[wasm_bindgen(setter)]
     pub fn set_adresa(&mut self, adresa: Adresa) {
         self.adresa = adresa;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn lokacija(&self) -> Lokacija {
+        self.lokacija.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_lokacija(&mut self, lokacija: Lokacija) {
+        self.lokacija = lokacija;
     }
 
     #[wasm_bindgen(getter)]
@@ -306,6 +373,35 @@ impl Fakultet {
     #[wasm_bindgen(setter)]
     pub fn set_korisnici(&mut self, korisnici: Vec<Korisnik>) {
         self.korisnici = Some(korisnici);
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Lokacija {
+    lat: f32,
+    long: f32,
+}
+
+#[wasm_bindgen]
+impl Lokacija {
+    #[wasm_bindgen(getter)]
+    pub fn lat(&self) -> f32 {
+        self.lat.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_lat(&mut self, lat: f32) {
+        self.lat = lat;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn long(&self) -> f32 {
+        self.long.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_long(&mut self, long: f32) {
+        self.long = long;
     }
 }
 
@@ -334,6 +430,7 @@ impl Adresa {
 pub struct Kolegij {
     id: i32,
     naziv: String,
+    slika: String,
     skraceno: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -361,6 +458,15 @@ impl Kolegij {
     #[wasm_bindgen(setter)]
     pub fn set_naziv(&mut self, naziv: String) {
         self.naziv = naziv;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn slika(&self) -> String {
+        self.slika.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_slika(&mut self, slika: String) {
+        self.slika = slika;
     }
 
     #[wasm_bindgen(getter)]
@@ -488,6 +594,11 @@ impl DjelatnikKolegij {
 pub struct Katedra {
     id: i32,
     naziv: String,
+    opis: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    kolegiji: Option<Vec<Kolegij>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    djelatnici: Option<Vec<Korisnik>>,
 }
 
 #[wasm_bindgen]
@@ -510,6 +621,34 @@ impl Katedra {
     pub fn set_naziv(&mut self, naziv: String) {
         self.naziv = naziv;
     }
+
+    #[wasm_bindgen(getter)]
+    pub fn opis(&self) -> String {
+        self.opis.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_opis(&mut self, opis: String) {
+        self.opis = opis;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn kolegiji(&self) -> Vec<Kolegij> {
+        self.kolegiji.clone().expect("Kolegiji")
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_kolegiji(&mut self, kolegiji: Vec<Kolegij>) {
+        self.kolegiji = Some(kolegiji);
+    }
+    #[wasm_bindgen(getter)]
+    pub fn djelatnici(&self) -> Vec<Korisnik> {
+        self.djelatnici.clone().expect("Korisnici")
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_djelatnici(&mut self, djelatnici: Vec<Korisnik>) {
+        self.djelatnici = Some(djelatnici);
+    }
 }
 
 #[wasm_bindgen]
@@ -518,6 +657,7 @@ pub struct Sekcija {
     id: i32,
     naziv: String,
     opis: String,
+    vidljivo: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     sadrzaj: Option<Vec<Sadrzaj>>,
 }
@@ -541,6 +681,15 @@ impl Sekcija {
     #[wasm_bindgen(setter)]
     pub fn set_naziv(&mut self, naziv: String) {
         self.naziv = naziv;
+    }
+    #[wasm_bindgen(getter)]
+    pub fn vidljivo(&self) -> bool {
+        self.vidljivo.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_vidljivo(&mut self, vidljivo: bool) {
+        self.vidljivo = vidljivo;
     }
 
     #[wasm_bindgen(getter)]

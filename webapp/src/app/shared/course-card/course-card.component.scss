@@ -3,6 +3,8 @@
 :host {
   display: flex;
   height: fit-content;
+  flex: 0 1 250px;
+  height: auto;
 }
 
 .Card {
@@ -10,7 +12,6 @@
   flex-direction: column;
   background: $background;
   border-radius: 8px;
-  max-width: 400px;
   box-shadow: -2px 0px 12px -4px rgba(102, 107, 102, 0.84);
 
   &Header {
@@ -39,6 +40,7 @@
 
     &Label {
       font-size: 14px;
+
     }
   }
 

@@ -3,7 +3,7 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dodaj_studenta/7, dodaj_djelatnika/7, prijava/2, dohvati_korisnika/2,
+-export([dodaj_studenta/7, dodaj_djelatnika/8, prijava/2, dohvati_korisnika/2,
          dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/4, uredi_djelatnika/5,
          uredi_korisnika/4, map_to_record/1, map_to_record_student/1, map_to_record_djelatnik/1]).
 
@@ -11,9 +11,9 @@ dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis, Nadimak) ->
     Dodatno = #student{nadimak = Nadimak},
     dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, student, Dodatno).
 
-dodaj_djelatnika(Ime, Prezime, Oib, Lozinka, Email, Opis, Kabinet) ->
+dodaj_djelatnika(Ime, Prezime, Oib, Lozinka, Uloga, Email, Opis, Kabinet) ->
     Dodatno = #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = []},
-    dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, djelatnik, Dodatno).
+    dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, Uloga, Dodatno).
 
 dodaj_korisnika(Ime, Prezime, Oib, Lozinka, Email, Opis, Uloga, Dodatno) ->
     Id = ?ID,
@@ -160,15 +160,19 @@ dohvati_korisnike() ->
 
 parse_role(student) ->
     <<"Student">>;
-parse_role(djelatnik) ->
-    <<"Djelatnik">>.
+parse_role(dekan) ->
+    <<"Dekan">>;
+parse_role(profesor) ->
+    <<"Profesor">>;
+parse_role(asistent) ->
+    <<"Asistent">>.
 
 model_switch(#db_korisnik{uloga = Uloga, dodatno = Dodatno}) ->
     case Uloga of
         student ->
             #student{nadimak = Nadimak} = Dodatno,
             #{nadimak => Nadimak};
-        djelatnik ->
+        _ ->
             #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = VrijemeKonz} = Dodatno,
             #{kabinet => Kabinet, vrijeme_konzultacija => VrijemeKonz}
     end.

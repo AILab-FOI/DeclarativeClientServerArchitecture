@@ -2,10 +2,10 @@
 
 -include_lib("database/include/records.hrl").
 
--export([dodaj/1, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/2]).
+-export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/3]).
 
 dohvati() ->
-    Fun = fun(Katedra, Acc) -> [ucitaj(full, Katedra) | Acc] end,
+    Fun = fun(Katedra, Acc) -> [ucitaj(core, Katedra) | Acc] end,
     mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_katedra) end).
 
 dohvati(Id) ->
@@ -26,10 +26,13 @@ dohvati(Type, Id) ->
           end,
     mnesia:transaction(Fun).
 
-dodaj(Naziv) ->
+dodaj(Naziv, Opis) ->
     Id = ?ID,
     Fun = fun() ->
-             case mnesia:write(#db_katedra{id = Id, naziv = Naziv}) of
+             case mnesia:write(#db_katedra{id = Id,
+                                           naziv = Naziv,
+                                           opis = Opis})
+             of
                  ok -> {ok, Id};
                  _ -> {error, "Transakcija neuspješna"}
              end
@@ -44,9 +47,12 @@ obrisi(Id) ->
           end,
     mnesia:transaction(Fun).
 
-uredi(Id, Naziv) ->
+uredi(Id, Naziv, Opis) ->
     Fun = fun() ->
-             case mnesia:write(#db_katedra{id = Id, naziv = Naziv}) of
+             case mnesia:write(#db_katedra{id = Id,
+                                           naziv = Naziv,
+                                           opis = Opis})
+             of
                  ok -> {ok, Id};
                  _ -> {error, "Transakcija neuspješna"}
              end
@@ -66,5 +72,9 @@ ucitaj(full, R) ->
     M1 = katedra_kolegij:ucitaj_kolegije(M0),
     katedra_djelatnik:ucitaj_djelatnike(M1).
 
-transform_katedra(#db_katedra{id = Id, naziv = Naziv}) ->
-    #{id => Id, naziv => Naziv}.
+transform_katedra(#db_katedra{id = Id,
+                              naziv = Naziv,
+                              opis = Opis}) ->
+    #{id => Id,
+      naziv => Naziv,
+      opis => Opis}.

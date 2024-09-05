@@ -65,8 +65,12 @@ fakultet_korisnik_keys() ->
              #db_fakultet_korisnik{id_korisnik = 6, id_fakultet = 1}].
 
 katedra_djelatnik_keys() ->
-            [#db_katedra_djelatnik{id_katedra = 3, id_djelatnik = 4},
-             #db_katedra_djelatnik{id_katedra = 3, id_djelatnik = 5}].
+            [#db_katedra_djelatnik{id_katedra = 3,
+                                   id_djelatnik = 4,
+                                   tip = voditelj},
+             #db_katedra_djelatnik{id_katedra = 3,
+                                   id_djelatnik = 5,
+                                   tip = suradnik}].
 
 kolegij_student_keys() ->
             [#db_student_kolegij{id = {1, 1}, ocjene = []},
@@ -167,7 +171,7 @@ korisnici() ->
                           prezime = <<"Mihić"/utf8>>,
                           oib = 4,
                           slika = <<"21104.png">>,
-                          uloga = djelatnik,
+                          uloga = profesor,
                           lozinka = <<"lozinka"/utf8>>,
                           email = <<"mmihic@foi.hr"/utf8>>,
                           dodatno = #djelatnik{kabinet = <<"135"/utf8>>, vrijeme_konzultacija = []},
@@ -177,7 +181,7 @@ korisnici() ->
                           prezime = <<"Anić"/utf8>>,
                           oib = 5,
                           slika = <<"21104.png">>,
-                          uloga = djelatnik,
+                          uloga = asistent,
                           lozinka = <<"lozinka"/utf8>>,
                           email = <<"aanic@foi.hr"/utf8>>,
                           dodatno = #djelatnik{kabinet = <<"135"/utf8>>, vrijeme_konzultacija = []},
@@ -195,24 +199,39 @@ korisnici() ->
 
 fakulteti() ->
             [#db_fakultet{id = 1,
-                          naziv = <<"FOI"/utf8>>,
+                          naziv = <<"Fakultet Organizacije i Informatike">>,
+                          opis = <<"Opis Fakulteta">>,
+                          skraceno = <<"FOI"/utf8>>,
                           logo = <<"">>,
+                          lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 2,
-                          naziv = <<"FER"/utf8>>,
+                          naziv = <<"Fakultet Elektrotehnike i Računarstva"/utf8>>,
+                          opis = <<"Opis Fakulteta">>,
+                          skraceno = <<"FER"/utf8>>,
                           logo = <<"">>,
+                          lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 3,
-                          naziv = <<"EFZG"/utf8>>,
+                          naziv = <<"Ekonomski Fakultet Zagreb">>,
+                          opis = <<"Opis Fakulteta">>,
+                          skraceno = <<"EFZG"/utf8>>,
                           logo = <<"">>,
+                          lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 4,
-                          naziv = <<"FFZG"/utf8>>,
+                          naziv = <<"Filozofski Fakultet Zagreb">>,
+                          opis = <<"Opis Fakulteta">>,
+                          skraceno = <<"FFZG"/utf8>>,
                           logo = <<"">>,
+                          lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 5,
-                          naziv = <<"FKIT"/utf8>>,
+                          naziv = <<"Fakultet Kemijskog Inžinjerstva i Tehnologije"/utf8>>,
+                          opis = <<"Opis Fakulteta">>,
+                          skraceno = <<"FKIT"/utf8>>,
                           logo = <<"">>,
+                          lokacija = {31.44, 116.44},
                           adresa = adresa()}].
 
 adresa() ->
@@ -223,12 +242,21 @@ adresa() ->
                     kucni_broj = <<"2"/utf8>>}.
 
 katedre() ->
-            [#db_katedra{id = 1, naziv = <<"Katedra za gospodatstvo"/utf8>>},
-             #db_katedra{id = 2, naziv = <<"Katedra za organizaciju"/utf8>>},
-             #db_katedra{id = 3, naziv = <<"Katedra za kvantitivne metode"/utf8>>},
+            [#db_katedra{id = 1,
+                         naziv = <<"Katedra za gospodatstvo"/utf8>>,
+                         opis = <<"Opis Katedre">>},
+             #db_katedra{id = 2,
+                         naziv = <<"Katedra za organizaciju"/utf8>>,
+                         opis = <<"Opis Katedre">>},
+             #db_katedra{id = 3,
+                         naziv = <<"Katedra za kvantitivne metode"/utf8>>,
+                         opis = <<"Opis Katedre">>},
              #db_katedra{id = 4,
-                         naziv = <<"Katedra za informatičke tehnologije i računarstvo"/utf8>>},
-             #db_katedra{id = 5, naziv = <<"Katedra za razvoj informacijskih sustava"/utf8>>}].
+                         naziv = <<"Katedra za informatičke tehnologije i računarstvo"/utf8>>,
+                         opis = <<"Opis Katedre">>},
+             #db_katedra{id = 5,
+                         naziv = <<"Katedra za razvoj informacijskih sustava"/utf8>>,
+                         opis = <<"Opis Katedre">>}].
 
 kolegiji() ->
             [#db_kolegij{id = 1,
@@ -275,25 +303,32 @@ kolegiji() ->
 sekcije() ->
             [#db_sekcija{id = 1,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju Mat1"/utf8>>},
+                         opis = <<"Osnovne informacije o kolegiju Mat1"/utf8>>,
+                         vidljivo = true},
              #db_sekcija{id = 2,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju Mat2"/utf8>>},
+                         opis = <<"Osnovne informacije o kolegiju Mat2"/utf8>>,
+                         vidljivo = true},
              #db_sekcija{id = 3,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju DP"/utf8>>},
+                         opis = <<"Osnovne informacije o kolegiju DP"/utf8>>,
+                         vidljivo = true},
              #db_sekcija{id = 4,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju OPM"/utf8>>},
+                         opis = <<"Osnovne informacije o kolegiju OPM"/utf8>>,
+                         vidljivo = true},
              #db_sekcija{id = 5,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju Prog1"/utf8>>},
+                         opis = <<"Osnovne informacije o kolegiju Prog1"/utf8>>,
+                         vidljivo = true},
              #db_sekcija{id = 6,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju Prog2"/utf8>>},
+                         opis = <<"Osnovne informacije o kolegiju Prog2"/utf8>>,
+                         vidljivo = true},
              #db_sekcija{id = 7,
                          naziv = <<"Osnovne informacije"/utf8>>,
-                         opis = <<"Osnovne informacije o kolegiju UzDiz"/utf8>>}].
+                         opis = <<"Osnovne informacije o kolegiju UzDiz"/utf8>>,
+                         vidljivo = true}].
 
 sadrzaj() ->
             [#db_sadrzaj{id = 1,

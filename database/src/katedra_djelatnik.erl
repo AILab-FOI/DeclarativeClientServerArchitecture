@@ -3,13 +3,14 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dohvati_katedre/1, dohvati_djelatnike/1, dodaj_djelatnika_na_katedru/2,
+-export([dohvati_katedre/1, dohvati_djelatnike/1, dodaj_djelatnika_na_katedru/3,
          ucitaj_djelatnike/1, ucitaj_katedre/1, obrisi_katedru/1, obrisi_djelatnika/1]).
 
-dodaj_djelatnika_na_katedru(IdDjelatnik, IdKatedra) ->
+dodaj_djelatnika_na_katedru(IdDjelatnik, IdKatedra, Tip) ->
     Fun = fun() ->
              case mnesia:write(#db_katedra_djelatnik{id_djelatnik = IdDjelatnik,
-                                                     id_katedra = IdKatedra})
+                                                     id_katedra = IdKatedra,
+                                                     tip = Tip})
              of
                  ok -> true;
                  _ -> false
@@ -21,14 +22,15 @@ dohvati_djelatnike(IdKatedra) ->
     Fun = fun() ->
              Match =
                  ets:fun2ms(fun(#db_katedra_djelatnik{id_djelatnik = Djelatnik,
-                                                      id_katedra = Katedra})
+                                                      id_katedra = Katedra,
+                                                      tip = Tip})
                                when Katedra =:= IdKatedra ->
-                               Djelatnik
+                               {Djelatnik, Tip}
                             end),
              Djelatnici = mnesia:select(db_katedra_djelatnik, Match),
-             lists:map(fun(Djelatnik) ->
-                          {atomic, Result} = korisnik:dohvati_korisnika(Djelatnik),
-                          Result
+             lists:map(fun({Djelatnik, Tip}) ->
+                          {atomic, Result} = korisnik:dohvati_korisnika(core, Djelatnik),
+                          Result#{tip => Tip}
                        end,
                        Djelatnici)
           end,

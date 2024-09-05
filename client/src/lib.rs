@@ -1,17 +1,17 @@
 use std::future::Future;
 
+use js_sys::Uint8Array;
 use reqwest::multipart;
 use serde::de::DeserializeOwned;
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
-use js_sys::Uint8Array;
 use web_sys::console;
 
 mod types;
 
 #[wasm_bindgen]
-pub async fn dohvati_fakultete(token: String) -> Result<JsValue, JsValue> {
-    let result = match create_get_request("http://localhost:5000/faculty", token).await {
+pub async fn dohvati_fakultete() -> Result<JsValue, JsValue> {
+    let result = match create_get_request("http://localhost:5000/faculty", "".to_string()).await {
         Ok(response) => parse_data::<Vec<types::Fakultet>>(response).await,
         Err(_) => parse_network_err(),
     };
@@ -19,18 +19,22 @@ pub async fn dohvati_fakultete(token: String) -> Result<JsValue, JsValue> {
 }
 
 #[wasm_bindgen]
-pub async fn dohvati_fakultet(id: i32, token: String) -> Result<JsValue, JsValue> {
-    let result =
-        match create_get_request(&format!("http://localhost:5000/faculty/{}", id), token).await {
-            Ok(response) => parse_data::<types::Fakultet>(response).await,
-            Err(_) => parse_network_err(),
-        };
+pub async fn dohvati_fakultet(id: i32) -> Result<JsValue, JsValue> {
+    let result = match create_get_request(
+        &format!("http://localhost:5000/faculty/{}", id),
+        "".to_string(),
+    )
+    .await
+    {
+        Ok(response) => parse_data::<types::Fakultet>(response).await,
+        Err(_) => parse_network_err(),
+    };
     result
 }
 
 #[wasm_bindgen]
-pub async fn dohvati_katedre(token: String) -> Result<JsValue, JsValue> {
-    let result = match create_get_request("http://localhost:5000/deparment", token).await {
+pub async fn dohvati_katedre() -> Result<JsValue, JsValue> {
+    let result = match create_get_request("http://localhost:5000/deparment", "".to_string()).await {
         Ok(response) => parse_data::<Vec<types::Katedra>>(response).await,
         Err(_) => parse_network_err(),
     };
@@ -38,10 +42,10 @@ pub async fn dohvati_katedre(token: String) -> Result<JsValue, JsValue> {
 }
 
 #[wasm_bindgen]
-pub async fn dohvati_katedru(id: i32, token: String) -> Result<JsValue, JsValue> {
+pub async fn dohvati_katedru(id: i32) -> Result<JsValue, JsValue> {
     let result = match create_get_request(
         &format!("http://localhost:5000/department/{}", id),
-        token,
+        "".to_string(),
     )
     .await
     {
@@ -244,7 +248,7 @@ pub async fn upload_file(database: String, id: String, file: web_sys::File) {
         let result = reader.result().unwrap();
         let array = Uint8Array::new(&result);
         let data = array.to_vec();
-        send_multipart(&database, &id, &data,&"png", &filename.clone());
+        send_multipart(&database, &id, &data, &"png", &filename.clone());
     }) as Box<dyn FnMut(_)>);
 
     reader.set_onload(Some(onload.as_ref().unchecked_ref()));

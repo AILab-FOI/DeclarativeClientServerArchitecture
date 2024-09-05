@@ -4,9 +4,11 @@
   @if (courses()) {
     <div class="ContentSection">
       <h2 class="ContentSectionHeading">Courses</h2>
-      @for (course of courses(); track course) {
-        <app-course-card [course]="course"></app-course-card>
-      }
+      <div class="ContentSectionItems">
+        @for (course of courses(); track course) {
+          <app-course-card [course]="course"></app-course-card>
+        }
+      </div>
     </div>
   } @else {
     <div>Loading...</div>

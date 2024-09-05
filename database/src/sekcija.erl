@@ -3,7 +3,7 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/3]).
+-export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/4]).
 
 dohvati() ->
     Fun = fun(Sekcija, Acc) -> [ucitaj(core, Sekcija) | Acc] end,
@@ -32,6 +32,7 @@ dodaj(Naziv, Opis) ->
     Fun = fun() ->
              case mnesia:write(#db_sekcija{id = Id,
                                            naziv = Naziv,
+                                           vidljivo = true,
                                            opis = Opis})
              of
                  ok -> {ok, Id};
@@ -47,11 +48,12 @@ obrisi(Id) ->
           end,
     mnesia:transaction(Fun).
 
-uredi(Id, Naziv, Opis) ->
+uredi(Id, Naziv, Opis, Vidljivo) ->
     Fun = fun() ->
              case mnesia:write(#db_sekcija{id = Id,
                                            naziv = Naziv,
-                                           opis = Opis})
+                                           opis = Opis,
+                                           vidljivo = Vidljivo})
              of
                  ok -> {ok, Id};
                  _ -> {error, "Transakcija neuspješna"}
@@ -67,7 +69,9 @@ ucitaj(full, R) ->
 
 transform_sekcija(#db_sekcija{id = Id,
                               naziv = Naziv,
+                              vidljivo = Vidljivo,
                               opis = Opis}) ->
     #{id => Id,
       naziv => Naziv,
+      vidljivo => Vidljivo,
       opis => Opis}.

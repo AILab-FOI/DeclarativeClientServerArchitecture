@@ -34,10 +34,12 @@
   <div class="ContentPage">
     @if (page() === 0) {
       @for (sekcija of course()?.sekcije; track sekcija) {
-        <app-section
-          [isWorker]="user.isWorker()"
-          [sekcija]="sekcija"
-        ></app-section>
+        @if (sekcija.vidljivo) {
+          <app-section
+            [isWorker]="user.isWorker()"
+            [sekcija]="sekcija"
+          ></app-section>
+        }
       } @empty {
         <h1>Nema sekcija na kolegiju</h1>
       }

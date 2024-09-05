@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { Sekcija } from '../../core';
+import { Sekcija, UserService } from '../../core';
 import { ContentCardComponent } from '../content-card/content-card.component';
 import { openModal } from '../modal/modal.component';
 import { Dialog, DialogRef } from '@angular/cdk/dialog';
@@ -15,6 +15,7 @@ import { SectionEditComponent } from '../section-edit/section-edit.component';
 export class SectionComponent {
   public sekcija = input.required<Sekcija>();
   public isWorker = input.required<boolean>();
+  public user = inject(UserService);
   private dialog = inject(Dialog);
   public sadrzaj = computed(() => {
     return this.sekcija()?.sadrzaj;

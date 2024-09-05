@@ -7,7 +7,7 @@
     postanski_broj := number(),
     drzava := binary(),
     kucni_broj := binary()}.
--type status_djelatnika() :: nositelj | asistent.
+-type status_djelatnika() :: nositelj | suradnik.
 -type datum_vrijeme() ::
   {{integer(), integer(), integer()}, {integer(), integer(), integer()}}.
 -type lozinka() :: {binary(), binary()}.
@@ -61,9 +61,16 @@
 -type kolegij_ref() :: id().
 -type pitanje_ref() :: id().
 -type djelatnik_konfiguracija_ref() :: id().
+-type tip_djelatnika() :: voditelj | djelatnik.
 
 -record(db_fakultet,
-        {id :: id(), logo :: binary(), naziv :: binary(), adresa :: adresa()}).
+        {id :: id(),
+         logo :: binary(),
+         naziv :: binary(),
+         skraceno :: binary(),
+         adresa :: adresa(),
+         opis :: binary(),
+         lokacija :: {number(), number()}}).
 -record(adresa,
         {grad :: binary(),
          ulica :: binary(),
@@ -74,9 +81,9 @@
         {id_korisnik :: korisnik_ref(), id_fakultet :: fakultet_ref()}).
 -record(db_fakultet_katedra,
         {id_katedra :: katedra_ref(), id_fakultet :: fakultet_ref()}).
--record(db_katedra, {id :: id(), naziv :: binary()}).
+-record(db_katedra, {id :: id(), naziv :: binary(), opis :: binary()}).
 -record(db_katedra_djelatnik,
-        {id_katedra :: katedra_ref(), id_djelatnik :: korisnik_ref()}).
+        {id_katedra :: katedra_ref(), id_djelatnik :: korisnik_ref(), tip :: tip_djelatnika()}).
 -record(db_katedra_kolegij, {id_kolegij :: kolegij_ref(), id_katedra :: katedra_ref()}).
 -record(db_korisnik,
         {id :: id(),
@@ -85,7 +92,7 @@
          oib :: integer(),
          slika :: binary(),
          lozinka :: lozinka(),
-         uloga :: student | djelatnik,
+         uloga :: student | profesor | dekan | asistent,
          email :: binary(),
          opis :: binary(),
          dodatno :: student() | djelatnik()}).
@@ -97,7 +104,8 @@
 -record(db_kolegij,
         {id :: id(), slika :: binary(), naziv :: binary(), skraceno :: binary()}).
 -record(db_kolegij_sekcija, {id_kolegij :: kolegij_ref(), id_sekcija :: sekcija_ref()}).
--record(db_sekcija, {id :: id(), naziv :: binary(), opis :: binary()}).
+-record(db_sekcija,
+        {id :: id(), naziv :: binary(), opis :: binary(), vidljivo :: boolean()}).
 -record(db_sekcija_sadrzaj, {id_sadrzaj :: sadrzaj_ref(), id_sekcija :: sekcija_ref()}).
 -record(db_sadrzaj,
         {id :: id(),
@@ -108,16 +116,3 @@
 -record(lekcija,
         {sadrzaj :: binary(), slika :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
 -record(poveznica, {referenca :: binary(), vrijeme_kreiranja :: datum_vrijeme()}).
--record(db_kviz,
-        {id :: id(),
-         naziv :: binary(),
-         dostupan_od :: datum_vrijeme(),
-         dostupan_do :: datum_vrijeme()}).
--record(db_kviz_student,
-        {id_kviz :: kviz_ref(),
-         id_student :: korisnik_ref(),
-         pitanje_odgovor :: [{pitanje_ref(), odgovor()}],
-         vrijeme_rjesavanja :: datum_vrijeme(),
-         bodovi :: float()}).
--record(db_pitanje, {id :: id(), naziv :: binary(), odgovori = [] :: [odgovor()]}).
--record(odgovor, {id :: id(), vrijednost :: binary(), tocan :: boolean()}).

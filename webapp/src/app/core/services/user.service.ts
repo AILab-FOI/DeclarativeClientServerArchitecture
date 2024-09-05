@@ -22,11 +22,11 @@ const defaultKorisnik: () => Korisnik = () => ({
 export class UserService {
   public user = signal<Korisnik>(defaultKorisnik());
   public readonly isWorker = computed(() => {
-    return this.user().uloga === 'Djelatnik';
+    return this.user().uloga !== 'Student';
   });
-  public readonly routePrefix = computed(() => {
-    if (this.isWorker()) return 'worker/';
-    return 'student/';
+
+  public readonly isDean = computed(() => {
+    return this.user().uloga === 'Dekan';
   });
 
   private token = inject(TokenService);

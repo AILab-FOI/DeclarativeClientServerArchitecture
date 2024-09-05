@@ -66,9 +66,10 @@ run_put_request(_, Req, State) ->
 
 run_patch_request(#{<<"id">> := Id,
                     <<"naziv">> := Naziv,
-                    <<"opis">> := Opis},
+                    <<"opis">> := Opis,
+                    <<"Vidljivo">> := Vidljivo},
                   Req,
                   State) ->
-    request:response(Req, State, fun() -> sekcija:uredi(Id, Naziv, Opis) end);
+    request:response(Req, State, fun() -> sekcija:uredi(Id, Naziv, Opis, Vidljivo) end);
 run_patch_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).

@@ -3,11 +3,11 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/4,
+-export([dodaj/4, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/5,
          map_to_record_adresa/1]).
 
 dohvati() ->
-    Fun = fun(Fakultet, Acc) -> [ucitaj(full, Fakultet) | Acc] end,
+    Fun = fun(Fakultet, Acc) -> [ucitaj(core, Fakultet) | Acc] end,
     mnesia:transaction(fun() -> mnesia:foldl(Fun, [], db_fakultet) end).
 
 dohvati(Id) ->
@@ -28,11 +28,13 @@ dohvati(Type, Id) ->
           end,
     mnesia:transaction(Fun).
 
-dodaj(Naziv, Adresa) ->
+dodaj(Naziv, Opis, Adresa, Lokacija) ->
     Id = ?ID,
     Fun = fun() ->
              case mnesia:write(#db_fakultet{id = Id,
                                             naziv = Naziv,
+                                            lokacija = Lokacija,
+                                            opis = Opis,
                                             logo = <<"21104.png">>,
                                             adresa = Adresa})
              of
@@ -50,11 +52,12 @@ obrisi(Id) ->
           end,
     mnesia:transaction(Fun).
 
-uredi(Id, Naziv, Adresa, Logo) ->
+uredi(Id, Naziv, Opis, Adresa, Logo) ->
     Fun = fun() ->
              case mnesia:write(#db_fakultet{id = Id,
                                             naziv = Naziv,
                                             logo = Logo,
+                                            opis = Opis,
                                             adresa = Adresa})
              of
                  ok -> {ok, Id};
@@ -80,6 +83,9 @@ ucitaj(full, R) ->
 transform_fakultet(#db_fakultet{id = Id,
                                 naziv = Naziv,
                                 logo = Logo,
+                                skraceno = Skraceno,
+                                opis = Opis,
+                                lokacija = {Lat, Long},
                                 adresa =
                                     #adresa{grad = Grad,
                                             ulica = Ulica,
@@ -89,6 +95,9 @@ transform_fakultet(#db_fakultet{id = Id,
     #{id => Id,
       naziv => Naziv,
       logo => Logo,
+      skraceno => Skraceno,
+      opis => Opis,
+      lokacija => #{lat => Lat, long => Long},
       adresa =>
           #{grad => Grad,
             ulica => Ulica,

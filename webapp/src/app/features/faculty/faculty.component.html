@@ -1,0 +1,51 @@
+<div class="Content">
+  @if (faculty()) {
+    <div class="ContentHeader">
+      <h1 class="ContentHeaderHeading">{{ faculty().naziv }}</h1>
+      @if (userService.isDean()) {
+        <img
+          (click)="openEdit()"
+          class="ContentHeaderEdit"
+          src="../../../assets/icons/icons8-edit-48.png"
+        />
+      }
+    </div>
+    <hr class="ContentSeparator" />
+    <div class="ContentFaculty">
+      <img
+        class="ContentFacultyImg"
+        src="http://localhost:5000/images/21104.png"
+      />
+      <div class="ContentFacultyInfo">
+        <label class="ContentFacultyInfoText"
+          >Short : {{ faculty().skraceno }}</label
+        >
+        <label class="ContentFacultyInfoText"
+          >Description: {{ faculty().opis }}</label
+        >
+      </div>
+      <div class="ContentFacultyInfo">
+        <label class="ContentFacultyInfoText"
+          >Street: {{ faculty().adresa.ulica }}
+        </label>
+      </div>
+    </div>
+    <hr class="ContentSeparator" />
+    <app-map
+      [latLng]="{ lat: faculty().lokacija.lat, lng: faculty().lokacija.long }"
+    ></app-map>
+    <hr class="ContentSeparator" />
+    <div class="ContentHeader">
+      <h2 class="ContentHeaderHeading">Departments</h2>
+    </div>
+    <div class="ContentDepartments">
+      @for (department of faculty()?.katedre; track department?.id) {
+        <app-department-card [department]="department"></app-department-card>
+      }
+    </div>
+
+    <hr class="ContentSeparator" />
+  } @else {
+    <h1>Loading...</h1>
+  }
+</div>

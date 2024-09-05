@@ -1,10 +1,6 @@
 <ng-container [ngTemplateOutlet]="outlet()"></ng-container>
 <ng-template #lekcija>
-  <a
-    class="Content"
-    routerLink="/{{ user.routePrefix() }}/content/{{ sadrzaj().id }}"
-    target="_blank"
-  >
+  <a class="Content" routerLink="/content/{{ sadrzaj().id }}" target="_blank">
     <img
       class="ContentImg"
       src="../../../../assets/icons/lesson/lesson-24.png"

@@ -13,7 +13,7 @@ export class FacultyService {
   public dohvati_fakultete() {
     if (this.token.exists()) {
       let token = this.token.accessToken();
-      dohvati_fakultete(token).then((res: Response<Fakultet>) => {
+      dohvati_fakultete().then((res: Response<Fakultet>) => {
         console.log(res);
       });
     }

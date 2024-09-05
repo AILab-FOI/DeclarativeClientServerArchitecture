@@ -1,5 +1,5 @@
 <button (click)="userMenu.set(!this.userMenu())" class="User">
-  <img class="UserImg" src="http://localhost:5000/images/21104.png" />
+  <img class="UserImg" [src]="'http://localhost:5000/images/' + user().slika" />
 </button>
 @if (userMenu()) {
   <div class="List">
@@ -10,22 +10,6 @@
       (click)="userMenu.set(!this.userMenu())"
     >
       Profile
-    </a>
-    <a
-      class="ListItem"
-      routerLinkActive="active"
-      routerLink="messages"
-      (click)="userMenu.set(!this.userMenu())"
-    >
-      Messages
-    </a>
-    <a
-      class="ListItem"
-      routerLinkActive="active"
-      routerLink="preferences"
-      (click)="userMenu.set(!this.userMenu())"
-    >
-      Preferences
     </a>
     <hr class="ListDivider" />
     <a class="ListItem" (click)="auth.logout()"> Log out </a>

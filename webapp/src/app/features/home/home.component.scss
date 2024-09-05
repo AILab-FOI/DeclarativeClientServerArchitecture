@@ -1,4 +1,41 @@
 @import '../../../styles/variables.scss';
 @import '../../../styles/mixins.scss';
 
-@include layout() {}
+@include layout() {
+  &Header {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgba($orange, .3);
+    border-radius: 8px;
+
+    &Edit {
+      max-width: 35px;
+      max-height: 35px;
+      margin: auto 0;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &Courses {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: stretch;
+    height: auto;
+  }
+
+  &Separator {
+
+    border: 1px solid $gray;
+    opacity: .6;
+    width: 80%;
+    margin: 0 auto;
+  }
+}

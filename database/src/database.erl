@@ -61,19 +61,11 @@ install() ->
     create_table(db_sekcija, set, Nodes, record_info(fields, db_sekcija), []),
     create_table(db_sekcija_sadrzaj, bag, Nodes, record_info(fields, db_sekcija_sadrzaj), []),
     create_table(db_sadrzaj, set, Nodes, record_info(fields, db_sadrzaj), []),
-    create_table(db_kviz, set, Nodes, record_info(fields, db_kviz), []),
-    create_table(db_kviz_student,
-                 bag,
-                 Nodes,
-                 record_info(fields, db_kviz_student),
-                 [#db_kviz_student.id_student]),
     create_table(db_korisnik,
                  set,
                  Nodes,
                  record_info(fields, db_korisnik),
                  [#db_korisnik.oib, #db_korisnik.email]),
-
-    create_table(db_pitanje, set, Nodes, record_info(fields, db_pitanje), []),
 
     rpc:multicall(Nodes, application, stop, [mnesia]),
     mnesia:start().

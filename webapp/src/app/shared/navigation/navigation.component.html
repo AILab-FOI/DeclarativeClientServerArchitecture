@@ -1,6 +1,10 @@
 <div class="Nav">
   <div class="NavHeader">
-    <h2 class="NavHeaderHeading">WebApp</h2>
+    @if (auth.isAuthenticated()) {
+      <img [src]="user.user()?.fakultet.logo" />
+    } @else {
+      <h2 class="NavHeaderHeading">WebApp</h2>
+    }
   </div>
   <div class="NavList">
     <a class="NavListItem" routerLinkActive="active" routerLink="home">

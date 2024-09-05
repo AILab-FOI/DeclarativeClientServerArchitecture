@@ -4,10 +4,11 @@ import {
   Router,
   withComponentInputBinding,
 } from '@angular/router';
-
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { UserService, WasmService } from './core';
 import { TokenService } from './core/services/token.service';
+import { provideToastr } from 'ngx-toastr';
 
 export function initializeWasm(
   wasmService: WasmService,
@@ -36,6 +37,8 @@ export function initializeUser(userService: UserService) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withComponentInputBinding()),
+    provideAnimations(),
+    provideToastr(),
     WasmService,
     {
       provide: APP_INITIALIZER,
