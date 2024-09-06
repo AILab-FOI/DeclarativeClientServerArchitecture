@@ -13,18 +13,20 @@
     <hr class="ContentSeparator" />
     <div class="ContentFaculty">
       <div class="ContentFacultyInfo">
-        <label class="ContentFacultyInfoText"
-          >Short : {{ department().naziv }}</label
-        >
-        <label class="ContentFacultyInfoText"
-          >Description: {{ department().opis }}</label
-        >
+        <label class="ContentFacultyInfoText">{{ department().opis }}</label>
       </div>
     </div>
     <hr class="ContentSeparator" />
 
     <div class="ContentHeader">
-      <h2 class="ContentHeaderHeading">Departments</h2>
+      <h2 class="ContentHeaderHeading">Courses</h2>
+      @if (isUserLeader()) {
+        <img
+          (click)="openEditCourses()"
+          class="ContentHeaderEdit"
+          src="../../../assets/icons/icons8-edit-48.png"
+        />
+      }
     </div>
     <div class="ContentDepartments">
       @for (course of department()?.kolegiji; track course?.id) {
@@ -37,14 +39,24 @@
     <hr class="ContentSeparator" />
     <div class="ContentHeader">
       <h2 class="ContentHeaderHeading">Workers</h2>
+      @if (isUserLeader()) {
+        <img
+          (click)="openEditWorkers()"
+          class="ContentHeaderEdit"
+          src="../../../assets/icons/icons8-edit-48.png"
+        />
+      }
     </div>
 
     <div class="ContentUsers">
       @for (user of department()?.djelatnici; track user?.id) {
-        <app-user-card
-          [user]="user"
-          [clickable]="tokenService.exists()"
-        ></app-user-card>
+        <div class="ContentUsersUser">
+          <app-user-card
+            [user]="user"
+            [clickable]="tokenService.exists()"
+          ></app-user-card>
+          <label>{{ user.tip }}</label>
+        </div>
       }
     </div>
 

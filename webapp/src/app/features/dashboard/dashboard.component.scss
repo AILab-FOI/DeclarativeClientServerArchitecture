@@ -2,26 +2,43 @@
 @import '../../../styles/mixins.scss';
 
 @include layout() {
-  &Section {
-    border: 1px solid $background;
-    padding: 20px;
-    border-radius: 5px;
+
+  &Header {
+    padding: 10px;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgba($orange, .3);
+    border-radius: 8px;
 
-    &Items {
-      display: flex;
-      display: flex;
-      padding: 0 auto;
-      justify-content: space-between;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: stretch;
-      height: auto;
+    &Edit {
+      max-width: 35px;
+      max-height: 35px;
+      margin: auto 0;
 
+      &:hover {
+        cursor: pointer;
+      }
     }
+  }
+
+  &Courses {
+    display: flex;
+    padding: 0 auto;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: stretch;
+    height: auto;
+  }
+
+  &Separator {
+
+    border: 1px solid $gray;
+    opacity: .6;
+    width: 80%;
+    margin: 0 auto;
   }
 
 }

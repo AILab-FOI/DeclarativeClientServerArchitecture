@@ -1,0 +1,10 @@
+@for (korisnik of korisnici(); track korisnik.id) {
+  <div
+    class="User"
+    [class.selected]="korisnik.id === selected()"
+    (click)="select(korisnik)"
+  >
+    <img [src]="'http://localhost:5000/assets/' + korisnik.slika" />
+    <label>{{ korisnik.ime }} {{ korisnik.prezime }}</label>
+  </div>
+}

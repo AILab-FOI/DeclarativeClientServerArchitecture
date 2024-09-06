@@ -1,9 +1,12 @@
 <div class="Card" (click)="goTo()">
   <div class="CardHeader">
-    <img class="CardHeaderImg" src="../../../assets/icons/course.png" />
+    <img
+      class="CardHeaderImg"
+      [src]="'http://localhost:5000/assets/' + faculty().logo"
+    />
   </div>
 
   <div class="CardContent">
-    <h1 class="CardContentHeading">{{ faculty().naziv }}</h1>
+    <h1 class="CardContentHeading">{{ faculty().skraceno }}</h1>
   </div>
 </div>

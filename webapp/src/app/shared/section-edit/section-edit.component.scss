@@ -1,0 +1,47 @@
+@import '../../../styles/variables.scss';
+
+.Content {
+  &User {
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    place-content: center;
+
+    &Label {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      &Img {
+        border-radius: 50%;
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
+
+
+        &:hover {
+          cursor: pointer;
+          outline: 1px solid $orange;
+        }
+      }
+
+      &Text {
+        margin: 0 auto;
+        font-size: 22px;
+      }
+    }
+
+    &Info {
+      display: flex;
+      flex-direction: column;
+      margin: auto 0;
+      gap: 10px;
+
+      label {
+        font-size: 20px;
+      }
+    }
+  }
+
+}

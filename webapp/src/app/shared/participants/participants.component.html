@@ -1,3 +1,15 @@
-@for (participant of participants(); track participant.id) {
-  <label>{{ participant.ime }} {{ participant.prezime }}</label>
-}
+<div class="Content">
+  @if (userService.isWorker()) {
+    <button (click)="openEdit()">Add Student</button>
+  }
+  @for (participant of participants(); track participant.id) {
+    <div
+      class="ContentItem"
+      [class.worker]="participant.uloga !== 'Student'"
+      (click)="goTo(participant.id)"
+    >
+      <img [src]="'http://localhost:5000/assets/' + participant.slika" />
+      <label>{{ participant.ime }} {{ participant.prezime }}</label>
+    </div>
+  }
+</div>

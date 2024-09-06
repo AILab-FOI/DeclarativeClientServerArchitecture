@@ -13,12 +13,17 @@ import {
   UserEditComponent,
 } from '../../shared';
 import { Dialog } from '@angular/cdk/dialog';
-import { dohvati_korisnika } from '../../../assets/pkg/client';
+import {
+  dohvati_korisnika,
+  uredi_djelatnika,
+  uredi_studenta,
+} from '../../../assets/pkg/client';
+import { DepartmentCardComponent } from '../../shared/department-card/department-card.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CourseCardComponent],
+  imports: [CourseCardComponent, DepartmentCardComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -31,6 +36,7 @@ export class ProfileComponent {
     return parseInt(this.id()) === this.userService.user().id;
   });
   public courses = computed(() => {
+    console.log(this.user());
     return this.user().kolegiji;
   });
 
@@ -51,12 +57,45 @@ export class ProfileComponent {
       data: structuredClone(this.userService.user()),
       tool: { view: UserEditComponent },
       inputs: {},
-      title: 'Edit section',
+      title: 'Edit user',
     });
     ref.componentInstance['query'].subscribe((user: Korisnik) => {
       if (user) {
-        console.log(user);
-        // TODO: UREĐIVANJE SEKCIJE QUERY
+        if (user.uloga === 'Student') {
+          uredi_studenta(
+            user.id,
+            user.opis,
+            user.dodatno.nadimak,
+            user.slika,
+            this.tokenService.accessToken(),
+          ).then((res) => {
+            dohvati_korisnika(res, this.tokenService.accessToken()).then(
+              (korisnik) => {
+                this.user.set(korisnik);
+                if (this.isCurrenUser()) {
+                  this.userService.user.set(korisnik);
+                }
+              },
+            );
+          });
+        } else {
+          uredi_djelatnika(
+            user.id,
+            user.opis,
+            user.dodatno.kabinet,
+            user.slika,
+            this.tokenService.accessToken(),
+          ).then((res) => {
+            dohvati_korisnika(res, this.tokenService.accessToken()).then(
+              (korisnik) => {
+                this.user.set(korisnik);
+                if (this.isCurrenUser()) {
+                  this.userService.user.set(korisnik);
+                }
+              },
+            );
+          });
+        }
       }
       ref.close();
     });

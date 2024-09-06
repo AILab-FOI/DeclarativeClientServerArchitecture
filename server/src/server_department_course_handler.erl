@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PATCH">>, <<"PUT">>, <<"DELETE">>], Req, State}.
+    {[<<"PATCH">>, <<"POST">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     request:auth(Req, State).

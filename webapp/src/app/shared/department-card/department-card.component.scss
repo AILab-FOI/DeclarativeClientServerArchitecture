@@ -2,8 +2,8 @@
 
 :host {
   display: flex;
-  height: fit-content;
-  flex: 0 1 200px;
+  height: 250px;
+  flex: 0 1 300px;
 }
 
 .Card {
@@ -14,9 +14,7 @@
   box-shadow: -2px 0px 12px -4px rgba(102, 107, 102, 0.84);
 
   &Header {
-    height: 100%;
     background: $white;
-
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 
@@ -32,6 +30,12 @@
   &Content {
 
     padding: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+
 
     &Heading {
       font-size: 22px;

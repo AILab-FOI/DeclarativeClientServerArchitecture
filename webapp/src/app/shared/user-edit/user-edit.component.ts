@@ -22,6 +22,13 @@ export class UserEditComponent {
     });
     this.query.emit(this.data());
   }
+  editDodatno(field: string, value: unknown): void {
+    this.data.update((d) => {
+      d.dodatno[field] = value;
+      return d;
+    });
+    this.query.emit(this.data());
+  }
 
   async fileUpload(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];

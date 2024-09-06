@@ -12,6 +12,9 @@
   gap: 20px;
 
   &Header {
+    img {
+      height: 40px;
+    }
 
     &Heading {
       color: $white;

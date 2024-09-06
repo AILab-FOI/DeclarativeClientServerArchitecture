@@ -42,6 +42,15 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    img {
+      margin: 0 auto;
+      width: 24px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
   }
 
   &Separator {

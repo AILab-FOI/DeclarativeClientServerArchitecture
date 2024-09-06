@@ -24,10 +24,8 @@ dohvati_studente(IdKolegij) ->
                                Student
                             end),
              Studenti = mnesia:select(db_student_kolegij, Match),
-             io:format("~p~n", [Studenti]),
              lists:map(fun(Student) ->
                           {atomic, Result} = korisnik:dohvati_korisnika(core, Student),
-                          io:format("~p~n", [Result]),
                           Result
                        end,
                        Studenti)

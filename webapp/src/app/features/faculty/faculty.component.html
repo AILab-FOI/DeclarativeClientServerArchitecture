@@ -1,7 +1,9 @@
 <div class="Content">
   @if (faculty()) {
     <div class="ContentHeader">
-      <h1 class="ContentHeaderHeading">{{ faculty().naziv }}</h1>
+      <h1 class="ContentHeaderHeading">
+        {{ faculty().naziv }} ({{ faculty().skraceno }})
+      </h1>
       @if (userService.isDean()) {
         <img
           (click)="openEdit()"
@@ -14,20 +16,10 @@
     <div class="ContentFaculty">
       <img
         class="ContentFacultyImg"
-        src="http://localhost:5000/images/21104.png"
+        [src]="'http://localhost:5000/assets/' + faculty().logo"
       />
       <div class="ContentFacultyInfo">
-        <label class="ContentFacultyInfoText"
-          >Short : {{ faculty().skraceno }}</label
-        >
-        <label class="ContentFacultyInfoText"
-          >Description: {{ faculty().opis }}</label
-        >
-      </div>
-      <div class="ContentFacultyInfo">
-        <label class="ContentFacultyInfoText"
-          >Street: {{ faculty().adresa.ulica }}
-        </label>
+        <label class="ContentFacultyInfoText">{{ faculty().opis }}</label>
       </div>
     </div>
     <hr class="ContentSeparator" />
@@ -37,6 +29,13 @@
     <hr class="ContentSeparator" />
     <div class="ContentHeader">
       <h2 class="ContentHeaderHeading">Departments</h2>
+      @if (userService.isDean()) {
+        <img
+          (click)="openEditDepartment()"
+          class="ContentHeaderEdit"
+          src="../../../assets/icons/icons8-edit-48.png"
+        />
+      }
     </div>
     <div class="ContentDepartments">
       @for (department of faculty()?.katedre; track department?.id) {

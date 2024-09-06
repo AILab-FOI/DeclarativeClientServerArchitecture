@@ -3,18 +3,7 @@ import { dohvati_korisnika } from '../../../assets/pkg/client';
 import { jwtDecode } from 'jwt-decode';
 import { Korisnik } from '../types/elevated_types';
 import { TokenService } from './token.service';
-
-const defaultKorisnik: () => Korisnik = () => ({
-  id: 0,
-  ime: '',
-  prezime: '',
-  opis: '',
-  oib: 0,
-  email: '',
-  dodatno: {},
-  uloga: '',
-  kolegiji: [],
-});
+import { defaultKorisnik } from '../types/defaults';
 
 @Injectable({
   providedIn: 'root',

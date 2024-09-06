@@ -1,1 +1,26 @@
-<p>section-edit works!</p>
+<div class="ContentUser">
+  <div class="ContentUserInfo">
+    <label class="ContentUserInfoText">Title</label>
+    <app-input
+      [type]="'text'"
+      [value]="data().naziv"
+      [style]="{ width: '300px', height: '50px', font_size: '18px' }"
+      (valueChange)="edit('naziv', $event)"
+    ></app-input>
+
+    <label class="ContentUserInfoText">Description</label>
+    <app-input
+      [type]="'textarea'"
+      [value]="data().opis"
+      [style]="{ width: '400px', height: '100px', font_size: '18px' }"
+      (valueChange)="edit('opis', $event)"
+    ></app-input>
+
+    <label class="ContentUserInfoText">Visibility</label>
+    <input
+      type="checkbox"
+      [checked]="data().vidljivo"
+      (change)="edit('vidljivo', !data().vidljivo)"
+    />
+  </div>
+</div>

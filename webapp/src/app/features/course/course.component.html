@@ -19,13 +19,20 @@
       >
         Participants
       </button>
-      @if (!user.isWorker()) {
+      @if (user.isWorker()) {
         <button
           class="ContentHeaderNavItem"
           [class.active]="page() === 2"
-          (click)="page.set(2)"
+          (click)="openEditSection()"
         >
-          Grades
+          Add section
+        </button>
+        <button
+          class="ContentHeaderNavItem"
+          [class.active]="page() === 2"
+          (click)="openEditCourse()"
+        >
+          Edit course
         </button>
       }
     </div>
@@ -34,19 +41,15 @@
   <div class="ContentPage">
     @if (page() === 0) {
       @for (sekcija of course()?.sekcije; track sekcija) {
-        @if (sekcija.vidljivo) {
-          <app-section
-            [isWorker]="user.isWorker()"
-            [sekcija]="sekcija"
-          ></app-section>
-        }
+        <app-section
+          [isWorker]="user.isWorker()"
+          [sekcija]="sekcija"
+        ></app-section>
       } @empty {
         <h1>Nema sekcija na kolegiju</h1>
       }
     } @else if (page() === 1) {
-      <app-participants [participants]="participants()"></app-participants>
-    } @else if (page() === 2) {
-      <app-grades></app-grades>
+      <app-participants [course]="course().id"></app-participants>
     }
   </div>
 </div>

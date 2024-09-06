@@ -11,19 +11,24 @@
   </div>
 
   <div class="ContentUser">
-    <img class="ContentUserImg" src="http://localhost:5000/images/21104.png" />
+    <img
+      class="ContentUserImg"
+      [src]="'http://localhost:5000/assets/' + user().slika"
+    />
     <div class="ContentUserInfo">
       <label class="ContentUserInfoText">Name: {{ user().ime }} </label>
       <label class="ContentUserInfoText">Surname: {{ user().prezime }}</label>
-      <label class="ContentUserInfoText"
-        >Short name: {{ user().dodatno.nadimak }}</label
-      >
       <label class="ContentUserInfoText">Email: {{ user().email }}</label>
-      <label class="ContentUserInfoText">Address: {{ user().oib }}</label>
-      <label class="ContentUserInfoText">City: {{ user().ime }}</label>
-      <label class="ContentUserInfoText"
-        >Faculty: {{ user()?.fakultet?.naziv }}</label
-      >
+      @if (user().uloga === "Student") {
+        <label class="ContentUserInfoText"
+          >Short name: {{ user().dodatno.nadimak }}</label
+        >
+      } @else {
+        <label class="ContentUserInfoText"
+          >Location: Room {{ user().dodatno.kabinet }}</label
+        >
+      }
+      <label class="ContentUserInfoText">Description: {{ user().opis }}</label>
     </div>
   </div>
 
@@ -31,8 +36,29 @@
   <div class="ContentHeader">
     <h2 class="ContentHeaderHeading">Faculty</h2>
   </div>
+  <div class="ContentFaculty">
+    <img
+      class="ContentFacultyImg"
+      [src]="'http://localhost:5000/assets/' + user().fakultet.logo"
+    />
+    <div class="ContentFacultyInfo">
+      <label class="ContentFacultyInfoText">{{ user().fakultet.opis }}</label>
+    </div>
+  </div>
 
   <hr class="ContentSeparator" />
+  @if (user().uloga !== "Student") {
+    <div class="ContentHeader">
+      <h2 class="ContentHeaderHeading">Departments</h2>
+    </div>
+    <div class="ContentCourses">
+      @for (department of user().katedre; track department.id) {
+        <app-department-card [department]="department"></app-department-card>
+      }
+    </div>
+    <hr class="ContentSeparator" />
+  }
+
   <div class="ContentHeader">
     <h2 class="ContentHeaderHeading">Courses</h2>
   </div>

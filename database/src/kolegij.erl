@@ -3,7 +3,7 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dodaj/3, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/4]).
+-export([dodaj/2, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/4]).
 
 dohvati() ->
     Fun = fun(Kolegij, Acc) -> [ucitaj(core, Kolegij) | Acc] end,
@@ -27,12 +27,12 @@ dohvati(Type, Id) ->
           end,
     mnesia:transaction(Fun).
 
-dodaj(Naziv, Skraceno, Slika) ->
+dodaj(Naziv, Skraceno) ->
     Id = ?ID,
     Fun = fun() ->
              case mnesia:write(#db_kolegij{id = Id,
                                            naziv = Naziv,
-                                           slika = Slika,
+                                           slika = <<"course.png">>,
                                            skraceno = Skraceno})
              of
                  ok -> {ok, Id};
@@ -77,8 +77,8 @@ ucitaj(studenti, R) ->
 ucitaj(full, R) ->
     M0 = transform_kolegij(R),
     M1 = kolegij_sekcija:ucitaj_sekcije(M0),
-    djelatnik_kolegij:ucitaj_djelatnike(M1),
-    student_kolegij:ucitaj_studente(M1).
+    M2 = djelatnik_kolegij:ucitaj_djelatnike(M1),
+    student_kolegij:ucitaj_studente(M2).
 
 transform_kolegij(#db_kolegij{id = Id,
                               naziv = Naziv,

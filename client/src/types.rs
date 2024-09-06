@@ -437,6 +437,8 @@ pub struct Kolegij {
     sekcije: Option<Vec<Sekcija>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     studenti: Option<Vec<Korisnik>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    djelatnici: Option<Vec<Korisnik>>,
 }
 
 #[wasm_bindgen]
@@ -497,6 +499,16 @@ impl Kolegij {
     #[wasm_bindgen(setter)]
     pub fn set_studenti(&mut self, studenti: Vec<Korisnik>) {
         self.studenti = Some(studenti);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn djelatnici(&self) -> Vec<Korisnik> {
+        self.djelatnici.clone().expect("Nema sekcija")
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_djelatnici(&mut self, djelatnici: Vec<Korisnik>) {
+        self.djelatnici = Some(djelatnici);
     }
 }
 
@@ -592,7 +604,8 @@ impl DjelatnikKolegij {
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Katedra {
-    id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<i32>,
     naziv: String,
     opis: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -605,13 +618,14 @@ pub struct Katedra {
 impl Katedra {
     #[wasm_bindgen(getter)]
     pub fn id(&self) -> i32 {
-        self.id.clone()
+        self.id.clone().expect("Id")
     }
 
     #[wasm_bindgen(setter)]
     pub fn set_id(&mut self, id: i32) {
-        self.id = id;
+        self.id = Some(id);
     }
+
     #[wasm_bindgen(getter)]
     pub fn naziv(&self) -> String {
         self.naziv.clone()

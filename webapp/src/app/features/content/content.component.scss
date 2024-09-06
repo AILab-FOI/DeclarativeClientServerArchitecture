@@ -1,0 +1,94 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins.scss';
+
+@include layout() {
+  gap: 10px;
+
+  &Header {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgba($orange, .3);
+    border-radius: 8px;
+
+    &Edit {
+      max-width: 35px;
+      max-height: 35px;
+      margin: auto 0;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &Faculty {
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+
+    &Img {
+      max-width: 300px;
+      max-height: 300px;
+    }
+
+    &Info {
+      display: flex;
+      flex-direction: column;
+      margin: auto 0;
+      gap: 10px;
+
+      label {
+        font-size: 20px;
+      }
+    }
+
+  }
+
+  &User {
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+
+    &Img {
+      border-radius: 50%;
+      max-width: 300px;
+    }
+
+    &Info {
+      display: flex;
+      flex-direction: column;
+      margin: auto 0;
+      gap: 10px;
+
+      label {
+        font-size: 20px;
+      }
+    }
+  }
+
+  &Courses {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: stretch;
+    height: auto;
+  }
+
+  label {
+    margin-left: auto;
+  }
+
+  &Separator {
+
+    border: 1px solid $gray;
+    opacity: .6;
+    width: 80%;
+    margin: 0 auto;
+  }
+}

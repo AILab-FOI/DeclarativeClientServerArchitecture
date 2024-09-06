@@ -1,6 +1,6 @@
 <ng-container [ngTemplateOutlet]="outlet()"></ng-container>
 <ng-template #lekcija>
-  <a class="Content" routerLink="/content/{{ sadrzaj().id }}" target="_blank">
+  <a class="Content" routerLink="/content/{{ sadrzaj().id }}">
     <img
       class="ContentImg"
       src="../../../../assets/icons/lesson/lesson-24.png"
@@ -20,14 +20,6 @@
       class="ContentImg"
       src="../../../../assets/icons/url/external-link-24.png"
     />
-    <label class="ContentText">{{ sadrzaj().naziv }}</label>
-    <label class="ContentSide">{{ datum() }}</label>
-  </a>
-</ng-template>
-
-<ng-template #kviz>
-  <a class="Content" [routerLink]="['/quiz', sadrzaj().id]" target="_blank">
-    <img class="ContentImg" src="../../../../assets/icons/quiz/quiz-24.png" />
     <label class="ContentText">{{ sadrzaj().naziv }}</label>
     <label class="ContentSide">{{ datum() }}</label>
   </a>

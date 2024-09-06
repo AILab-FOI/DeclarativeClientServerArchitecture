@@ -10,7 +10,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"PATCH">>, <<"PUT">>, <<"DELETE">>], Req, State}.
+    {[<<"GET">>, <<"PATCH">>, <<"POST">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     request:auth(Req, State).
@@ -53,7 +53,7 @@ json_request(Req, State) ->
 
 gather_method(Map, Req, State) ->
     case cowboy_req:method(Req) of
-        <<"PUT">> ->
+        <<"POST">> ->
             run_put_request(Map, Req, State);
         <<"PATCH">> ->
             run_patch_request(Map, Req, State)
@@ -66,9 +66,10 @@ run_put_request(_, Req, State) ->
 
 run_patch_request(#{<<"id">> := Id,
                     <<"naziv">> := Naziv,
-                    <<"skraceno">> := Skraceno},
+                    <<"skraceno">> := Skraceno,
+                    <<"slika">> := Slika},
                   Req,
                   State) ->
-    request:response(Req, State, fun() -> kolegij:uredi(Id, Naziv, Skraceno) end);
+    request:response(Req, State, fun() -> kolegij:uredi(Id, Naziv, Skraceno, Slika) end);
 run_patch_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).

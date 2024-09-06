@@ -4,7 +4,7 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dodaj_studenta/7, dodaj_djelatnika/8, prijava/2, dohvati_korisnika/2,
-         dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/4, uredi_djelatnika/5,
+         dohvati_korisnike/0, obrisi_korisnika/1, uredi_studenta/4, uredi_djelatnika/4,
          uredi_korisnika/4, map_to_record/1, map_to_record_student/1, map_to_record_djelatnik/1]).
 
 dodaj_studenta(Ime, Prezime, Oib, Lozinka, Email, Opis, Nadimak) ->
@@ -57,8 +57,8 @@ uredi_studenta(Id, Opis, Nadimak, Slika) ->
     Dodatno = #student{nadimak = Nadimak},
     uredi_korisnika(Id, Opis, Dodatno, Slika).
 
-uredi_djelatnika(Id, Opis, Kabinet, VrijemeKonzultacija, Slika) ->
-    Dodatno = #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = VrijemeKonzultacija},
+uredi_djelatnika(Id, Opis, Kabinet, Slika) ->
+    Dodatno = #djelatnik{kabinet = Kabinet, vrijeme_konzultacija = []},
     uredi_korisnika(Id, Opis, Dodatno, Slika).
 
 uredi_korisnika(Id, Opis, Dodatno, Slika) ->
@@ -67,12 +67,10 @@ uredi_korisnika(Id, Opis, Dodatno, Slika) ->
                                     db_korisnik,
                                     Id,
                                     fun(Korisnik) ->
-                                       io:format("~p~n", [Slika]),
                                        NoviKorisnik =
                                            Korisnik#db_korisnik{opis = Opis,
                                                                 dodatno = Dodatno,
                                                                 slika = Slika},
-                                       io:format("~p~n", [NoviKorisnik]),
                                        operations:write_secure(object, NoviKorisnik, {ok, Id})
                                     end)
           end,

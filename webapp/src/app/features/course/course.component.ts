@@ -7,18 +7,33 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { DjelatnikKolegij, StudentKolegij, UserService } from '../../core';
 import {
+  defaultSekcija,
+  DjelatnikKolegij,
+  Kolegij,
+  Sekcija,
+  StudentKolegij,
+  UserService,
+} from '../../core';
+import {
+  dodaj_sekciju,
+  dodaj_sekciju_na_kolegij,
   dohvati_djelatnika_na_kolegiju,
   dohvati_studenta_na_kolegiju,
+  uredi_kolegij,
+  uredi_sekciju,
 } from '../../../assets/pkg/client';
 import { TokenService } from '../../core/services/token.service';
 import {
   GradesComponent,
+  openModal,
   ParticipantsComponent,
   SectionComponent,
 } from '../../shared';
 import { ToastrService } from 'ngx-toastr';
+import { Dialog } from '@angular/cdk/dialog';
+import { SectionAddComponent } from '../../shared/section-add/section-add.component';
+import { CourseEditComponent } from '../../shared/course-edit/course-edit.component';
 
 @Component({
   selector: 'app-course',
@@ -41,41 +56,96 @@ export class CourseComponent {
   });
   public id = input.required<number>();
   public data = signal<DjelatnikKolegij | StudentKolegij>(undefined);
-  public participants = computed(() => {
-    return this.course().studenti;
-  });
   public page = signal(0);
   private location = inject(Location);
+  private dialog = inject(Dialog);
 
   constructor() {
     effect(() => {
-      if (this.user.isWorker()) {
-        dohvati_djelatnika_na_kolegiju(
-          this.user.user().id,
-          this.id(),
-          this.token.accessToken(),
-        )
-          .then((res) => {
-            this.data.set(res as DjelatnikKolegij);
-          })
-          .catch((err) => {
-            this.toast.error('User not on Course');
-            this.location.back();
-          });
-      } else {
-        dohvati_studenta_na_kolegiju(
-          this.user.user().id,
-          this.id(),
-          this.token.accessToken(),
-        )
-          .then((res) => {
-            this.data.set(res as StudentKolegij);
-          })
-          .catch((err) => {
-            this.toast.error('User not on Course');
-            this.location.back();
-          });
-      }
+      this.get();
     });
+  }
+  openEditSection(): void {
+    let ref = openModal<Sekcija>(this.dialog, {
+      data: structuredClone(defaultSekcija()),
+      tool: { view: SectionAddComponent },
+      inputs: {},
+      title: 'Add section',
+    });
+    ref.componentInstance['query'].subscribe((section: Sekcija) => {
+      if (section) {
+        dodaj_sekciju(
+          section.naziv,
+          section.opis,
+          this.token.accessToken(),
+        ).then((res) => {
+          dodaj_sekciju_na_kolegij(
+            res,
+            this.course().id,
+            this.token.accessToken(),
+          ).then((res) => {
+            if (res) {
+              this.get();
+            }
+          });
+        });
+      }
+      ref.close();
+    });
+  }
+
+  openEditCourse(): void {
+    let ref = openModal<Kolegij>(this.dialog, {
+      data: structuredClone(this.course()),
+      tool: { view: CourseEditComponent },
+      inputs: {},
+      title: 'Edit course',
+    });
+    ref.componentInstance['query'].subscribe((course: Kolegij) => {
+      if (course) {
+        uredi_kolegij(
+          course.id,
+          course.naziv,
+          course.skraceno,
+          course.slika,
+          this.token.accessToken(),
+        ).then((res) => {
+          this.get();
+        });
+      }
+      ref.close();
+    });
+  }
+
+  get() {
+    if (this.user.isWorker()) {
+      dohvati_djelatnika_na_kolegiju(
+        this.user.user().id,
+        this.id(),
+        this.token.accessToken(),
+      )
+        .then((res) => {
+          this.data.set(res as DjelatnikKolegij);
+          console.log(res);
+        })
+        .catch((err) => {
+          this.toast.error(err);
+          this.location.back();
+        });
+    } else {
+      dohvati_studenta_na_kolegiju(
+        this.user.user().id,
+        this.id(),
+        this.token.accessToken(),
+      )
+        .then((res) => {
+          console.log(res);
+          this.data.set(res as StudentKolegij);
+        })
+        .catch((err) => {
+          this.toast.error(err);
+          this.location.back();
+        });
+    }
   }
 }

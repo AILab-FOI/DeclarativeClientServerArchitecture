@@ -3,7 +3,7 @@
 -include_lib("database/include/records.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--export([dodaj/4, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/5,
+-export([dodaj/4, dohvati/1, dohvati/2, dohvati/0, obrisi/1, uredi/4,
          map_to_record_adresa/1]).
 
 dohvati() ->
@@ -52,22 +52,22 @@ obrisi(Id) ->
           end,
     mnesia:transaction(Fun).
 
-uredi(Id, Naziv, Opis, Adresa, Logo) ->
+uredi(Id, Naziv, Opis, Logo) ->
     Fun = fun() ->
-             case mnesia:write(#db_fakultet{id = Id,
-                                            naziv = Naziv,
-                                            logo = Logo,
-                                            opis = Opis,
-                                            adresa = Adresa})
-             of
-                 ok -> {ok, Id};
-                 _ -> {error, "Transakcija neuspješna"}
-             end
+             operations:read_secure(function,
+                                    db_fakultet,
+                                    Id,
+                                    fun(Fakultet) ->
+                                       NoviFakultet =
+                                           Fakultet#db_fakultet{opis = Opis,
+                                                                naziv = Naziv,
+                                                                logo = Logo},
+                                       operations:write_secure(object, NoviFakultet, {ok, Id})
+                                    end)
           end,
     mnesia:transaction(Fun).
 
 ucitaj(core, R) ->
-    io:format("~p~n", [R]),
     transform_fakultet(R);
 ucitaj(katedre, R) ->
     M0 = transform_fakultet(R),

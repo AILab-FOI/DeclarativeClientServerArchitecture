@@ -1,14 +1,13 @@
 <div class="Content">
-  <h1 class="ContentHeading">Welcome, {{ username() }}</h1>
+  <div class="ContentHeader">
+    <h1 class="ContentHeaderHeading">Welcome, {{ username() }}</h1>
+  </div>
 
   @if (courses()) {
-    <div class="ContentSection">
-      <h2 class="ContentSectionHeading">Courses</h2>
-      <div class="ContentSectionItems">
-        @for (course of courses(); track course) {
-          <app-course-card [course]="course"></app-course-card>
-        }
-      </div>
+    <div class="ContentCourses">
+      @for (course of courses(); track course) {
+        <app-course-card [course]="course"></app-course-card>
+      }
     </div>
   } @else {
     <div>Loading...</div>

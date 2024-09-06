@@ -1,13 +1,97 @@
-import { Component, input } from '@angular/core';
-import { Korisnik } from '../../core';
+import { Component, effect, inject, input, model, signal } from '@angular/core';
+import {
+  defaultKorisnik,
+  Kolegij,
+  Korisnik,
+  TokenService,
+  UserService,
+} from '../../core';
+import { ButtonComponent } from '../button/button.component';
+import { Router } from '@angular/router';
+import { openModal } from '../modal/modal.component';
+import { Dialog } from '@angular/cdk/dialog';
+import { UserEditComponent } from '../user-edit/user-edit.component';
+import { UserAddComponent } from '../user-add/user-add.component';
+import {
+  dodaj_djelatnika_na_kolegij,
+  dodaj_studenta_na_kolegij,
+  dohvati_kolegij,
+} from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-participants',
   standalone: true,
-  imports: [],
+  imports: [ButtonComponent],
   templateUrl: './participants.component.html',
   styleUrl: './participants.component.scss',
 })
 export class ParticipantsComponent {
-  public participants = input.required<Korisnik[]>();
+  public course = input.required<number>();
+  public userService = inject(UserService);
+  public tokenService = inject(TokenService);
+  private router = inject(Router);
+  private dialog = inject(Dialog);
+  public participants = signal<Korisnik[]>([]);
+
+  goTo(id: number): void {
+    this.router.navigate(['profile', id]);
+  }
+
+  constructor() {
+    effect(() => {
+      dohvati_kolegij(this.course(), this.tokenService.accessToken()).then(
+        (res: Kolegij) => {
+          this.participants.set(res.studenti.concat(res.djelatnici));
+        },
+      );
+    });
+  }
+
+  openEdit(): void {
+    let ref = openModal<Korisnik>(this.dialog, {
+      data: defaultKorisnik(),
+      tool: { view: UserAddComponent },
+      inputs: {
+        fakultet: this.userService.user().fakultet.id,
+      },
+      title: 'Edit section',
+    });
+    ref.componentInstance['query'].subscribe((user: Korisnik) => {
+      if (user && user.id !== 0) {
+        if (user.uloga === 'Student') {
+          dodaj_studenta_na_kolegij(
+            this.course(),
+            user.id,
+            this.tokenService.accessToken(),
+          ).then((res) => {
+            if (res) {
+              dohvati_kolegij(
+                this.course(),
+                this.tokenService.accessToken(),
+              ).then((res: Kolegij) => {
+                this.participants.set(res.djelatnici.concat(res.studenti));
+              });
+            }
+          });
+        } else {
+          dodaj_djelatnika_na_kolegij(
+            this.course(),
+            user.id,
+            'Nositelj',
+            this.tokenService.accessToken(),
+          ).then((res) => {
+            if (res) {
+              dohvati_kolegij(
+                this.course(),
+                this.tokenService.accessToken(),
+              ).then((res: Kolegij) => {
+                this.participants.set(res.djelatnici.concat(res.studenti));
+              });
+            }
+          });
+        }
+      }
+      ref.close();
+    });
+  }
 }

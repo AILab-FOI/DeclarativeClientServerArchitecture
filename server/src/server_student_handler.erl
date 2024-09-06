@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PUT">>, <<"PATCH">>], Req, State}.
+    {[<<"POST">>, <<"PATCH">>], Req, State}.
 
 is_authorized(Req, State) ->
     request:auth(Req, State).
@@ -33,7 +33,7 @@ json_request(Req, State) ->
 
 gather_method(Map, Req, State) ->
     case cowboy_req:method(Req) of
-        <<"PUT">> ->
+        <<"POST">> ->
             run_put_request(Map, Req, State);
         <<"PATCH">> ->
             run_patch_request(Map, Req, State)
@@ -57,26 +57,13 @@ run_put_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).
 
 run_patch_request(#{<<"id">> := Id,
-                    <<"ime">> := Ime,
-                    <<"prezime">> := Prezime,
-                    <<"oib">> := Oib,
-                    <<"lozinka">> := Lozinka,
-                    <<"email">> := Email,
                     <<"opis">> := Opis,
-                    <<"nadimak">> := Nadimak},
+                    <<"nadimak">> := Nadimak,
+                    <<"slika">> := Slika},
                   Req,
                   State) ->
     request:response(Req,
                      State,
-                     fun() ->
-                        korisnik:uredi_studenta(Id,
-                                                Ime,
-                                                Prezime,
-                                                Oib,
-                                                Lozinka,
-                                                Email,
-                                                Opis,
-                                                Nadimak)
-                     end);
+                     fun() -> korisnik:uredi_studenta(Id, Opis, Nadimak, Slika) end);
 run_patch_request(_, Req, State) ->
     request:err(400, <<"Wrong keys">>, Req, State).

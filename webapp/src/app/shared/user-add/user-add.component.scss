@@ -1,0 +1,31 @@
+@import '../../../styles/variables.scss';
+
+:host {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.User {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  flex: 1 1 100px;
+  border: 1px solid $orange;
+
+
+  img {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+  }
+
+  label {
+    margin: 0 auto
+  }
+}
+
+.selected {
+  background: rgba($orange, .5);
+}

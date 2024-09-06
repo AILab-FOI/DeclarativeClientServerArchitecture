@@ -86,8 +86,10 @@ uredi(Id, Naziv, Tip, Vrijednost) ->
     Fun = fun() ->
              case mnesia:write(#db_sadrzaj{id = Id,
                                            naziv = Naziv,
-                                           tip = Tip,
-                                           vrijednost = Vrijednost})
+                                           tip = parse_tip(to_atom, Tip),
+                                           vrijednost =
+                                               generate_vrijednost(parse_tip(to_atom, Tip),
+                                                                   Vrijednost)})
              of
                  ok -> {ok, Id};
                  _ -> {error, "Transakcija neuspješna"}

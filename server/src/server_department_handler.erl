@@ -8,7 +8,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"PATCH">>, <<"PUT">>, <<"DELETE">>], Req, State}.
+    {[<<"GET">>, <<"PATCH">>, <<"POST">>, <<"DELETE">>], Req, State}.
 
 is_authorized(Req, State) ->
     case cowboy_req:method(Req) of
@@ -58,7 +58,7 @@ json_request(Req, State) ->
 
 gather_method(Map, Req, State) ->
     case cowboy_req:method(Req) of
-        <<"PUT">> ->
+        <<"POST">> ->
             run_put_request(Map, Req, State);
         <<"PATCH">> ->
             run_patch_request(Map, Req, State)

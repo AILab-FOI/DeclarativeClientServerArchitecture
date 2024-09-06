@@ -9,7 +9,7 @@ init(Req, State) ->
     {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"PUT">>], Req, State}.
+    {[<<"POST">>], Req, State}.
 
 content_types_accepted(Req, State) ->
     {[{{<<"application">>, <<"json">>, []}, from_json}], Req, State}.
@@ -35,7 +35,6 @@ json_request(Req, State) ->
     end.
 
 run_put_request(Map, Req, State) ->
-    io:format("~p", [maps:get(<<"refresh_token">>, Map)]),
     case jwt_manager:refresh_tokens(
              maps:get(<<"refresh_token">>, Map))
     of

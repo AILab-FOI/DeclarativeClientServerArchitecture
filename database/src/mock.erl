@@ -41,6 +41,8 @@ katedra_kolegij_keys() ->
 
 kolegij_sekcija_keys() ->
             [#db_kolegij_sekcija{id_kolegij = 1, id_sekcija = 1},
+             #db_kolegij_sekcija{id_kolegij = 1, id_sekcija = 8},
+             #db_kolegij_sekcija{id_kolegij = 1, id_sekcija = 9},
              #db_kolegij_sekcija{id_kolegij = 2, id_sekcija = 2},
              #db_kolegij_sekcija{id_kolegij = 3, id_sekcija = 3},
              #db_kolegij_sekcija{id_kolegij = 9, id_sekcija = 4},
@@ -52,9 +54,14 @@ sekcija_sadrzaj_keys() ->
             [#db_sekcija_sadrzaj{id_sekcija = 1, id_sadrzaj = 1},
              #db_sekcija_sadrzaj{id_sekcija = 1, id_sadrzaj = 3},
              #db_sekcija_sadrzaj{id_sekcija = 1, id_sadrzaj = 5},
-             #db_sekcija_sadrzaj{id_sekcija = 2, id_sadrzaj = 2},
-             #db_sekcija_sadrzaj{id_sekcija = 1, id_sadrzaj = 4},
-             #db_sekcija_sadrzaj{id_sekcija = 1, id_sadrzaj = 6}].
+             % #db_sekcija_sadrzaj{id_sekcija = 2, id_sadrzaj = 2},
+             % #db_sekcija_sadrzaj{id_sekcija = 2, id_sadrzaj = 4},
+             % #db_sekcija_sadrzaj{id_sekcija = 2, id_sadrzaj = 6},
+             #db_sekcija_sadrzaj{id_sekcija = 8, id_sadrzaj = 7},
+             #db_sekcija_sadrzaj{id_sekcija = 8, id_sadrzaj = 8},
+             #db_sekcija_sadrzaj{id_sekcija = 8, id_sadrzaj = 11},
+             #db_sekcija_sadrzaj{id_sekcija = 9, id_sadrzaj = 9},
+             #db_sekcija_sadrzaj{id_sekcija = 9, id_sadrzaj = 10}].
 
 fakultet_korisnik_keys() ->
             [#db_fakultet_korisnik{id_korisnik = 1, id_fakultet = 1},
@@ -62,6 +69,7 @@ fakultet_korisnik_keys() ->
              #db_fakultet_korisnik{id_korisnik = 3, id_fakultet = 1},
              #db_fakultet_korisnik{id_korisnik = 4, id_fakultet = 1},
              #db_fakultet_korisnik{id_korisnik = 5, id_fakultet = 1},
+             #db_fakultet_korisnik{id_korisnik = 7, id_fakultet = 1},
              #db_fakultet_korisnik{id_korisnik = 6, id_fakultet = 1}].
 
 katedra_djelatnik_keys() ->
@@ -145,7 +153,7 @@ korisnici() ->
                           lozinka = <<"lozinka"/utf8>>,
                           email = <<"iivic@foi.hr"/utf8>>,
                           dodatno = #student{nadimak = <<"Ivo"/utf8>>},
-                          opis = <<"Opis"/utf8>>},
+                          opis = <<"Student na Fakultetu Organizacije i Informatike"/utf8>>},
              #db_korisnik{id = 2,
                           ime = <<"Petar"/utf8>>,
                           prezime = <<"Perić"/utf8>>,
@@ -186,6 +194,16 @@ korisnici() ->
                           email = <<"aanic@foi.hr"/utf8>>,
                           dodatno = #djelatnik{kabinet = <<"135"/utf8>>, vrijeme_konzultacija = []},
                           opis = <<"Opis"/utf8>>},
+             #db_korisnik{id = 7,
+                          ime = <<"Kruno"/utf8>>,
+                          prezime = <<"Krunić"/utf8>>,
+                          oib = 7,
+                          slika = <<"21104.png">>,
+                          uloga = dekan,
+                          lozinka = <<"lozinka"/utf8>>,
+                          email = <<"kkrunic@foi.hr"/utf8>>,
+                          dodatno = #djelatnik{kabinet = <<"135"/utf8>>, vrijeme_konzultacija = []},
+                          opis = <<"Dekan Fakulteta Organizacije i Informatike"/utf8>>},
              #db_korisnik{id = 6,
                           ime = <<"Franjo"/utf8>>,
                           prezime = <<"Franjić"/utf8>>,
@@ -200,37 +218,42 @@ korisnici() ->
 fakulteti() ->
             [#db_fakultet{id = 1,
                           naziv = <<"Fakultet Organizacije i Informatike">>,
-                          opis = <<"Opis Fakulteta">>,
+                          opis =
+                                      <<"SUZG FOI djeluje 60 godina, što je za studij suvremenih tehnologija "
+                                        "dugo razdoblje. Tijekom tog razdoblja Fakultet obrazuje najstručnije "
+                                        "kadrove u području informacijskih znanosti (informatike) i "
+                                        "informacijskih tehnologija, kao i ekonomije, organizacije, "
+                                        "komunikologije i drugih srodnih područja."/utf8>>,
                           skraceno = <<"FOI"/utf8>>,
-                          logo = <<"">>,
-                          lokacija = {31.44, 116.44},
+                          logo = <<"foi.png">>,
+                          lokacija = {46.30772093396054, 16.33808609928215},
                           adresa = adresa()},
              #db_fakultet{id = 2,
                           naziv = <<"Fakultet Elektrotehnike i Računarstva"/utf8>>,
-                          opis = <<"Opis Fakulteta">>,
+                          opis = <<"Opis Fakulteta"/utf8>>,
                           skraceno = <<"FER"/utf8>>,
-                          logo = <<"">>,
+                          logo = <<"fer.jpg">>,
                           lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 3,
                           naziv = <<"Ekonomski Fakultet Zagreb">>,
                           opis = <<"Opis Fakulteta">>,
                           skraceno = <<"EFZG"/utf8>>,
-                          logo = <<"">>,
+                          logo = <<"efzg.png">>,
                           lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 4,
                           naziv = <<"Filozofski Fakultet Zagreb">>,
                           opis = <<"Opis Fakulteta">>,
                           skraceno = <<"FFZG"/utf8>>,
-                          logo = <<"">>,
+                          logo = <<"ffzg.jpg">>,
                           lokacija = {31.44, 116.44},
                           adresa = adresa()},
              #db_fakultet{id = 5,
                           naziv = <<"Fakultet Kemijskog Inžinjerstva i Tehnologije"/utf8>>,
                           opis = <<"Opis Fakulteta">>,
                           skraceno = <<"FKIT"/utf8>>,
-                          logo = <<"">>,
+                          logo = <<"fkit.jpg">>,
                           lokacija = {31.44, 116.44},
                           adresa = adresa()}].
 
@@ -250,7 +273,14 @@ katedre() ->
                          opis = <<"Opis Katedre">>},
              #db_katedra{id = 3,
                          naziv = <<"Katedra za kvantitivne metode"/utf8>>,
-                         opis = <<"Opis Katedre">>},
+                         opis =
+                                     <<"Katedra za kvantitativne metode bavi se proučavanjem i primjenom "
+                                       "matematičkih i statističkih tehnika u analizi podataka, optimizaciji "
+                                       "i donošenju odluka. Studenti stječu vještine za korištenje "
+                                       "kvantitativnih metoda u poslovnim i ekonomskim situacijama, "
+                                       "te razvijaju sposobnost analitičkog razmišljanja i rješavanja "
+                                       "problema. Cilj katedre je osposobiti studente za primjenu kvantitati"
+                                       "vnih alata u stvarnom svijetu, uz interdisciplinarni pristup.">>},
              #db_katedra{id = 4,
                          naziv = <<"Katedra za informatičke tehnologije i računarstvo"/utf8>>,
                          opis = <<"Opis Katedre">>},
@@ -328,6 +358,18 @@ sekcije() ->
              #db_sekcija{id = 7,
                          naziv = <<"Osnovne informacije"/utf8>>,
                          opis = <<"Osnovne informacije o kolegiju UzDiz"/utf8>>,
+                         vidljivo = true},
+             #db_sekcija{id = 8,
+                         naziv = <<"Uvod u matematičku indukciju"/utf8>>,
+                         opis =
+                                     <<"Uvodno poglavlje o pojmu matematičke indukcije unutar kojega "
+                                       "dolazimo do spoznaje logičkog razmišljanja"/utf8>>,
+                         vidljivo = true},
+             #db_sekcija{id = 9,
+                         naziv = <<"Teorija grafova"/utf8>>,
+                         opis =
+                                     <<"Teorija grafova jedno je od poglavlja matematike koje je moguće "
+                                       "korisititi u svakodnevnom životu"/utf8>>,
                          vidljivo = true}].
 
 sadrzaj() ->
@@ -340,7 +382,7 @@ sadrzaj() ->
                          tip = poveznica,
                          vrijednost = poveznica()},
              #db_sadrzaj{id = 3,
-                         naziv = <<"Nastavni Plan Mat1"/utf8>>,
+                         naziv = <<"Nastavni Plan"/utf8>>,
                          tip = lekcija,
                          vrijednost = lekcija()},
              #db_sadrzaj{id = 4,
@@ -354,7 +396,27 @@ sadrzaj() ->
              #db_sadrzaj{id = 6,
                          naziv = <<"Nastavni Program Mat2"/utf8>>,
                          tip = dokument,
-                         vrijednost = dokument()}].
+                         vrijednost = dokument()},
+             #db_sadrzaj{id = 7,
+                         naziv = <<"Matematička indukcija"/utf8>>,
+                         tip = dokument,
+                         vrijednost = dokument()},
+             #db_sadrzaj{id = 8,
+                         naziv = <<"Video pojašnjenja"/utf8>>,
+                         tip = poveznica,
+                         vrijednost = poveznica()},
+             #db_sadrzaj{id = 9,
+                         naziv = <<"Šetnje grafom"/utf8>>,
+                         tip = dokument,
+                         vrijednost = dokument()},
+             #db_sadrzaj{id = 10,
+                         naziv = <<"Problem kineskog poštara"/utf8>>,
+                         tip = lekcija,
+                         vrijednost = lekcija()},
+             #db_sadrzaj{id = 11,
+                         naziv = <<"Predikatna logika"/utf8>>,
+                         tip = lekcija,
+                         vrijednost = lekcija()}].
 
 poveznica() ->
             #poveznica{referenca = <<"https://www.google.hr"/utf8>>,
@@ -365,6 +427,37 @@ dokument() ->
                       vrijeme_kreiranja = calendar:universal_time()}.
 
 lekcija() ->
-            #lekcija{sadrzaj = <<"Sadržaj lekcije 1"/utf8>>,
+            #lekcija{sadrzaj =
+                                 <<"U današnje informacijsko doba, učinkovito upravljanje organizacijama "
+                                   "zahtijeva pristupe različite od tradicionalnog strateškog planiranja"
+                                   ", karakterističnog za uspješne organizacije industrijskog doba. "
+                                   "Pored poznavanja i primjene metoda upravljanja, za učinkovito "
+                                   "upravljanje organizacijama zahtijeva se i primjena suvremenih "
+                                   "informacijsko komunikacijskih tehnologija u potpori metodama "
+                                   "upravljanja. Misija organizacije određuje razlog njenog postojanja, "
+                                   "dok vizija opisuje organizaciju u budućnosti. Konkretizacijom "
+                                   "vizije menadžment definira strateške ciljeve koje u određenom "
+                                   "vremenskom periodu organizacija mora postići. Procjenom spremnosti "
+                                   "za ostvarenje pojedinog strateškog cilja, dobivaju se strategije, "
+                                   "aktivnosti i ciljevi koje pojedine organizacijske razine moraju "
+                                   "postići. Sukladno metodi uravnoteženih bodovnih tablica (Balanced "
+                                   "Scorecard - BSC), vrši se upravljanje organizacijom na temelju "
+                                   "mjerenja pristupa ciljevima. Sve navedene metode imaju jasne "
+                                   "rezultate svoje primjene, koji se mogu metamodelirati. Ovim "
+                                   "postupkom pojašnjavaju se prirodni odnosi medu metodama upravljanja "
+                                   "i definira se procesna i podatkovna arhitektura CASE alata "
+                                   "za potporu upravljanju mjerenjem performansi. Ono što menadžment "
+                                   "mora znati, da bi organizaciju odveo u vremenu prema viziji, "
+                                   "jest koliko je, u svakom trenutku, daleko od postavljenih ciljeva. "
+                                   "Ova informacija se može dobiti iz jedinstvenog informacijskog "
+                                   "sustava koji daje potporu mjerenju performansi na svim organizacijsk"
+                                   "im razinama, a utemeljen je na prethodno definiranom metamodelu.\nSt"
+                                   "udenti će dobiti znanja potrebna za razvoj elemenata misije, "
+                                   "vizije, strateških ciljeva, strategija, i mjera. Isto tako "
+                                   "će se upoznati sa strukturom i načinom izrade plana mjerenja "
+                                   "performansi, kao i sa dizajnom i uporabom potrebne informatičke "
+                                   "potpore mjerenju performansi. Bit će osposobljeni za samostalnu "
+                                   "izradu plana mjerenja performansi i njegovu implementaciju "
+                                   "u alatu za potporu mjerenju."/utf8>>,
                      slika = <<"">>,
                      vrijeme_kreiranja = calendar:universal_time()}.

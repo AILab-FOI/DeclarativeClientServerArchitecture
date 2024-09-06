@@ -1,1 +1,26 @@
-<p>content works!</p>
+<div class="Content">
+  @if (content()) {
+    <div class="ContentHeader">
+      <h1 class="ContentHeaderHeading">{{ content().naziv }}</h1>
+      @if (userService.isWorker()) {
+        <img
+          (click)="openEdit()"
+          class="ContentHeaderEdit"
+          src="../../../assets/icons/icons8-edit-48.png"
+        />
+      }
+    </div>
+    <hr class="ContentSeparator" />
+    <div class="ContentFaculty">
+      <div class="ContentFacultyInfo">
+        <label class="ContentFacultyInfoText">{{
+          content().vrijednost.sadrzaj
+        }}</label>
+      </div>
+    </div>
+    <hr class="ContentSeparator" />
+    <label>Last updated: {{ lastUpdated() | date }} </label>
+  } @else {
+    <h1>Loading...</h1>
+  }
+</div>

@@ -1,29 +1,39 @@
-@if (user.user().tip !== "student") {
-  <div class="Section" [class.blur]="!sekcija().vidljivo">
+@if (isWorker()) {
+  <div class="Section" [class.blur]="!sekcija()?.vidljivo">
     <div class="SectionHeader">
       <div class="SectionHeaderLeft" (click)="open.set(!open())">
-        <img
-          class="SectionHeaderLeftClosable"
-          src="../../../assets/icons/expand-arrow-24.png"
-        />
+        @if (open()) {
+          <img
+            class="SectionHeaderLeftClosable"
+            src="../../../assets/icons/collapse-arrow-24.png"
+          />
+        } @else {
+          <img
+            class="SectionHeaderLeftClosable"
+            src="../../../assets/icons/expand-arrow-24.png"
+          />
+        }
         <h2 class="SectionHeaderLeftHeading">{{ sekcija().naziv }}</h2>
       </div>
-      @if (isWorker()) {
-        <div class="SectionHeaderRight">
-          <img
-            (click)="openEdit()"
-            class="SectionHeaderRightEdit"
-            src="../../../assets/icons/icons8-edit-24.png"
-          />
-        </div>
-      }
+      <div class="SectionHeaderRight">
+        <img
+          (click)="openEdit()"
+          class="SectionHeaderRightEdit"
+          src="../../../assets/icons/icons8-edit-24.png"
+        />
+      </div>
     </div>
     @if (open()) {
       <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>
       <div class="SectionContent">
-        @for (sadrzaj of sekcija().sadrzaj; track sadrzaj) {
+        @for (sadrzaj of sekcija().sadrzaj; track sadrzaj.id) {
           <app-content-card [sadrzaj]="sadrzaj"></app-content-card>
         }
+        <img
+          (click)="openEditContent()"
+          class="SectionContentImage"
+          src="../../../assets/icons/add.png"
+        />
       </div>
     }
     <hr class="SectionSeparator" />
@@ -46,15 +56,6 @@
           }
           <h2 class="SectionHeaderLeftHeading">{{ sekcija().naziv }}</h2>
         </div>
-        @if (isWorker()) {
-          <div class="SectionHeaderRight">
-            <img
-              (click)="openEdit()"
-              class="SectionHeaderRightEdit"
-              src="../../../assets/icons/icons8-edit-24.png"
-            />
-          </div>
-        }
       </div>
       @if (open()) {
         <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>

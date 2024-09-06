@@ -60,7 +60,7 @@ export class ModalComponent<T> {
           });
         }
         c.instance['query'].subscribe((o: T) => {
-          this.data.set(o);
+          this.data.update((e) => o);
         });
       }
     });

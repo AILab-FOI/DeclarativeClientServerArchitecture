@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService, OutsideClickDirective, UserService } from '../../core';
 import { UserMenuComponent } from '../user-menu/user-menu.component';

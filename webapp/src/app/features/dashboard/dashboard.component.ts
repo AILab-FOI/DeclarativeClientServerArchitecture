@@ -14,7 +14,6 @@ export class DashboardComponent {
   public username = computed(() => {
     return this.user.user().ime + ' ' + this.user.user().prezime;
   });
-
   public courses = computed(() => {
     return this.user.user().kolegiji;
   });

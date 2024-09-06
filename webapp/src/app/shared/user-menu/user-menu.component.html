@@ -1,8 +1,9 @@
 <button (click)="userMenu.set(!this.userMenu())" class="User">
-  <img class="UserImg" [src]="'http://localhost:5000/images/' + user().slika" />
+  <img class="UserImg" [src]="'http://localhost:5000/assets/' + user().slika" />
 </button>
 @if (userMenu()) {
   <div class="List">
+    <label class="ListItemNoHover">{{ user().ime }} {{ user().prezime }}</label>
     <a
       class="ListItem"
       routerLinkActive="active"
