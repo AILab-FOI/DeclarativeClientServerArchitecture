@@ -30,16 +30,24 @@
     </div>
     <div class="ContentDepartments">
       @for (course of department()?.kolegiji; track course?.id) {
-        <app-course-card
-          [course]="course"
-          [clickable]="tokenService.exists()"
-        ></app-course-card>
+        <div class="Together">
+          <app-course-card
+            [course]="course"
+            [clickable]="tokenService.exists()"
+          ></app-course-card>
+          @if (isUserLeader()) {
+            <app-button
+              [title]="'worker from department'"
+              (query)="deleteCourse(course.id)"
+            ></app-button>
+          }
+        </div>
       }
     </div>
     <hr class="ContentSeparator" />
     <div class="ContentHeader">
       <h2 class="ContentHeaderHeading">Workers</h2>
-      @if (isUserLeader()) {
+      @if (isUserLeader() || userService.isDean()) {
         <img
           (click)="openEditWorkers()"
           class="ContentHeaderEdit"
@@ -56,6 +64,12 @@
             [clickable]="tokenService.exists()"
           ></app-user-card>
           <label>{{ user.tip }}</label>
+          @if (isUserLeader()) {
+            <app-button
+              [title]="'worker from department'"
+              (query)="deleteWorker(user.id)"
+            ></app-button>
+          }
         </div>
       }
     </div>

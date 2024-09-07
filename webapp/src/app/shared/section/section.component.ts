@@ -4,6 +4,7 @@ import {
   inject,
   input,
   model,
+  output,
   signal,
 } from '@angular/core';
 import {
@@ -15,7 +16,7 @@ import {
 } from '../../core';
 import { ContentCardComponent } from '../content-card/content-card.component';
 import { openModal } from '../modal/modal.component';
-import { Dialog, DialogRef } from '@angular/cdk/dialog';
+import { Dialog } from '@angular/cdk/dialog';
 import { SectionEditComponent } from '../section-edit/section-edit.component';
 import { ContentAddComponent } from '../content-add/content-add.component';
 import {
@@ -23,14 +24,16 @@ import {
   dodaj_lekciju,
   dodaj_poveznicu,
   dodaj_sadrzaj_na_sekciju,
-  dohvati_sekciju,
+  obrisi_sadrzaj,
+  obrisi_sekciju,
   uredi_sekciju,
 } from '../../../assets/pkg/client';
+import { ButtonComponent } from '../button/button.component';
 
 @Component({
   selector: 'app-section',
   standalone: true,
-  imports: [ContentCardComponent],
+  imports: [ContentCardComponent, ButtonComponent],
   templateUrl: './section.component.html',
   styleUrl: './section.component.scss',
 })
@@ -38,6 +41,7 @@ export class SectionComponent {
   public sekcija = model.required<Sekcija>();
   public isWorker = input.required<boolean>();
   public user = inject(UserService);
+  public query = output<boolean>();
   private token = inject(TokenService);
   private dialog = inject(Dialog);
   public sadrzaj = computed(() => {
@@ -62,9 +66,7 @@ export class SectionComponent {
           section.vidljivo,
           this.token.accessToken(),
         ).then((res) => {
-          dohvati_sekciju(res, this.token.accessToken()).then((sekcija) => {
-            this.sekcija.set(sekcija);
-          });
+          this.query.emit(true);
         });
       }
       ref.close();
@@ -80,7 +82,6 @@ export class SectionComponent {
     });
     ref.componentInstance['query'].subscribe((content: Sadrzaj) => {
       if (content) {
-        console.log(content);
         if (content.tip === 'dokument') {
           dodaj_dokument(
             content.naziv,
@@ -93,13 +94,7 @@ export class SectionComponent {
               this.token.accessToken(),
             ).then((res) => {
               if (res) {
-                console.log(res);
-                dohvati_sekciju(
-                  this.sekcija().id,
-                  this.token.accessToken(),
-                ).then((sekcija) => {
-                  this.sekcija.set(sekcija);
-                });
+                this.query.emit(true);
               }
             });
           });
@@ -115,12 +110,7 @@ export class SectionComponent {
               this.token.accessToken(),
             ).then((res) => {
               if (res) {
-                dohvati_sekciju(
-                  this.sekcija().id,
-                  this.token.accessToken(),
-                ).then((sekcija) => {
-                  this.sekcija.set(sekcija);
-                });
+                this.query.emit(true);
               }
             });
           });
@@ -136,18 +126,31 @@ export class SectionComponent {
               this.token.accessToken(),
             ).then((res) => {
               if (res) {
-                dohvati_sekciju(
-                  this.sekcija().id,
-                  this.token.accessToken(),
-                ).then((sekcija) => {
-                  this.sekcija.set(sekcija);
-                });
+                this.query.emit(true);
               }
             });
           });
         }
+      } else {
+        this.query.emit(false);
       }
       ref.close();
     });
+  }
+
+  delete(pom: boolean, id: number): void {
+    if (pom) {
+      obrisi_sadrzaj(id, this.token.accessToken()).then((_) =>
+        this.query.emit(true),
+      );
+    }
+  }
+
+  deleteSection(res: boolean): void {
+    if (res) {
+      obrisi_sekciju(this.sekcija().id, this.token.accessToken()).then((_) => {
+        this.query.emit(true);
+      });
+    }
   }
 }

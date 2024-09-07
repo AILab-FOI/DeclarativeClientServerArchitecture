@@ -6,6 +6,7 @@ use serde::de::DeserializeOwned;
 use serde_json::Value;
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::JsFuture;
 use web_sys::console;
 
 mod types;
@@ -241,6 +242,60 @@ pub async fn dodaj_djelatnika_na_katedru(
     let result =
         match create_post_request("http://localhost:5000/department_worker", obj, token).await {
             Ok(response) => parse_data::<bool>(response).await,
+            Err(_) => parse_network_err(),
+        };
+    result
+}
+
+#[wasm_bindgen]
+pub async fn obrisi_djelatnika_na_kolegiju(
+    id_kolegij: i32,
+    id_djelatnik: i32,
+    token: String,
+) -> Result<JsValue, JsValue> {
+    let obj = serde_json::json!({
+        "id_kolegij": id_kolegij,
+        "id_djelatnik":id_djelatnik,
+    });
+    let result =
+        match create_delete_request("http://localhost:5000/worker_course", obj, token).await {
+            Ok(response) => parse_data::<String>(response).await,
+            Err(_) => parse_network_err(),
+        };
+    result
+}
+
+#[wasm_bindgen]
+pub async fn obrisi_studenta_na_kolegiju(
+    id_kolegij: i32,
+    id_student: i32,
+    token: String,
+) -> Result<JsValue, JsValue> {
+    let obj = serde_json::json!({
+        "id_kolegij": id_kolegij,
+        "id_student":id_student,
+    });
+    let result =
+        match create_delete_request("http://localhost:5000/student_course", obj, token).await {
+            Ok(response) => parse_data::<String>(response).await,
+            Err(_) => parse_network_err(),
+        };
+    result
+}
+
+#[wasm_bindgen]
+pub async fn obrisi_djelatnika_na_katedri(
+    id_katedra: i32,
+    id_djelatnik: i32,
+    token: String,
+) -> Result<JsValue, JsValue> {
+    let obj = serde_json::json!({
+        "id_katedra": id_katedra,
+        "id_djelatnik":id_djelatnik,
+    });
+    let result =
+        match create_delete_request("http://localhost:5000/department_worker", obj, token).await {
+            Ok(response) => parse_data::<String>(response).await,
             Err(_) => parse_network_err(),
         };
     result
@@ -692,47 +747,36 @@ pub async fn login(email: String, password: String) -> Result<JsValue, JsValue> 
     result
 }
 
+fn get_extension(name: &str) -> Option<&str> {
+    name.rsplit('.').next()
+}
+
 #[wasm_bindgen]
-pub async fn send_multipart(
-    database: &str,
-    id: &str,
-    data: &[u8],
-    filetype: &str,
-    filename: &str,
-) -> Result<JsValue, JsValue> {
+pub async fn upload_file(file: web_sys::File, token: String) -> Result<JsValue, JsValue> {
     let client = reqwest::Client::new();
-    let form = multipart::Form::new().part("file", multipart::Part::bytes(data.to_vec()));
+
+    let array_buffer = JsFuture::from(file.array_buffer()).await?;
+    let uint8_array = Uint8Array::new(&array_buffer);
+    let bytes = uint8_array.to_vec();
+    let filename = file.name();
+
+    let extension = get_extension(&filename).unwrap_or("unknown");
+
+    let part_file = reqwest::multipart::Part::bytes(bytes).file_name(filename.clone());
+
+    let form = reqwest::multipart::Form::new().part(extension.to_string(), part_file);
+
     let result = match client
         .post("http://localhost:5000/upload")
+        .bearer_auth(token)
         .multipart(form)
         .send()
         .await
     {
-        Ok(response) => Ok(to_value(&"ASD").unwrap()),
-        Err(_) => {
-            let err = types::MyError::new(500, "Network error");
-            Err(to_value(&err).unwrap())
-        }
+        Ok(response) => parse_data::<String>(response).await,
+        Err(_) => parse_network_err(),
     };
     result
-}
-
-#[wasm_bindgen]
-pub async fn upload_file(database: String, id: String, file: web_sys::File) {
-    let reader = web_sys::FileReader::new().unwrap();
-    let filename = file.name();
-    let onload = Closure::wrap(Box::new(move |event: web_sys::ProgressEvent| {
-        let target = event.target().unwrap();
-        let reader = target.dyn_into::<web_sys::FileReader>().unwrap();
-        let result = reader.result().unwrap();
-        let array = Uint8Array::new(&result);
-        let data = array.to_vec();
-        send_multipart(&database, &id, &data, &"png", &filename.clone());
-    }) as Box<dyn FnMut(_)>);
-
-    reader.set_onload(Some(onload.as_ref().unchecked_ref()));
-    reader.read_as_array_buffer(&file).unwrap();
-    onload.forget();
 }
 
 pub fn create_get_request(

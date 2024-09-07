@@ -27,6 +27,7 @@
     padding: 10px;
     border-radius: 8px;
     display: flex;
+    width: 100%;
 
     label {
       margin: auto 20px;
@@ -35,6 +36,7 @@
     img {
       margin: auto 0;
       height: 30px;
+      width: 30px;
     }
 
     &:hover {
@@ -46,4 +48,9 @@
 
 .worker {
   border: 1px solid $orange;
+}
+
+.Item {
+  display: flex;
+  flex-direction: row;
 }

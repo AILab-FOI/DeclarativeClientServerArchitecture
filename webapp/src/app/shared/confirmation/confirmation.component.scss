@@ -1,0 +1,81 @@
+@import '../../../styles/variables.scss';
+
+:host {
+  width: 30vw;
+  height: 30vh;
+  background: white;
+  display: flex;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.Header {
+  display: flex;
+  flex-direction: row;
+  background: $background;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  padding: 16px 24px;
+  justify-content: space-between;
+
+  &Title {
+    display: flex;
+    gap: 10px;
+    flex-grow: 1;
+
+    &Close {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    &Text {
+      margin: auto 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  &Button {
+    background: rgba(27, 87, 177, 1);
+    outline: none;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    border: none;
+    gap: 8px;
+    padding: 6px 16px;
+
+    &:hover {
+      cursor: pointer;
+      background: rgba(27, 87, 177, .5);
+    }
+
+    &Img {
+      margin: auto 0;
+    }
+
+    &Label {
+      margin: auto 0;
+    }
+  }
+}
+
+.Content {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  place-content: center;
+  gap: 10px;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.disabled {
+  background: rgba(27, 87, 177, .5);
+  pointer-events: none;
+}

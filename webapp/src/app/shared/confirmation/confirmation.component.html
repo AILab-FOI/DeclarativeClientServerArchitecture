@@ -1,0 +1,28 @@
+<div class="Header">
+  <div class="HeaderTitle">
+    <img
+      (click)="close()"
+      class="HeaderTitleClose"
+      src="../../../assets/icons/close.svg"
+    />
+    <h1 class="HeaderTitleText">{{ title() }}</h1>
+  </div>
+  <button
+    [class.disabled]="entered() !== random"
+    class="HeaderButton"
+    (click)="save()"
+  >
+    <img class="HeaderButtonImg" src="../../../assets/icons/check.svg" />
+    <p class="HeaderButtonLabel">Save</p>
+  </button>
+</div>
+<div class="Content">
+  <h1>Are you sure?</h1>
+  <h2>{{ random }}</h2>
+  <input
+    #text
+    type="text"
+    [value]="entered()"
+    (keyup)="entered.set(text.value)"
+  />
+</div>

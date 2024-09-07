@@ -1,11 +1,13 @@
 <div class="ContentUser">
   <label class="ContentUserLabel" for="file-upload">
     @if (imgSource()) {
-      <img class="ContentUserLabelImg" [src]="imgSource()" />
+      <img class="ContentUserLabelImg" loading="lazy" [src]="imgSource()" />
     } @else {
       <img
         class="ContentUserLabelImg"
-        [src]="'http://localhost:5000/assets/' + data().slika"
+        [ngSrc]="data().slika"
+        height="300"
+        width="300"
       />
     }
     <label class="ContentUserLabelText">Choose new Image </label>

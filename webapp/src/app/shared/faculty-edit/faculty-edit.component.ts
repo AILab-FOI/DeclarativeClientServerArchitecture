@@ -1,12 +1,13 @@
-import { Component, model, output, signal } from '@angular/core';
-import { Fakultet } from '../../core';
+import { Component, inject, model, output, signal } from '@angular/core';
+import { Fakultet, TokenService } from '../../core';
 import { upload_file } from '../../../assets/pkg/client';
 import { InputComponent } from '../input/input.component';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-faculty-edit',
   standalone: true,
-  imports: [InputComponent],
+  imports: [InputComponent, NgOptimizedImage],
   templateUrl: './faculty-edit.component.html',
   styleUrl: './faculty-edit.component.scss',
 })
@@ -14,6 +15,7 @@ export class FacultyEditComponent {
   data = model<Fakultet>(undefined);
   query = output<Fakultet>();
   imgSource = signal<any>(undefined);
+  token = inject(TokenService);
 
   edit(field: string, value: unknown): void {
     this.data.update((d) => {
@@ -32,8 +34,12 @@ export class FacultyEditComponent {
         this.imgSource.set(reader.result);
       };
       reader.readAsDataURL(file);
-      let asd = await upload_file('fakultet', `${this.data().id}`, file);
-      console.log(asd);
+      upload_file(file, this.token.accessToken()).then((res) => {
+        this.data.update((d) => {
+          d.logo = res;
+          return d;
+        });
+      });
     }
   }
 }

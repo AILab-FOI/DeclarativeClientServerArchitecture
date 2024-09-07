@@ -77,7 +77,7 @@ parse_tip(to_atom, Status) ->
 
 obrisi(Id) ->
     Fun = fun() ->
-             sekcija_sadrzaj:obrisi_sekciju(Id),
+             sekcija_sadrzaj:obrisi_sadrzaj(Id),
              mnesia:delete({db_sadrzaj, Id})
           end,
     mnesia:transaction(Fun).
@@ -112,16 +112,20 @@ transform_sadrzaj(#db_sadrzaj{id = Id,
 
 transform_vrijednost(poveznica,
                      #poveznica{referenca = Referenca, vrijeme_kreiranja = VrijemeKreiranja}) ->
-    #{referenca => Referenca,
-      vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)};
+    #{referenca => Referenca, vrijeme_kreiranja => to_epoch(VrijemeKreiranja)};
 transform_vrijednost(dokument,
                      #dokument{referenca = Referenca, vrijeme_kreiranja = VrijemeKreiranja}) ->
-    #{referenca => Referenca,
-      vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)};
+    #{referenca => Referenca, vrijeme_kreiranja => to_epoch(VrijemeKreiranja)};
 transform_vrijednost(lekcija,
                      #lekcija{sadrzaj = Sadrzaj,
                               slika = Slika,
                               vrijeme_kreiranja = VrijemeKreiranja}) ->
     #{sadrzaj => Sadrzaj,
       slika => Slika,
-      vrijeme_kreiranja => calendar:datetime_to_gregorian_seconds(VrijemeKreiranja)}.
+      vrijeme_kreiranja => to_epoch(VrijemeKreiranja)}.
+
+to_epoch(Time) ->
+    CurrTime = calendar:datetime_to_gregorian_seconds(Time),
+    StartTime = calendar:datetime_to_gregorian_seconds({{1970, 1, 1}, {0, 0, 0}}),
+    EpochTime = CurrTime - StartTime,
+    EpochTime.

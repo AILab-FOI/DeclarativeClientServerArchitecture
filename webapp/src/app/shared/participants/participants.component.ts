@@ -10,18 +10,20 @@ import { ButtonComponent } from '../button/button.component';
 import { Router } from '@angular/router';
 import { openModal } from '../modal/modal.component';
 import { Dialog } from '@angular/cdk/dialog';
-import { UserEditComponent } from '../user-edit/user-edit.component';
 import { UserAddComponent } from '../user-add/user-add.component';
 import {
   dodaj_djelatnika_na_kolegij,
   dodaj_studenta_na_kolegij,
   dohvati_kolegij,
+  obrisi_djelatnika_na_kolegiju,
+  obrisi_studenta_na_kolegiju,
 } from '../../../assets/pkg/client';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-participants',
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, NgOptimizedImage],
   templateUrl: './participants.component.html',
   styleUrl: './participants.component.scss',
 })
@@ -53,6 +55,8 @@ export class ParticipantsComponent {
       tool: { view: UserAddComponent },
       inputs: {
         fakultet: this.userService.user().fakultet.id,
+        sudionici: this.participants(),
+        mode: 'all',
       },
       title: 'Edit section',
     });
@@ -93,5 +97,32 @@ export class ParticipantsComponent {
       }
       ref.close();
     });
+  }
+  delete(user: Korisnik): void {
+    if (user.uloga === 'Student') {
+      obrisi_studenta_na_kolegiju(
+        this.course(),
+        user.id,
+        this.tokenService.accessToken(),
+      ).then((_) => {
+        dohvati_kolegij(this.course(), this.tokenService.accessToken()).then(
+          (res: Kolegij) => {
+            this.participants.set(res.djelatnici.concat(res.studenti));
+          },
+        );
+      });
+    } else {
+      obrisi_djelatnika_na_kolegiju(
+        this.course(),
+        user.id,
+        this.tokenService.accessToken(),
+      ).then((_) => {
+        dohvati_kolegij(this.course(), this.tokenService.accessToken()).then(
+          (res: Kolegij) => {
+            this.participants.set(res.djelatnici.concat(res.studenti));
+          },
+        );
+      });
+    }
   }
 }

@@ -9,6 +9,11 @@ import { routes } from './app.routes';
 import { UserService, WasmService } from './core';
 import { TokenService } from './core/services/token.service';
 import { provideToastr } from 'ngx-toastr';
+import {
+  IMAGE_LOADER,
+  ImageLoaderConfig,
+  provideImgixLoader,
+} from '@angular/common';
 
 export function initializeWasm(
   wasmService: WasmService,
@@ -39,6 +44,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideAnimations(),
     provideToastr(),
+    provideImgixLoader('http://localhost:5000/assets/'),
     WasmService,
     {
       provide: APP_INITIALIZER,

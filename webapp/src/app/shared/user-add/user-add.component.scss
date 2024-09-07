@@ -2,9 +2,17 @@
 
 :host {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+}
+
+.Select {
+  display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 10px;
+
 }
 
 .User {
@@ -16,6 +24,7 @@
 
 
   img {
+    border-radius: 50%;
     width: 30px;
     height: 30px;
     margin: 0 auto;

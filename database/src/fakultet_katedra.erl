@@ -4,7 +4,7 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dohvati_katedre/1, dohvati_fakultet/1, dodaj_katedru_na_fakultet/2,
-         ucitaj_katedre/1, obrisi_fakultet/1, obrisi_katedru/1]).
+         ucitaj_katedre/1,ucitaj_fakultet/1, obrisi_fakultet/1, obrisi_katedru/1]).
 
 dodaj_katedru_na_fakultet(IdKatedra, IdFakultet) ->
     Fun = fun() ->
@@ -65,3 +65,7 @@ obrisi_katedru(IdKatedra) ->
 ucitaj_katedre(#{id := Id} = M) ->
     {atomic, Katedre} = dohvati_katedre(Id),
     M#{katedre => Katedre}.
+
+ucitaj_fakultet(#{id := Id} = M) ->
+    {atomic, Fakultet} = dohvati_fakultet(Id),
+    M#{fakultet => Fakultet}.

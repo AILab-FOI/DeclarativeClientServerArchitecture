@@ -13,7 +13,10 @@
   <div class="ContentUser">
     <img
       class="ContentUserImg"
-      [src]="'http://localhost:5000/assets/' + user().slika"
+      loading="lazy"
+      [ngSrc]="user().slika"
+      width="300"
+      height="300"
     />
     <div class="ContentUserInfo">
       <label class="ContentUserInfoText">Name: {{ user().ime }} </label>
@@ -39,7 +42,10 @@
   <div class="ContentFaculty">
     <img
       class="ContentFacultyImg"
-      [src]="'http://localhost:5000/assets/' + user().fakultet.logo"
+      loading="lazy"
+      [ngSrc]="user().fakultet.logo"
+      width="300"
+      height="300"
     />
     <div class="ContentFacultyInfo">
       <label class="ContentFacultyInfoText">{{ user().fakultet.opis }}</label>

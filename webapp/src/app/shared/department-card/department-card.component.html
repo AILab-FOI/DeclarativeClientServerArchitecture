@@ -1,9 +1,18 @@
 <div class="Card" (click)="goTo()">
   <div class="CardHeader">
-    <img class="CardHeaderImg" src="../../../assets/icons/course.png" />
+    <img
+      loading="lazy"
+      class="CardHeaderImg"
+      src="../../../assets/icons/course.png"
+    />
   </div>
 
   <div class="CardContent">
     <h1 class="CardContentHeading">{{ department().naziv }}</h1>
   </div>
 </div>
+@if (removable()) {
+  <div class="Absolute">
+    <app-button [title]="'department'" (query)="delete($event)"></app-button>
+  </div>
+}

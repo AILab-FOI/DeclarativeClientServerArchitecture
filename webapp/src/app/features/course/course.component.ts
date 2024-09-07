@@ -21,7 +21,6 @@ import {
   dohvati_djelatnika_na_kolegiju,
   dohvati_studenta_na_kolegiju,
   uredi_kolegij,
-  uredi_sekciju,
 } from '../../../assets/pkg/client';
 import { TokenService } from '../../core/services/token.service';
 import {
@@ -62,7 +61,7 @@ export class CourseComponent {
 
   constructor() {
     effect(() => {
-      this.get();
+      this.get(true);
     });
   }
   openEditSection(): void {
@@ -85,7 +84,7 @@ export class CourseComponent {
             this.token.accessToken(),
           ).then((res) => {
             if (res) {
-              this.get();
+              this.get(true);
             }
           });
         });
@@ -110,42 +109,42 @@ export class CourseComponent {
           course.slika,
           this.token.accessToken(),
         ).then((res) => {
-          this.get();
+          this.get(true);
         });
       }
       ref.close();
     });
   }
 
-  get() {
-    if (this.user.isWorker()) {
-      dohvati_djelatnika_na_kolegiju(
-        this.user.user().id,
-        this.id(),
-        this.token.accessToken(),
-      )
-        .then((res) => {
-          this.data.set(res as DjelatnikKolegij);
-          console.log(res);
-        })
-        .catch((err) => {
-          this.toast.error(err);
-          this.location.back();
-        });
-    } else {
-      dohvati_studenta_na_kolegiju(
-        this.user.user().id,
-        this.id(),
-        this.token.accessToken(),
-      )
-        .then((res) => {
-          console.log(res);
-          this.data.set(res as StudentKolegij);
-        })
-        .catch((err) => {
-          this.toast.error(err);
-          this.location.back();
-        });
+  get(reaction: boolean) {
+    if (reaction) {
+      if (this.user.isWorker()) {
+        dohvati_djelatnika_na_kolegiju(
+          this.user.user().id,
+          this.id(),
+          this.token.accessToken(),
+        )
+          .then((res) => {
+            this.data.set(res as DjelatnikKolegij);
+          })
+          .catch((err) => {
+            this.toast.error(err);
+            this.location.back();
+          });
+      } else {
+        dohvati_studenta_na_kolegiju(
+          this.user.user().id,
+          this.id(),
+          this.token.accessToken(),
+        )
+          .then((res) => {
+            this.data.set(res as StudentKolegij);
+          })
+          .catch((err) => {
+            this.toast.error(err);
+            this.location.back();
+          });
+      }
     }
   }
 }

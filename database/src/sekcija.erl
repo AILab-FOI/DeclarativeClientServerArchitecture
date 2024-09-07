@@ -43,7 +43,8 @@ dodaj(Naziv, Opis) ->
 
 obrisi(Id) ->
     Fun = fun() ->
-             sekcija_sadrzaj:obrisi_sekcija(Id),
+             sekcija_sadrzaj:obrisi_sekcije(Id),
+             kolegij_sekcija:obrisi_sekciju(Id),
              mnesia:delete({db_sekcija, Id})
           end,
     mnesia:transaction(Fun).

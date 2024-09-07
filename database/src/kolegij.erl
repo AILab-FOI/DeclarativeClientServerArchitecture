@@ -46,6 +46,7 @@ obrisi(Id) ->
              djelatnik_kolegij:obrisi_kolegij(Id),
              student_kolegij:obrisi_kolegij(Id),
              kolegij_sekcija:obrisi_kolegij(Id),
+             katedra_kolegij:obrisi_kolegij(Id),
              mnesia:delete({db_kolegij, Id})
           end,
     mnesia:transaction(Fun).

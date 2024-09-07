@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  inject,
   model,
   output,
   signal,
@@ -8,8 +9,9 @@ import {
   viewChild,
 } from '@angular/core';
 import { InputComponent } from '../input/input.component';
-import { Sadrzaj } from '../../core';
+import { Sadrzaj, TokenService } from '../../core';
 import { CommonModule } from '@angular/common';
+import { upload_file } from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-content-add',
@@ -22,6 +24,7 @@ export class ContentAddComponent {
   data = model.required<Sadrzaj>();
 
   query = output<Sadrzaj>();
+  token = inject(TokenService);
 
   selected = signal<string>('dokument');
 
@@ -48,5 +51,21 @@ export class ContentAddComponent {
     });
     this.selected.set(value);
     this.query.emit(this.data());
+  }
+
+  fileUpload(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {};
+      reader.readAsDataURL(file);
+      upload_file(file, this.token.accessToken()).then((res) => {
+        this.data.update((d) => {
+          d.vrijednost.referenca = res;
+          return d;
+        });
+      });
+    }
   }
 }

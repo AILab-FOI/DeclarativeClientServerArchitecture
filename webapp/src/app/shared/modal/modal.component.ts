@@ -5,7 +5,6 @@ import {
   input,
   model,
   output,
-  signal,
   Type,
   viewChild,
   ViewContainerRef,

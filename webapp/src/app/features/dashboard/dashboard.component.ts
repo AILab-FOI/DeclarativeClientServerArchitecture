@@ -1,6 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
-import { UserService } from '../../core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Kolegij, Korisnik, TokenService, UserService } from '../../core';
 import { CourseCardComponent } from '../../shared/course-card/course-card.component';
+import { dohvati_korisnika } from '../../../assets/pkg/client';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,12 +12,18 @@ import { CourseCardComponent } from '../../shared/course-card/course-card.compon
 })
 export class DashboardComponent {
   public user = inject(UserService);
+  public token = inject(TokenService);
   public username = computed(() => {
     return this.user.user().ime + ' ' + this.user.user().prezime;
   });
-  public courses = computed(() => {
-    return this.user.user().kolegiji;
-  });
-
-  constructor() {}
+  public courses = signal<Kolegij[]>([]);
+  constructor() {
+    effect(() => {
+      dohvati_korisnika(this.user.user().id, this.token.accessToken()).then(
+        (res: Korisnik) => {
+          this.courses.set(res.kolegiji);
+        },
+      );
+    });
+  }
 }

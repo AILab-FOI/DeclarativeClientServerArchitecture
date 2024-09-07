@@ -22,17 +22,4 @@ export class DepartmentEditComponent {
     });
     this.query.emit(this.data());
   }
-
-  async fileUpload(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imgSource.set(reader.result);
-      };
-      reader.readAsDataURL(file);
-      let asd = await upload_file('fakultet', `${this.data().id}`, file);
-    }
-  }
 }

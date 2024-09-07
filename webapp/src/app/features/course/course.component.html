@@ -40,10 +40,11 @@
   <hr />
   <div class="ContentPage">
     @if (page() === 0) {
-      @for (sekcija of course()?.sekcije; track sekcija) {
+      @for (sekcija of course()?.sekcije; track sekcija.id) {
         <app-section
           [isWorker]="user.isWorker()"
           [sekcija]="sekcija"
+          (query)="get($event)"
         ></app-section>
       } @empty {
         <h1>Nema sekcija na kolegiju</h1>

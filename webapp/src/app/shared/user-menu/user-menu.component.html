@@ -1,5 +1,11 @@
 <button (click)="userMenu.set(!this.userMenu())" class="User">
-  <img class="UserImg" [src]="'http://localhost:5000/assets/' + user().slika" />
+  <img
+    class="UserImg"
+    loading="lazy"
+    [ngSrc]="user().slika"
+    width="30"
+    height="30"
+  />
 </button>
 @if (userMenu()) {
   <div class="List">

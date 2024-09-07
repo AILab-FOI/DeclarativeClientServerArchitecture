@@ -15,10 +15,13 @@ import {
   UserService,
 } from '../../core';
 import {
+  dodaj_djelatnika_na_katedru,
   dodaj_djelatnika_na_kolegij,
   dodaj_kolegij,
   dodaj_kolegij_na_katedru,
   dohvati_katedru,
+  obrisi_djelatnika_na_katedri,
+  obrisi_kolegij,
   uredi_katedru,
 } from '../../../assets/pkg/client';
 import { Dialog } from '@angular/cdk/dialog';
@@ -30,11 +33,12 @@ import {
 import { DepartmentEditComponent } from '../../shared/department-edit/department-edit.component';
 import { CourseAddComponent } from '../../shared/course-add/course-add.component';
 import { UserAddComponent } from '../../shared/user-add/user-add.component';
+import { ButtonComponent } from '../../shared/button/button.component';
 
 @Component({
   selector: 'app-department',
   standalone: true,
-  imports: [CourseCardComponent, UserCardComponent],
+  imports: [CourseCardComponent, UserCardComponent, ButtonComponent],
   templateUrl: './department.component.html',
   styleUrl: './department.component.scss',
 })
@@ -45,12 +49,11 @@ export class DepartmentComponent {
   public department = signal<Katedra>(undefined);
   public isUserLeader = computed(() => {
     if (this.tokenService.exists()) {
-      console.log(this.userService.user().uloga);
       if (
         this.userService.user().uloga !== 'Student' &&
         this.department().djelatnici.find(
           (k) => k.id === this.userService.user().id,
-        ).tip === 'voditelj'
+        )?.tip === 'voditelj'
       ) {
         return true;
       }
@@ -81,7 +84,6 @@ export class DepartmentComponent {
           department.opis,
           this.tokenService.accessToken(),
         ).then((res) => {
-          console.log(res);
           dohvati_katedru(res).then((department) => {
             this.department.set(department);
           });
@@ -109,7 +111,7 @@ export class DepartmentComponent {
             this.department().id,
             course,
             this.tokenService.accessToken(),
-          ).then((res) => {
+          ).then((_) => {
             dodaj_djelatnika_na_kolegij(
               course,
               this.userService.user().id,
@@ -133,15 +135,46 @@ export class DepartmentComponent {
     let ref = openModal<Korisnik[]>(this.dialog, {
       data: structuredClone([]),
       tool: { view: UserAddComponent },
-      inputs: {},
-      title: 'Add course',
+      inputs: {
+        fakultet: this.department().fakultet.id,
+        sudionici: this.department().djelatnici,
+        mode: 'workers',
+      },
+      title: 'Add worker',
     });
     ref.componentInstance['query'].subscribe((user: Korisnik) => {
       if (user) {
-        console.log(user);
-        // TODO: UREĐIVANJE SEKCIJE QUERY
+        dodaj_djelatnika_na_katedru(
+          this.department().id,
+          user.id,
+          user.tip,
+          this.tokenService.accessToken(),
+        ).then((_) => {
+          dohvati_katedru(parseInt(this.id())).then((department) => {
+            this.department.set(department);
+          });
+        });
       }
       ref.close();
+    });
+  }
+
+  deleteCourse(id: number): void {
+    obrisi_kolegij(id, this.tokenService.accessToken()).then((_) =>
+      dohvati_katedru(parseInt(this.id())).then((department) => {
+        this.department.set(department);
+      }),
+    );
+  }
+  deleteWorker(id: number): void {
+    obrisi_djelatnika_na_katedri(
+      parseInt(this.id()),
+      id,
+      this.tokenService.accessToken(),
+    ).then((_) => {
+      dohvati_katedru(parseInt(this.id())).then((department) => {
+        this.department.set(department);
+      });
     });
   }
 }

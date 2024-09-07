@@ -19,7 +19,7 @@ handle_cors_request(Origin, #{method := Method} = Req, Env) ->
         <<"OPTIONS">> ->
             Req4 =
                 cowboy_req:set_resp_header(<<"access-control-allow-methods">>,
-                                           <<"GET, PUT, POST, PATCH">>,
+                                           <<"GET, DELETE, PUT, POST, PATCH">>,
                                            Req3),
             Req5 = cowboy_req:set_resp_header(<<"access-control-allow-headers">>, <<"*">>, Req4),
             Req6 = cowboy_req:set_resp_header(<<"access-control-max-age">>, <<"0">>, Req5),

@@ -1,8 +1,15 @@
 <div class="Nav">
   <div class="NavHeader">
-    @if (auth.isAuthenticated()) {
+    @if (
+      auth.isAuthenticated() &&
+      user.user().fakultet?.logo !== null &&
+      user.user().fakultet !== undefined
+    ) {
       <img
-        [src]="'http://localhost:5000/assets/' + user.user()?.fakultet.logo"
+        [ngSrc]="user.user()?.fakultet?.logo"
+        width="40"
+        height="40"
+        priority
       />
     } @else {
       <h2 class="NavHeaderHeading">AcademiX</h2>

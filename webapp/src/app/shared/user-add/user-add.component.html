@@ -1,10 +1,23 @@
-@for (korisnik of korisnici(); track korisnik.id) {
-  <div
-    class="User"
-    [class.selected]="korisnik.id === selected()"
-    (click)="select(korisnik)"
-  >
-    <img [src]="'http://localhost:5000/assets/' + korisnik.slika" />
-    <label>{{ korisnik.ime }} {{ korisnik.prezime }}</label>
-  </div>
+<div class="Select">
+  @for (korisnik of korisnici(); track korisnik.id) {
+    <div
+      class="User"
+      [class.selected]="korisnik.id === selected()"
+      (click)="select(korisnik)"
+    >
+      <img
+        loading="lazy"
+        [ngSrc]="'http://localhost:5000/assets/' + korisnik.slika"
+        width="30"
+        height="30"
+      />
+      <label>{{ korisnik.ime }} {{ korisnik.prezime }}</label>
+    </div>
+  }
+</div>
+@if (mode() === "workers") {
+  <select (change)="editTip($any($event.target).value)">
+    <option value="voditelj">Voditelj</option>
+    <option value="suradnik">Suradnik</option>
+  </select>
 }

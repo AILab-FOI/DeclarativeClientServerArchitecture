@@ -612,6 +612,8 @@ pub struct Katedra {
     kolegiji: Option<Vec<Kolegij>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     djelatnici: Option<Vec<Korisnik>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    fakultet: Option<Fakultet>,
 }
 
 #[wasm_bindgen]
@@ -662,6 +664,16 @@ impl Katedra {
     #[wasm_bindgen(setter)]
     pub fn set_djelatnici(&mut self, djelatnici: Vec<Korisnik>) {
         self.djelatnici = Some(djelatnici);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn fakultet(&self) -> Fakultet {
+        self.fakultet.clone().expect("Fakultet")
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_fakultet(&mut self, fakultet: Fakultet) {
+        self.fakultet = Some(fakultet);
     }
 }
 

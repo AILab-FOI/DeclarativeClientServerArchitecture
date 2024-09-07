@@ -1,11 +1,20 @@
 <div class="ContentUser">
   <label class="ContentUserLabel" for="file-upload">
     @if (imgSource()) {
-      <img class="ContentUserLabelImg" [src]="imgSource()" />
-    } @else {
       <img
         class="ContentUserLabelImg"
-        [src]="'http://localhost:5000/assets/' + data().logo"
+        loading="lazy"
+        [src]="imgSource()"
+        width="300"
+        height="300"
+      />
+    } @else {
+      <img
+        loading="lazy"
+        class="ContentUserLabelImg"
+        [ngSrc]="data().logo"
+        width="300"
+        height="300"
       />
     }
     <label class="ContentUserLabelText">Choose new Image </label>

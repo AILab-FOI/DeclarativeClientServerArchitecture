@@ -1,12 +1,12 @@
 import { Component, inject, input, model } from '@angular/core';
 import { AuthService, Korisnik } from '../../core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NgOptimizedImage],
   templateUrl: './user-menu.component.html',
   styleUrl: './user-menu.component.scss',
 })

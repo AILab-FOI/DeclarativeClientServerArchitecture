@@ -19,7 +19,7 @@
       </div>
     </div>
     <hr class="ContentSeparator" />
-    <label>Last updated: {{ lastUpdated() | date }} </label>
+    <label>Last updated: {{ lastUpdated() | date: "medium" }} </label>
   } @else {
     <h1>Loading...</h1>
   }

@@ -4,7 +4,7 @@
       <h1 class="ContentHeaderHeading">
         {{ faculty().naziv }} ({{ faculty().skraceno }})
       </h1>
-      @if (userService.isDean()) {
+      @if (userService.isDean() && userOnFaculty()) {
         <img
           (click)="openEdit()"
           class="ContentHeaderEdit"
@@ -16,7 +16,10 @@
     <div class="ContentFaculty">
       <img
         class="ContentFacultyImg"
-        [src]="'http://localhost:5000/assets/' + faculty().logo"
+        priority
+        [ngSrc]="faculty().logo"
+        width="300"
+        height="300"
       />
       <div class="ContentFacultyInfo">
         <label class="ContentFacultyInfoText">{{ faculty().opis }}</label>
@@ -29,7 +32,7 @@
     <hr class="ContentSeparator" />
     <div class="ContentHeader">
       <h2 class="ContentHeaderHeading">Departments</h2>
-      @if (userService.isDean()) {
+      @if (userService.isDean() && userOnFaculty()) {
         <img
           (click)="openEditDepartment()"
           class="ContentHeaderEdit"
@@ -39,7 +42,11 @@
     </div>
     <div class="ContentDepartments">
       @for (department of faculty()?.katedre; track department?.id) {
-        <app-department-card [department]="department"></app-department-card>
+        <app-department-card
+          [department]="department"
+          [removable]="userService.isDean() && userOnFaculty()"
+          (query)="delete($event)"
+        ></app-department-card>
       }
     </div>
 

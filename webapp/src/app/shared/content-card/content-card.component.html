@@ -1,41 +1,63 @@
 <ng-container [ngTemplateOutlet]="outlet()"></ng-container>
 <ng-template #lekcija>
-  <a class="Content" routerLink="/content/{{ sadrzaj().id }}">
-    <img
-      class="ContentImg"
-      src="../../../../assets/icons/lesson/lesson-24.png"
-    />
-    <label class="ContentText">{{ sadrzaj().naziv }}</label>
-    <label class="ContentSide">{{ datum() }}</label>
-  </a>
+  <div class="Item">
+    <a class="Content" routerLink="/content/{{ sadrzaj().id }}">
+      <img
+        class="ContentImg"
+        src="../../../../assets/icons/lesson/lesson-24.png"
+      />
+      <label class="ContentText">{{ sadrzaj().naziv }}</label>
+      <label class="ContentSide">{{ datum() | date: "medium" }}</label>
+    </a>
+
+    @if (user.isWorker()) {
+      <app-button [title]="'content'" (query)="query.emit($event)"
+        >Delete</app-button
+      >
+    }
+  </div>
 </ng-template>
 
 <ng-template #poveznica>
-  <a
-    class="Content"
-    href="{{ sadrzaj().vrijednost.referenca }}"
-    target="_blank"
-  >
-    <img
-      class="ContentImg"
-      src="../../../../assets/icons/url/external-link-24.png"
-    />
-    <label class="ContentText">{{ sadrzaj().naziv }}</label>
-    <label class="ContentSide">{{ datum() }}</label>
-  </a>
+  <div class="Item">
+    <a
+      class="Content"
+      href="{{ sadrzaj().vrijednost.referenca }}"
+      target="_blank"
+    >
+      <img
+        class="ContentImg"
+        src="../../../../assets/icons/url/external-link-24.png"
+      />
+      <label class="ContentText">{{ sadrzaj().naziv }}</label>
+      <label class="ContentSide">{{ datum() | date: "medium" }}</label>
+    </a>
+    @if (user.isWorker()) {
+      <app-button [title]="'content'" (query)="query.emit($event)"
+        >Delete</app-button
+      >
+    }
+  </div>
 </ng-template>
 
 <ng-template #dokument>
-  <a
-    class="Content"
-    href="{{ sadrzaj().vrijednost.referenca }}"
-    target="_blank"
-  >
-    <img
-      class="ContentImg"
-      src="../../../../assets/icons/document/document-24.png"
-    />
-    <label class="ContentText">{{ sadrzaj().naziv }}</label>
-    <label class="ContentSide">{{ datum() }}</label>
-  </a>
+  <div class="Item">
+    <a
+      class="Content"
+      href="http://localhost:5000/assets/{{ sadrzaj().vrijednost.referenca }}"
+      target="_blank"
+    >
+      <img
+        class="ContentImg"
+        src="../../../../assets/icons/document/document-24.png"
+      />
+      <label class="ContentText">{{ sadrzaj().naziv }}</label>
+      <label class="ContentSide">{{ datum() | date: "medium" }}</label>
+    </a>
+    @if (user.isWorker()) {
+      <app-button [title]="'content'" (query)="query.emit($event)"
+        >Delete</app-button
+      >
+    }
+  </div>
 </ng-template>

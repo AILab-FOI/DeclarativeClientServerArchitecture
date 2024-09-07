@@ -30,9 +30,14 @@
     }
 
     &Right {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
 
       &Edit {
         width: 24px;
+        height: 24px;
+        margin: auto 0;
         margin-left: auto;
       }
     }

@@ -2,7 +2,10 @@
   <div class="CardHeader">
     <img
       class="CardHeaderImg"
-      [src]="'http://localhost:5000/assets/' + faculty().logo"
+      loading="lazy"
+      [ngSrc]="faculty().logo"
+      width="200"
+      height="200"
     />
   </div>
 

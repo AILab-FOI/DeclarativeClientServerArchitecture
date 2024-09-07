@@ -21,13 +21,21 @@
           class="SectionHeaderRightEdit"
           src="../../../assets/icons/icons8-edit-24.png"
         />
+
+        <app-button
+          [title]="'section'"
+          (query)="deleteSection($event)"
+        ></app-button>
       </div>
     </div>
     @if (open()) {
       <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>
       <div class="SectionContent">
         @for (sadrzaj of sekcija().sadrzaj; track sadrzaj.id) {
-          <app-content-card [sadrzaj]="sadrzaj"></app-content-card>
+          <app-content-card
+            [sadrzaj]="sadrzaj"
+            (query)="delete($event, sadrzaj.id)"
+          ></app-content-card>
         }
         <img
           (click)="openEditContent()"
@@ -60,8 +68,11 @@
       @if (open()) {
         <label class="SectionHeaderHeading">{{ sekcija().opis }}</label>
         <div class="SectionContent">
-          @for (sadrzaj of sekcija().sadrzaj; track sadrzaj) {
-            <app-content-card [sadrzaj]="sadrzaj"></app-content-card>
+          @for (sadrzaj of sekcija().sadrzaj; track sadrzaj.id) {
+            <app-content-card
+              [sadrzaj]="sadrzaj"
+              (query)="delete($event, sadrzaj.id)"
+            ></app-content-card>
           }
         </div>
       }

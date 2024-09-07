@@ -4,7 +4,8 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 -export([dohvati_katedre/1, dohvati_djelatnike/1, dodaj_djelatnika_na_katedru/3,
-         ucitaj_djelatnike/1, ucitaj_katedre/1, obrisi_katedru/1, obrisi_djelatnika/1]).
+         ucitaj_djelatnike/1, ucitaj_katedre/1, obrisi_katedru/1, obrisi_djelatnika/1,
+         obrisi_djelatnika_na_katedri/2]).
 
 dodaj_djelatnika_na_katedru(IdDjelatnik, IdKatedra, Tip) ->
     Fun = fun() ->
@@ -69,6 +70,22 @@ obrisi_djelatnika(IdDjelatnik) ->
              Delete = mnesia:select(db_katedra_djelatnik, Match),
              lists:foreach(fun(IdKatedra) -> mnesia:delete({db_katedra_djelatnik, IdKatedra}) end,
                            Delete)
+          end,
+
+    mnesia:transaction(Fun).
+
+obrisi_djelatnika_na_katedri(IdDjelatnik, IdKatedra) ->
+    Fun = fun() ->
+             Match =
+                 ets:fun2ms(fun(#db_katedra_djelatnik{id_djelatnik = Djelatnik,
+                                                      id_katedra = Katedra} =
+                                    R)
+                               when Djelatnik =:= IdDjelatnik andalso Katedra =:= IdKatedra ->
+                               R
+                            end),
+             % NOTE: Testirati!!!
+             Delete = mnesia:select(db_katedra_djelatnik, Match),
+             lists:foreach(fun(Rec) -> mnesia:delete_object(Rec) end, Delete)
           end,
 
     mnesia:transaction(Fun).

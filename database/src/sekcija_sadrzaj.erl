@@ -59,7 +59,7 @@ obrisi_sekcije(IdSekcija) ->
                             end),
 
              Delete = mnesia:select(db_sekcija_sadrzaj, Match),
-             lists:foreach(fun(IdKolegij) -> mnesia:delete({db_katedra_kolegij, IdKolegij}) end,
+             lists:foreach(fun(IdKolegij) -> mnesia:delete({db_sekcija_sadrzaj, IdKolegij}) end,
                            Delete)
           end,
     mnesia:transaction(Fun).

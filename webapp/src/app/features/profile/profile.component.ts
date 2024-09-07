@@ -19,11 +19,12 @@ import {
   uredi_studenta,
 } from '../../../assets/pkg/client';
 import { DepartmentCardComponent } from '../../shared/department-card/department-card.component';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CourseCardComponent, DepartmentCardComponent],
+  imports: [CourseCardComponent, DepartmentCardComponent, NgOptimizedImage],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -36,7 +37,6 @@ export class ProfileComponent {
     return parseInt(this.id()) === this.userService.user().id;
   });
   public courses = computed(() => {
-    console.log(this.user());
     return this.user().kolegiji;
   });
 
@@ -44,12 +44,10 @@ export class ProfileComponent {
 
   constructor() {
     effect(() => {
-      if (!this.isCurrenUser()) {
-        dohvati_korisnika(
-          parseInt(this.id()),
-          this.tokenService.accessToken(),
-        ).then((res) => this.user.set(res));
-      }
+      dohvati_korisnika(
+        parseInt(this.id()),
+        this.tokenService.accessToken(),
+      ).then((res) => this.user.set(res));
     });
   }
   openEdit(): void {

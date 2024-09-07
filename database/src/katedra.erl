@@ -12,7 +12,7 @@ dohvati(Id) ->
     Fun = fun() ->
              case mnesia:read({db_katedra, Id}) of
                  [Katedra] -> ucitaj(core, Katedra);
-                 [] -> {error, "Katedra ne postoji"}
+                 [] -> {error, <<"Katedra ne postoji">>}
              end
           end,
     mnesia:transaction(Fun).
@@ -21,7 +21,7 @@ dohvati(Type, Id) ->
     Fun = fun() ->
              case mnesia:read({db_katedra, Id}) of
                  [Katedra] -> ucitaj(Type, Katedra);
-                 [] -> {error, "Katedra ne postoji"}
+                 [] -> {error, <<"Katedra ne postoji">>}
              end
           end,
     mnesia:transaction(Fun).
@@ -43,6 +43,7 @@ obrisi(Id) ->
     Fun = fun() ->
              katedra_djelatnik:obrisi_katedru(Id),
              katedra_kolegij:obrisi_katedru(Id),
+             fakultet_katedra:obrisi_katedru(Id),
              mnesia:delete({db_katedra, Id})
           end,
     mnesia:transaction(Fun).
@@ -70,7 +71,8 @@ ucitaj(djelatnici, R) ->
 ucitaj(full, R) ->
     M0 = transform_katedra(R),
     M1 = katedra_kolegij:ucitaj_kolegije(M0),
-    katedra_djelatnik:ucitaj_djelatnike(M1).
+    M2 = katedra_djelatnik:ucitaj_djelatnike(M1),
+    fakultet_katedra:ucitaj_fakultet(M2).
 
 transform_katedra(#db_katedra{id = Id,
                               naziv = Naziv,

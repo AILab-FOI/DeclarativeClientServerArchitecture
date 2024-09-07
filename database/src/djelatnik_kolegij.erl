@@ -73,7 +73,7 @@ obrisi_kolegij(IdKolegij) ->
                             end),
 
              Delete = mnesia:select(db_djelatnik_kolegij, Match),
-             lists:foreach(fun(Id) -> mnesia:delete({db_katedra_kolegij, Id}) end, Delete)
+             lists:foreach(fun(Id) -> mnesia:delete({db_djelatnik_kolegij, Id}) end, Delete)
           end,
     mnesia:transaction(Fun).
 
@@ -86,7 +86,7 @@ obrisi_djelatnika(IdDjelatnik) ->
                             end),
 
              Delete = mnesia:select(db_djelatnik_kolegij, Match),
-             lists:foreach(fun(Id) -> mnesia:delete({db_katedra_kolegij, Id}) end, Delete)
+             lists:foreach(fun(Id) -> mnesia:delete({db_djelatnik_kolegij, Id}) end, Delete)
           end,
     mnesia:transaction(Fun).
 

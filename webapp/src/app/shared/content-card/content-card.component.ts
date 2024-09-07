@@ -3,17 +3,19 @@ import {
   computed,
   inject,
   input,
+  output,
   TemplateRef,
   viewChild,
 } from '@angular/core';
-import { Sadrzaj, UserService } from '../../core';
+import { Sadrzaj, TokenService, UserService } from '../../core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ButtonComponent } from '../button/button.component';
 
 @Component({
   selector: 'app-content-card',
   standalone: true,
-  imports: [DatePipe, CommonModule, RouterModule],
+  imports: [DatePipe, CommonModule, RouterModule, ButtonComponent],
   templateUrl: './content-card.component.html',
   styleUrl: './content-card.component.scss',
 })
@@ -23,11 +25,12 @@ export class ContentCardComponent {
   private poveznica = viewChild('poveznica', { read: TemplateRef });
   private dokument = viewChild('dokument', { read: TemplateRef });
   private kviz = viewChild('kviz', { read: TemplateRef });
+  public token = inject(TokenService);
   public user = inject(UserService);
-
+  public query = output<boolean>();
   public datum = computed(() => {
     let date = new Date(
-      parseInt(this.sadrzaj().vrijednost.vrijeme_kreiranja.toString()) * 10000,
+      parseInt(this.sadrzaj().vrijednost.vrijeme_kreiranja.toString()) * 1000,
     );
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   });

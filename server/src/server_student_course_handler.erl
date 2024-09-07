@@ -23,7 +23,19 @@ charsets_provided(Req, State) ->
     {[<<"utf-8">>], Req, State}.
 
 delete_resource(Req, State) ->
-    request:delete(Req, State, fun(Id) -> student_kolegij:obrisi_student_na_kolegiju(Id) end).
+    case utils:gather_json(Req) of
+        {ok, Map, Req2} ->
+            case student_kolegij:obrisi_studenta_na_kolegiju(
+                     maps:get(<<"id_student">>, Map), maps:get(<<"id_kolegij">>, Map))
+            of
+                {atomic, ok} ->
+                    request:send_response(Req2, <<"ok">>, State);
+                {aborted, Reason} ->
+                    request:err(400, Reason, Req, State)
+            end;
+        _ ->
+            request:err(400, "Db Error", Req, State)
+    end.
 
 to_html(Req, State) ->
     html_request(Req, State).

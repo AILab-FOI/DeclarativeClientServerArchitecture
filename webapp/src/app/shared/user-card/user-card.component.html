@@ -1,4 +1,4 @@
 <div (click)="goTo()">
-  <img [src]="'http://localhost:5000/assets/' + user().slika" />
+  <img [ngSrc]="user().slika" width="50" height="50" />
   <label>{{ user().ime }} {{ user().prezime }}</label>
 </div>

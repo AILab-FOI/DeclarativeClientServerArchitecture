@@ -26,7 +26,7 @@ export class ContentComponent {
   public id = input.required<string>();
   public lastUpdated = computed(() => {
     return new Date(
-      parseInt(this.content()?.vrijednost.vrijeme_kreiranja.toString()),
+      parseInt(this.content()?.vrijednost.vrijeme_kreiranja.toString()) * 1000,
     );
   });
   private dialog = inject(Dialog);
@@ -36,7 +36,6 @@ export class ContentComponent {
         parseInt(this.id()),
         this.tokenService.accessToken(),
       ).then((sadrzaj) => {
-        console.log(sadrzaj);
         this.content.set(sadrzaj);
       });
     });
@@ -59,7 +58,6 @@ export class ContentComponent {
         ).then((res) => {
           dohvati_sadrzaj(res, this.tokenService.accessToken()).then(
             (sadrzaj) => {
-              console.log(sadrzaj);
               this.content.set(sadrzaj);
             },
           );

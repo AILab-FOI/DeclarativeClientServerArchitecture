@@ -1,12 +1,13 @@
-import { Component, model, output, signal } from '@angular/core';
-import { defaultKorisnik, Korisnik } from '../../core';
+import { Component, inject, model, output, signal } from '@angular/core';
+import { defaultKorisnik, Korisnik, TokenService } from '../../core';
 import { InputComponent } from '../input/input.component';
-import { send_multipart, upload_file } from '../../../assets/pkg/client';
+import { upload_file } from '../../../assets/pkg/client';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-user-edit',
   standalone: true,
-  imports: [InputComponent],
+  imports: [InputComponent, NgOptimizedImage],
   templateUrl: './user-edit.component.html',
   styleUrl: './user-edit.component.scss',
 })
@@ -14,6 +15,7 @@ export class UserEditComponent {
   data = model<Korisnik>(defaultKorisnik());
   query = output<Korisnik>();
   imgSource = signal<any>(undefined);
+  token = inject(TokenService);
 
   edit(field: string, value: unknown): void {
     this.data.update((d) => {
@@ -30,7 +32,7 @@ export class UserEditComponent {
     this.query.emit(this.data());
   }
 
-  async fileUpload(event: Event) {
+  fileUpload(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
 
     if (file) {
@@ -39,7 +41,12 @@ export class UserEditComponent {
         this.imgSource.set(reader.result);
       };
       reader.readAsDataURL(file);
-      let asd = await upload_file('korisnik', `${this.data().id}`, file);
+      upload_file(file, this.token.accessToken()).then((res) => {
+        this.data.update((d) => {
+          d.slika = res;
+          return d;
+        });
+      });
     }
   }
 }

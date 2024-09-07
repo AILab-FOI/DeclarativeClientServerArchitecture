@@ -50,14 +50,13 @@ obrisi_kolegij(IdKolegij) ->
 obrisi_sekciju(IdSekcija) ->
     Fun = fun() ->
              Match =
-                 ets:fun2ms(fun(#db_kolegij_sekcija{id_kolegij = Kolegij, id_sekcija = Sekcija})
+                 ets:fun2ms(fun(#db_kolegij_sekcija{id_kolegij = Kolegij, id_sekcija = Sekcija} = R)
                                when Sekcija =:= IdSekcija ->
-                               Kolegij
+                               R
                             end),
 
              Delete = mnesia:select(db_kolegij_sekcija, Match),
-             lists:foreach(fun(IdKolegij) -> mnesia:delete({db_katedra_kolegij, IdKolegij}) end,
-                           Delete)
+             lists:foreach(fun(Rec) -> mnesia:delete_object(Rec) end, Delete)
           end,
     mnesia:transaction(Fun).
 

@@ -4,6 +4,7 @@ import { Response } from './wasm.service';
 import { MyError, login, Tokens } from '../../../assets/pkg/client';
 import { UserService } from './user.service';
 import { TokenService } from './token.service';
+import { defaultKorisnik } from '../types/defaults';
 
 export type LoginHandler<T> = { status: boolean; data: T };
 
@@ -32,6 +33,7 @@ export class AuthService {
 
   logout(): void {
     this.token.removeAccessToken();
+    this.user.user.set(defaultKorisnik());
     this.router.navigate(['home']);
   }
 

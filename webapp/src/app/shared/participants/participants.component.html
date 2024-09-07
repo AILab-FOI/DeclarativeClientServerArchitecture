@@ -1,15 +1,28 @@
 <div class="Content">
   @if (userService.isWorker()) {
-    <button (click)="openEdit()">Add Student</button>
+    <button (click)="openEdit()">Add user</button>
   }
   @for (participant of participants(); track participant.id) {
-    <div
-      class="ContentItem"
-      [class.worker]="participant.uloga !== 'Student'"
-      (click)="goTo(participant.id)"
-    >
-      <img [src]="'http://localhost:5000/assets/' + participant.slika" />
-      <label>{{ participant.ime }} {{ participant.prezime }}</label>
+    <div class="Item">
+      <div
+        class="ContentItem"
+        [class.worker]="participant.uloga !== 'Student'"
+        (click)="goTo(participant.id)"
+      >
+        <img
+          loading="lazy"
+          [ngSrc]="participant.slika"
+          width="30"
+          height="30"
+        />
+        <label>{{ participant.ime }} {{ participant.prezime }}</label>
+      </div>
+      @if (userService.isWorker()) {
+        <app-button
+          [title]="'user from course'"
+          (query)="delete(participant)"
+        ></app-button>
+      }
     </div>
   }
 </div>

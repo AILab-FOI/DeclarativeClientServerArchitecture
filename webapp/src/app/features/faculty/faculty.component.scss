@@ -17,6 +17,10 @@
       height: 24px;
       margin: auto 0;
       margin-left: auto;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 
